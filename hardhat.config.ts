@@ -11,9 +11,10 @@ task('accounts', 'Prints the list of accounts', async (taskArgs, hre) => {
 });
 
 const config: HardhatUserConfig = {
-  defaultNetwork: 'hardhat',
+  defaultNetwork: 'localhost',
   networks: {
     hardhat: {
+      chainId: 1337,
       mining: {
         auto: false,
         interval: 5000,

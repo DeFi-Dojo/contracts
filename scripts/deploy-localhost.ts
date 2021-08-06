@@ -79,9 +79,6 @@ async function main() {
 
   console.log('Token1 deployed to:', token1.address);
   console.log('Token2 deployed to:', token2.address);
-
-  // Create pair of deployed tokens
-  await uniswapV2Factory.createPair(token1.address, token2.address);
 }
 
 main()
