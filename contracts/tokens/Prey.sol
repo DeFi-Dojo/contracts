@@ -20,7 +20,7 @@ contract Prey is
         public
         ERC20(name_, symbol_)
     {
-        _setupContractId("DummyMintableERC20");
+        _setupContractId("Prey");
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
         _setupRole(PREDICATE_ROLE, _msgSender());
 

@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const { RINKEBY_API_URL, ROPSTEN_API_URL, DEFAULT_NETWORK, POLYGON_MUMBAI_API_URL, WALLET_MNEMONIC } = process.env;
+const { RINKEBY_API_URL, ROPSTEN_API_URL, DEFAULT_NETWORK, POLYGON_MUMBAI_API_URL, WALLET_MNEMONIC, GOERLI_API_URL } = process.env;
 
 task('accounts', 'Prints the list of accounts', async (taskArgs, hre) => {
   const accounts = await hre.ethers.getSigners();
@@ -40,6 +40,10 @@ const config: HardhatUserConfig = {
     },
     matic: {
       url: POLYGON_MUMBAI_API_URL,
+      accounts,
+    },
+    goerli: {
+      url: GOERLI_API_URL,
       accounts,
     },
   },
