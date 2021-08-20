@@ -541,7 +541,6 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
 
     // **** SWAP (supporting fee-on-transfer tokens) ****
     // requires the initial amount to have already been sent to the first pair
-    /*
     function _swapSupportingFeeOnTransferTokens(address[] memory path, address _to) internal virtual {
         for (uint i; i < path.length - 1; i++) {
             (address input, address output) = (path[i], path[i + 1]);
@@ -566,7 +565,7 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
         address[] calldata path,
         address to,
         uint deadline
-    ) external virtual override ensure(deadline) {
+    ) external virtual ensure(deadline) {
         TransferHelper.safeTransferFrom(
             path[0], msg.sender, UniswapV2Library.pairFor(factory, path[0], path[1]), amountIn
         );
@@ -585,7 +584,6 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
     )
         external
         virtual
-        override
         payable
         ensure(deadline)
     {
@@ -609,7 +607,6 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
     )
         external
         virtual
-        override
         ensure(deadline)
     {
         require(path[path.length - 1] == WETH, 'UniswapV2Router: INVALID_PATH');
@@ -622,7 +619,6 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
         IWETH(WETH).withdraw(amountOut);
         TransferHelper.safeTransferETH(to, amountOut);
     }
-    */
 
     // **** LIBRARY FUNCTIONS ****
     function quote(
