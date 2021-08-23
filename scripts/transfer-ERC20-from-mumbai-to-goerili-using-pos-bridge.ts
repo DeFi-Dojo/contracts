@@ -13,10 +13,13 @@ async function main() {
   console.log(`Making transfer using address: ${owner.address}`);
 
   const from = owner.address;
-  const to = owner.address;
 
   const { matic, goerli } = hre.config.networks;
 
+
+  if(Array.isArray(matic.accounts) || typeof matic.accounts === 'string') {
+    throw new Error('Wrong config of matic, mnemonic not found')
+  }
 
   if(Array.isArray(goerli.accounts) || typeof goerli.accounts === 'string') {
     throw new Error('Wrong config of goerli, mnemonic not found')
@@ -30,33 +33,36 @@ async function main() {
     throw new Error('Wrong config of matic, url not found')
   }
 
+  const maticProvider = new HDWalletProvider(matic.accounts.mnemonic, matic.url)
+
   const parentProvider = new HDWalletProvider(goerli.accounts.mnemonic, goerli.url)
 
   const maticPOSClient = new MaticPOSClient({
       network: "testnet",
       version: "mumbai",
       parentProvider,
-      maticProvider: matic.url,
+      maticProvider,
   })
 
-  const amountEther = '0.01';
+  const amountMatic = '0.01';
 
-  const amount = hre.web3.utils.toWei(amountEther, 'ether')
+  const amount = hre.web3.utils.toWei(amountMatic, 'ether')
 
-  console.log(`sending ${amountEther} ether`);
+  console.log(`sending ${amountMatic} matic`);
 
-    /*
+  /*
    https://docs.matic.network/docs/develop/network-details/mapped-tokens/ 
-  change to your own root token address
+  change to your own child token address
   */
-  const rootTokenAddressOfDummyERC20Token = '0x655F2166b0709cd575202630952D71E2bB0d61Af';
+  const childTokenAddressOfDummyERC20Token = '0xfe4F5145f6e09952a5ba9e956ED0C25e3Fa4c7F1';
 
-  await maticPOSClient.approveERC20ForDeposit(rootTokenAddressOfDummyERC20Token, amount, { from})
+  const burn = await maticPOSClient.burnERC20(childTokenAddressOfDummyERC20Token, amount, { from });
 
-  await maticPOSClient.depositERC20ForUser(rootTokenAddressOfDummyERC20Token, to, amount, {
-      from,
-      gasPrice: "100000000000"
-  })
+  const { transactionHash: burnTransationHash } = burn;
+
+  console.log(`Burned successfully, transaction hash: ${burnTransationHash}`);
+
+  await maticPOSClient.exitERC20(burnTransationHash, { from });
 
   console.log('transfer completed');
 
