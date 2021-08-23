@@ -17,11 +17,8 @@ async function main() {
 
   const { matic, goerli } = hre.config.networks;
 
-  let mnemonic = '';
 
-  if(!Array.isArray(goerli.accounts) && typeof goerli.accounts !== 'string') {
-    mnemonic = goerli.accounts.mnemonic;
-  } else {
+  if(Array.isArray(goerli.accounts) || typeof goerli.accounts === 'string') {
     throw new Error('Wrong config of goerli, mnemonic not found')
   }
 
@@ -33,7 +30,7 @@ async function main() {
     throw new Error('Wrong config of matic, url not found')
   }
 
-  const { privateKey } = ethers.Wallet.fromMnemonic(mnemonic);
+  const { privateKey } = ethers.Wallet.fromMnemonic(goerli.accounts.mnemonic);
 
   const parentProvider = new HDWalletProvider(privateKey, goerli.url)
 
