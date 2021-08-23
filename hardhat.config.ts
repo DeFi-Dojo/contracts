@@ -1,5 +1,6 @@
 import '@nomiclabs/hardhat-waffle';
 import 'hardhat-ethernal';
+import "@nomiclabs/hardhat-web3";
 import { task, HardhatUserConfig } from 'hardhat/config';
 import dotenv from 'dotenv';
 
