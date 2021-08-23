@@ -1,5 +1,7 @@
 import hre, { ethers } from 'hardhat'
 
+// token address 0x57A621d2A54A10282B843415ad86392Fc461295f on goerli
+
 async function main() {
   const [owner] = await ethers.getSigners()
   console.log(`Deploying contracts using address: ${owner.address}`);
@@ -7,6 +9,8 @@ async function main() {
   // Deploy Tokens
   const Prey = await ethers.getContractFactory('Prey');
   const prey = await Prey.deploy("Prey", "PREY");
+
+  console.log(`Deploy`);
 
   await prey.deployed();
 
@@ -28,14 +32,6 @@ async function main() {
   await contract.grantRole(minterRole, MintableERC20PredicateProxyOnGorilla);
 
   console.log('Role granted');
-
-  // let provider = ethers.getDefaultProvider();
-
-  // let contract = new ethers.Contract(prey.address, prey.abi, provider);
-
-  // let tx = await contractWithSigner.setValue("I like turtles.");
-
-  // contract.
 }
 
 main()
