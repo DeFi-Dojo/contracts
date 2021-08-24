@@ -3,12 +3,7 @@ import { MaticPOSClient } from "@maticnetwork/maticjs";
 import HDWalletProvider from "@truffle/hdwallet-provider";
 import { typeCheck, eventTracking } from "../utils";
 
-const wait = () =>
-  new Promise<void>((resolve) => {
-    setTimeout(() => {
-      resolve();
-    }, 1000 * 60 * 2);
-  });
+// mumbai - goerli bridge part 1
 
 async function main() {
   const [owner] = await ethers.getSigners();
@@ -101,15 +96,20 @@ async function main() {
 
   console.log(`burned transaction confirmed on the etherum chain`);
   console.log(log);
+  console.log(
+    `change the burnTransationHash in the scripts/burn-exit-ERC20-from-mumbai-to-goerli-using-pos-bridge.ts to the: ${burnTransationHash}`
+  );
+  console.log("Than run the command:");
+  console.log(
+    "npx hardhat run scripts/burn-exit-ERC20-from-mumbai-to-goerli-using-pos-bridge"
+  );
 
-  await wait();
-
-  await maticPOSClient.exitERC20(burnTransationHash, { from });
-
-  console.log("transfer completed");
+  console.log(
+    'TODO: This is wrong way, merge it one script. Unfortunately if we try to do everything in one script there is error: { code: -32000, message: "nonce too low" }'
+  );
 
   // @ts-ignore
-  provider.disconnect();
+  parentWebsocketProvider.disconnect();
 }
 
 main()
