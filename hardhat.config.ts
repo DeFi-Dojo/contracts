@@ -1,14 +1,21 @@
-import '@nomiclabs/hardhat-waffle';
-import 'hardhat-ethernal';
+import "@nomiclabs/hardhat-waffle";
+import "hardhat-ethernal";
 import "@nomiclabs/hardhat-web3";
-import { task, HardhatUserConfig } from 'hardhat/config';
-import dotenv from 'dotenv';
+import { task, HardhatUserConfig } from "hardhat/config";
+import dotenv from "dotenv";
 
 dotenv.config();
 
-const { RINKEBY_API_URL, ROPSTEN_API_URL, DEFAULT_NETWORK, POLYGON_MUMBAI_API_URL, WALLET_MNEMONIC, GOERLI_API_URL } = process.env;
+const {
+  RINKEBY_API_URL,
+  ROPSTEN_API_URL,
+  DEFAULT_NETWORK,
+  POLYGON_MUMBAI_API_URL,
+  WALLET_MNEMONIC,
+  GOERLI_API_URL,
+} = process.env;
 
-task('accounts', 'Prints the list of accounts', async (taskArgs, hre) => {
+task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   const accounts = await hre.ethers.getSigners();
 
   for (const account of accounts) {
@@ -18,7 +25,7 @@ task('accounts', 'Prints the list of accounts', async (taskArgs, hre) => {
 
 const accounts = {
   mnemonic: WALLET_MNEMONIC,
-}
+};
 
 const config: HardhatUserConfig = {
   defaultNetwork: DEFAULT_NETWORK,
@@ -51,16 +58,7 @@ const config: HardhatUserConfig = {
   solidity: {
     compilers: [
       {
-        version: '0.5.16',
-        settings: {
-          optimizer: {
-             enabled: true,
-             runs: 200,
-          },
-        },
-      },
-      { 
-        version: '0.6.6',
+        version: "0.5.16",
         settings: {
           optimizer: {
             enabled: true,
@@ -68,8 +66,17 @@ const config: HardhatUserConfig = {
           },
         },
       },
-      { 
-        version: '0.7.6',
+      {
+        version: "0.6.6",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
+      },
+      {
+        version: "0.7.6",
         settings: {
           optimizer: {
             enabled: true,
@@ -80,12 +87,12 @@ const config: HardhatUserConfig = {
     ],
   },
   paths: {
-    sources: './contracts',
-    cache: './cache',
-    artifacts: './artifacts',
+    sources: "./contracts",
+    cache: "./cache",
+    artifacts: "./artifacts",
   },
   mocha: {
-      timeout: 20000,
+    timeout: 20000,
   },
 };
 

@@ -7,7 +7,9 @@ import {NativeMetaTransaction} from "@maticnetwork/pos-portal/contracts/common/N
 import {ContextMixin} from "@maticnetwork/pos-portal/contracts/common/ContextMixin.sol";
 import {AccessControlMixin} from "@maticnetwork/pos-portal/contracts/common/AccessControlMixin.sol";
 
-contract Prey is
+// https://docs.matic.network/docs/develop/ethereum-matic/mintable-assets
+// inspired by https://github.com/maticnetwork/pos-portal/blob/master/contracts/root/RootToken/DummyERC20.sol
+contract DexToken is
     ERC20,
     AccessControlMixin,
     NativeMetaTransaction,
@@ -20,7 +22,7 @@ contract Prey is
         public
         ERC20(name_, symbol_)
     {
-        _setupContractId("Prey");
+        _setupContractId("DexToken");
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
         _setupRole(PREDICATE_ROLE, _msgSender());
 
