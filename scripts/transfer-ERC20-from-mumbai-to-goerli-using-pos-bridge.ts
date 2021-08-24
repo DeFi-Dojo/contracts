@@ -27,7 +27,7 @@ async function main() {
     throw new Error("Wrong config of matic, url not found");
   }
 
-  // https://gitlab.ifi.uzh.ch/rodrigues/scflare/-/tree/a5ebdb0f288ec4909cfc38acf630cf9ddc4f1604/Truffle/node_modules/truffle-hdwallet-provider
+  // https://github.com/trufflesuite/truffle-hdwallet-provider
   // set the shareNonce to false so maticProvider and parentProvider won't share nonce which causes errors
   const maticProvider = new HDWalletProvider(
     matic.accounts.mnemonic,
