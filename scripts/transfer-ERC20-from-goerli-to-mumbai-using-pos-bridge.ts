@@ -36,7 +36,7 @@ async function main() {
     maticProvider: matic.url,
   });
 
-  const amountToken = "0.05";
+  const amountToken = "0.01";
 
   const amount = hre.web3.utils.toWei(amountToken, "ether");
 
