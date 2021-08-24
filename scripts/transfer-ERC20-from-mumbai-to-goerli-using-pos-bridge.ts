@@ -3,8 +3,6 @@ import { MaticPOSClient } from "@maticnetwork/maticjs";
 import HDWalletProvider from "@truffle/hdwallet-provider";
 import { typeCheck, eventTracking } from "../utils";
 
-// mumbai - goerli bridge part 1
-
 async function main() {
   const [owner] = await ethers.getSigners();
   console.log(`Making transfer using address: ${owner.address}`);
@@ -29,14 +27,22 @@ async function main() {
     throw new Error("Wrong config of matic, url not found");
   }
 
+  // https://gitlab.ifi.uzh.ch/rodrigues/scflare/-/tree/a5ebdb0f288ec4909cfc38acf630cf9ddc4f1604/Truffle/node_modules/truffle-hdwallet-provider
+  // set the shareNonce to false so maticProvider and parentProvider won't share nonce which causes errors
   const maticProvider = new HDWalletProvider(
     matic.accounts.mnemonic,
-    matic.url
+    matic.url,
+    0,
+    1,
+    false
   );
 
   const parentProvider = new HDWalletProvider(
     goerli.accounts.mnemonic,
-    goerli.url
+    goerli.url,
+    0,
+    1,
+    false
   );
 
   const maticPOSClient = new MaticPOSClient({
@@ -76,9 +82,7 @@ async function main() {
     throw new Error("Wrong config of matic, url not found");
   }
 
-  const childProvider = new hre.Web3.providers.HttpProvider(matic.url);
-
-  const childWeb3 = new hre.Web3(childProvider);
+  const childWeb3 = new hre.Web3(maticProvider);
 
   // RootChainProxy Address on root chain (0x86E4Dc95c7FBdBf52e33D563BbDB00823894C287 for mainnet)
   const rootChainProxyAddress = "0x2890ba17efe978480615e330ecb65333b880928e";
@@ -96,20 +100,12 @@ async function main() {
 
   console.log(`burned transaction confirmed on the etherum chain`);
   console.log(log);
-  console.log(
-    `change the burnTransationHash in the scripts/burn-exit-ERC20-from-mumbai-to-goerli-using-pos-bridge.ts to the: ${burnTransationHash}`
-  );
-  console.log("Than run the command:");
-  console.log(
-    "npx hardhat run scripts/burn-exit-ERC20-from-mumbai-to-goerli-using-pos-bridge"
-  );
 
-  console.log(
-    'TODO: This is wrong way, merge it one script. Unfortunately if we try to do everything in one script there is error: { code: -32000, message: "nonce too low" }'
-  );
+  await maticPOSClient.exitERC20(burnTransationHash, { from });
 
-  // @ts-ignore
-  parentWebsocketProvider.disconnect();
+  console.log("transfer completed");
+
+  parentWebsocketProvider.disconnect(0, "script ended");
 }
 
 main()
