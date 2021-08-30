@@ -1,6 +1,7 @@
 import { Contract } from 'ethers'
 import IUniswapV2Pair from '@uniswap/v2-core/build/IUniswapV2Pair.json'
 import hre from 'hardhat'
+import { expandTo18Decimals } from './utilities';
 
 interface V2Fixture {
   token0: Contract
@@ -23,11 +24,14 @@ export const deployHHContract = async (name: string, constructorArgs: any[]) => 
   return contract;
 }
 
+export const TOTAL_SUPPLY = expandTo18Decimals(10000)
+
 export async function loadV2HHFixture() {
   const provider = hre.ethers.provider;
-  const [wallet] = await hre.ethers.getSigners();
+  const [wallet, other] = await hre.ethers.getSigners();
   const [
     WETH,
+    TestERC20,
     tokenA,
     tokenB,
     WETHPartner,
@@ -35,6 +39,7 @@ export async function loadV2HHFixture() {
     routerEventEmitter
   ] = await Promise.all([
     deployHHContract('WETH9', []),
+    deployHHContract('TestERC20', [TOTAL_SUPPLY]),
     deployHHContract('GeneralERC20', [wallet.address, 'TokenA', 'TKA']),
     deployHHContract('GeneralERC20', [wallet.address, 'TokenA', 'TKA']),
     deployHHContract('GeneralERC20', [wallet.address, 'WETHPartner', 'WETHP']),
@@ -65,6 +70,7 @@ export async function loadV2HHFixture() {
   return {
     token0,
     token1,
+    TestERC20,
     WETH,
     WETHPartner,
     factoryV2,
@@ -74,6 +80,7 @@ export async function loadV2HHFixture() {
     routerEventEmitter,
     pair,
     WETHPair,
-    wallet
+    wallet,
+    other
   }
 }

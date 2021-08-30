@@ -1,4 +1,6 @@
 import { Contract, BigNumber, utils } from 'ethers'
+import * as ethersUtils from 'ethers/lib/utils'
+import hre from 'hardhat'
 const { keccak256, defaultAbiCoder, toUtf8Bytes, solidityPack } = utils
 
 export const MINIMUM_LIQUIDITY = BigNumber.from(10).pow(3)
@@ -59,3 +61,18 @@ export async function getApprovalDigest(
 export function encodePrice(reserve0: BigNumber, reserve1: BigNumber) {
   return [reserve1.mul(BigNumber.from(2).pow(112)).div(reserve0), reserve0.mul(BigNumber.from(2).pow(112)).div(reserve1)]
 }
+
+export function getCreate2Address(
+  factoryAddress: string,
+  [tokenA, tokenB]: [string, string],
+  bytecode: string
+): string {
+  const [token0, token1] = tokenA < tokenB ? [tokenA, tokenB] : [tokenB, tokenA]
+  return ethersUtils.getCreate2Address(
+    factoryAddress,
+    keccak256(solidityPack(['address', 'address'], [token0, token1])),
+    keccak256(bytecode)
+  )
+}
+
+export const mineBlock = (timestamp: string) => hre.network.provider.send('evm_mine', [timestamp])

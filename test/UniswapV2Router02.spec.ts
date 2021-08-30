@@ -1,6 +1,6 @@
 import chai, { expect } from 'chai'
-import { solidity, MockProvider, createFixtureLoader, deployContract } from 'ethereum-waffle'
-import { Contract, Wallet, BigNumber, constants } from 'ethers'
+import { solidity } from 'ethereum-waffle'
+import { Contract, BigNumber, constants } from 'ethers'
 import IUniswapV2Pair from '@uniswap/v2-core/build/IUniswapV2Pair.json'
 
 const {MaxUint256} = constants;
