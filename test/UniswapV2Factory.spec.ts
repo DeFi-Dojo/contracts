@@ -1,6 +1,6 @@
 import chai, { expect } from 'chai'
 import { Contract, constants, BigNumber } from 'ethers'
-import { solidity, MockProvider, createFixtureLoader } from 'ethereum-waffle'
+import { solidity } from 'ethereum-waffle'
 
 import { getCreate2Address } from './shared/utilities'
 import { loadV2HHFixture } from './shared/fixtures'

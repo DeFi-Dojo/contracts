@@ -1,14 +1,14 @@
 import chai, { expect } from 'chai'
-import { BigNumber, Contract, constants, utils } from 'ethers'
+import { Contract, constants, utils } from 'ethers'
 import { solidity } from 'ethereum-waffle'
 import { ecsign } from 'ethereumjs-util'
 
-import { expandTo18Decimals, getApprovalDigest } from './shared/utilities'
+import { expandTo18Decimals } from './shared/utilities'
 
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signers'
-import { deployHHContract, loadV2HHFixture, TOTAL_SUPPLY } from './shared/fixtures'
+import { loadV2HHFixture, TOTAL_SUPPLY } from './shared/fixtures'
 const { MaxUint256 } = constants
-const { hexlify, keccak256, defaultAbiCoder, toUtf8Bytes } = utils
+const { keccak256, defaultAbiCoder, toUtf8Bytes } = utils
 
 chai.use(solidity)
 

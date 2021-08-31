@@ -1,9 +1,9 @@
 import chai, { expect } from 'chai'
 import { Contract, constants } from 'ethers'
-import { solidity, MockProvider, createFixtureLoader } from 'ethereum-waffle'
+import { solidity } from 'ethereum-waffle'
 import { BigNumber } from 'ethers'
 
-import { expandTo18Decimals, encodePrice, mineBlock } from './shared/utilities'
+import { expandTo18Decimals } from './shared/utilities'
 import { loadV2HHFixture } from './shared/fixtures'
 const { AddressZero } = constants
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signers'

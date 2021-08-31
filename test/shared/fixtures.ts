@@ -3,20 +3,6 @@ import IUniswapV2Pair from '@uniswap/v2-core/build/IUniswapV2Pair.json'
 import hre from 'hardhat'
 import { expandTo18Decimals } from './utilities';
 
-interface V2Fixture {
-  token0: Contract
-  token1: Contract
-  WETH: Contract
-  WETHPartner: Contract
-  factoryV2: Contract
-  router01: Contract
-  router02: Contract
-  routerEventEmitter: Contract
-  router: Contract
-  pair: Contract
-  WETHPair: Contract
-}
-
 export const deployHHContract = async (name: string, constructorArgs: any[]) => {
   const factory = await hre.ethers.getContractFactory(name);
   const contract = await factory.deploy(...constructorArgs);
@@ -41,19 +27,13 @@ export async function loadV2HHFixture() {
     deployHHContract('WETH9', []),
     deployHHContract('TestERC20', [TOTAL_SUPPLY]),
     deployHHContract('GeneralERC20', [wallet.address, 'TokenA', 'TKA']),
-    deployHHContract('GeneralERC20', [wallet.address, 'TokenA', 'TKA']),
+    deployHHContract('GeneralERC20', [wallet.address, 'TokenB', 'TKB']),
     deployHHContract('GeneralERC20', [wallet.address, 'WETHPartner', 'WETHP']),
     deployHHContract('UniswapV2Factory', [wallet.address]),
     deployHHContract('RouterEventEmitter', []),
   ]);
 
-  const [
-    router01,
-    router02
-  ] = await Promise.all([
-    deployHHContract('UniswapV2Router01', [factoryV2.address, WETH.address]),
-    deployHHContract('UniswapV2Router02', [factoryV2.address, WETH.address]),
-  ])
+  const router02 = await deployHHContract('UniswapV2Router02', [factoryV2.address, WETH.address])
 
   await factoryV2.createPair(tokenA.address, tokenB.address).then((res: any) => res.wait())
   const pairAddress = await factoryV2.getPair(tokenA.address, tokenB.address)
@@ -74,8 +54,6 @@ export async function loadV2HHFixture() {
     WETH,
     WETHPartner,
     factoryV2,
-    router01,
-    router02,
     router: router02, // the default router, 01 had a minor bug
     routerEventEmitter,
     pair,

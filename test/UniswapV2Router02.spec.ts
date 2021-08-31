@@ -6,7 +6,7 @@ import IUniswapV2Pair from '@uniswap/v2-core/build/IUniswapV2Pair.json'
 const {MaxUint256} = constants;
 
 import { deployHHContract, loadV2HHFixture } from './shared/fixtures'
-import { expandTo18Decimals, getApprovalDigest, MINIMUM_LIQUIDITY } from './shared/utilities'
+import { expandTo18Decimals } from './shared/utilities'
 
 import { ecsign } from 'ethereumjs-util'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signers'
@@ -27,7 +27,7 @@ describe('UniswapV2Router02', () => {
     const fixture = await loadV2HHFixture();
     token0 = fixture.token0
     token1 = fixture.token1
-    router = fixture.router02
+    router = fixture.router
     wallet = fixture.wallet
   })
 
@@ -126,7 +126,7 @@ describe('fee-on-transfer tokens', () => {
     const fixture = await loadV2HHFixture();
 
     WETH = fixture.WETH
-    router = fixture.router02
+    router = fixture.router
     wallet = fixture.wallet
 
     DTT = await deployHHContract('DeflatingERC20', [expandTo18Decimals(10000)])
@@ -306,7 +306,7 @@ describe('fee-on-transfer tokens: reloaded', () => {
   beforeEach(async function() {
     const fixture = await loadV2HHFixture()
 
-    router = fixture.router02
+    router = fixture.router
 
     DTT = await deployHHContract('DeflatingERC20', [expandTo18Decimals(10000)])
     DTT2 = await deployHHContract('DeflatingERC20', [expandTo18Decimals(10000)])
