@@ -1,10 +1,7 @@
 import chai, { expect } from 'chai'
 import { Contract, constants, utils } from 'ethers'
 import { solidity } from 'ethereum-waffle'
-import { ecsign } from 'ethereumjs-util'
-
 import { expandTo18Decimals } from './shared/utilities'
-
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signers'
 import { loadV2HHFixture, TOTAL_SUPPLY } from './shared/fixtures'
 const { MaxUint256 } = constants

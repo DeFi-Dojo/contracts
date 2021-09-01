@@ -2,13 +2,9 @@ import chai, { expect } from 'chai'
 import { solidity } from 'ethereum-waffle'
 import { Contract, BigNumber, constants } from 'ethers'
 import IUniswapV2Pair from '@uniswap/v2-core/build/IUniswapV2Pair.json'
-
 const {MaxUint256} = constants;
-
 import { deployHHContract, loadV2HHFixture } from './shared/fixtures'
 import { expandTo18Decimals } from './shared/utilities'
-
-import { ecsign } from 'ethereumjs-util'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signers'
 import hre from 'hardhat'
 
