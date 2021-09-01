@@ -25,10 +25,10 @@ export async function loadV2HHFixture() {
     routerEventEmitter
   ] = await Promise.all([
     deployHHContract('WETH9', []),
-    deployHHContract('TestERC20', [TOTAL_SUPPLY]),
-    deployHHContract('GeneralERC20', [wallet.address, 'TokenA', 'TKA']),
-    deployHHContract('GeneralERC20', [wallet.address, 'TokenB', 'TKB']),
-    deployHHContract('GeneralERC20', [wallet.address, 'WETHPartner', 'WETHP']),
+    deployHHContract('TestUniERC20', [TOTAL_SUPPLY]),
+    deployHHContract('DummyERC20', [wallet.address, 'TokenA', 'TKA']),
+    deployHHContract('DummyERC20', [wallet.address, 'TokenB', 'TKB']),
+    deployHHContract('DummyERC20', [wallet.address, 'WETHPartner', 'WETHP']),
     deployHHContract('UniswapV2Factory', [wallet.address]),
     deployHHContract('RouterEventEmitter', []),
   ]);
