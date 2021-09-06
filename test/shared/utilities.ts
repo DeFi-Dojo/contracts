@@ -1,16 +1,19 @@
-import { Contract, BigNumber, utils } from 'ethers'
-import * as ethersUtils from 'ethers/lib/utils'
-import hre from 'hardhat'
-const { keccak256, defaultAbiCoder, toUtf8Bytes, solidityPack } = utils
+import { Contract, BigNumber, utils } from 'ethers';
+import * as ethersUtils from 'ethers/lib/utils';
+import hre from 'hardhat';
 
-export const MINIMUM_LIQUIDITY = BigNumber.from(10).pow(3)
+const {
+  keccak256, defaultAbiCoder, toUtf8Bytes, solidityPack,
+} = utils;
+
+export const MINIMUM_LIQUIDITY = BigNumber.from(10).pow(3);
 
 const PERMIT_TYPEHASH = keccak256(
-  toUtf8Bytes('Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)')
-)
+  toUtf8Bytes('Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)'),
+);
 
 export function expandTo18Decimals(n: number): BigNumber {
-  return BigNumber.from(n).mul(BigNumber.from(10).pow(18))
+  return BigNumber.from(n).mul(BigNumber.from(10).pow(18));
 }
 
 function getDomainSeparator(name: string, tokenAddress: string) {
@@ -22,10 +25,10 @@ function getDomainSeparator(name: string, tokenAddress: string) {
         keccak256(toUtf8Bytes(name)),
         keccak256(toUtf8Bytes('1')),
         1,
-        tokenAddress
-      ]
-    )
-  )
+        tokenAddress,
+      ],
+    ),
+  );
 }
 
 export async function getApprovalDigest(
@@ -36,10 +39,10 @@ export async function getApprovalDigest(
     value: BigNumber
   },
   nonce: BigNumber,
-  deadline: BigNumber
+  deadline: BigNumber,
 ): Promise<string> {
-  const name = await token.name()
-  const DOMAIN_SEPARATOR = getDomainSeparator(name, token.address)
+  const name = await token.name();
+  const DOMAIN_SEPARATOR = getDomainSeparator(name, token.address);
   return keccak256(
     solidityPack(
       ['bytes1', 'bytes1', 'bytes32', 'bytes32'],
@@ -50,29 +53,32 @@ export async function getApprovalDigest(
         keccak256(
           defaultAbiCoder.encode(
             ['bytes32', 'address', 'address', 'uint256', 'uint256', 'uint256'],
-            [PERMIT_TYPEHASH, approve.owner, approve.spender, approve.value, nonce, deadline]
-          )
-        )
-      ]
-    )
-  )
+            [PERMIT_TYPEHASH, approve.owner, approve.spender, approve.value, nonce, deadline],
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 export function encodePrice(reserve0: BigNumber, reserve1: BigNumber) {
-  return [reserve1.mul(BigNumber.from(2).pow(112)).div(reserve0), reserve0.mul(BigNumber.from(2).pow(112)).div(reserve1)]
+  return [
+    reserve1.mul(BigNumber.from(2).pow(112)).div(reserve0),
+    reserve0.mul(BigNumber.from(2).pow(112)).div(reserve1),
+  ];
 }
 
 export function getCreate2Address(
   factoryAddress: string,
   [tokenA, tokenB]: [string, string],
-  bytecode: string
+  bytecode: string,
 ): string {
-  const [token0, token1] = tokenA < tokenB ? [tokenA, tokenB] : [tokenB, tokenA]
+  const [token0, token1] = tokenA < tokenB ? [tokenA, tokenB] : [tokenB, tokenA];
   return ethersUtils.getCreate2Address(
     factoryAddress,
     keccak256(solidityPack(['address', 'address'], [token0, token1])),
-    keccak256(bytecode)
-  )
+    keccak256(bytecode),
+  );
 }
 
-export const mineBlock = (timestamp: string) => hre.network.provider.send('evm_mine', [timestamp])
+export const mineBlock = (timestamp: string) => hre.network.provider.send('evm_mine', [timestamp]);

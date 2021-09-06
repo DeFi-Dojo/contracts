@@ -1,5 +1,5 @@
-import Web3Type from "web3/types";
-import { Log } from "web3-core/types";
+import Web3Type from 'web3/types';
+import { Log } from 'web3-core/types';
 
 // https://docs.matic.network/docs/develop/ethereum-matic/pos/deposit-withdraw-event-pos/#checkpoint-events
 // txHash - transaction hash on Matic
@@ -15,12 +15,12 @@ export async function checkInclusion({
   childWeb3: Web3Type;
   parentWebsocketWeb3: Web3Type;
 }): Promise<Log> {
-  let txDetails = await childWeb3.eth.getTransactionReceipt(txHash);
+  const txDetails = await childWeb3.eth.getTransactionReceipt(txHash);
 
   const block = txDetails.blockNumber;
   return new Promise((resolve, reject) => {
     parentWebsocketWeb3.eth.subscribe(
-      "logs",
+      'logs',
       {
         address: rootChainAddress,
       },
@@ -30,15 +30,15 @@ export async function checkInclusion({
         }
 
         if (result.data) {
-          let transaction = parentWebsocketWeb3.eth.abi.decodeParameters(
-            ["uint256", "uint256", "bytes32"],
-            result.data
+          const transaction = parentWebsocketWeb3.eth.abi.decodeParameters(
+            ['uint256', 'uint256', 'bytes32'],
+            result.data,
           );
-          if (block <= transaction["1"]) {
+          if (block <= transaction['1']) {
             resolve(result);
           }
         }
-      }
+      },
     );
   });
 }
