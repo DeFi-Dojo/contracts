@@ -85,6 +85,18 @@ const config: HardhatUserConfig = {
         },
       },
     ],
+    // if it is in compilers it catches the @uniswap/library contracts
+    overrides: {
+      "contracts/gelato/UniswapV2Router02Handler.sol": {
+        version: "0.8.4",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
+      },
+    },
   },
   paths: {
     sources: "./contracts",

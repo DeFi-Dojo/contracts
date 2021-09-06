@@ -47,6 +47,27 @@ async function main() {
 
   console.log("UniswapV2Router02 deployed to:", uniswapV2Router02.address);
 
+  const UniswapV2Router02Handler = await ethers.getContractFactory(
+    "UniswapV2Router02Handler"
+  );
+
+  const uniswapV2Router02Handler = await UniswapV2Router02Handler.deploy(
+    uniswapV2Router02.address,
+    weth.address
+  );
+
+  await uniswapV2Router02Handler.deployed();
+
+  await hre.ethernal.push({
+    name: "UniswapV2Router02Handler",
+    address: uniswapV2Router02Handler.address,
+  });
+
+  console.log(
+    "UniswapV2Router02Handler deployed to:",
+    uniswapV2Router02Handler.address
+  );
+
   // Deploy Multicall
   const UniswapInterfaceMulticall = await ethers.getContractFactory(
     "UniswapInterfaceMulticall"
