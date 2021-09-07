@@ -1,5 +1,4 @@
 import chai, { expect } from 'chai';
-import { describe, beforeEach, it } from 'mocha';
 import { Contract, constants, BigNumber } from 'ethers';
 import { solidity } from 'ethereum-waffle';
 

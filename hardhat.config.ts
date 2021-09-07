@@ -1,8 +1,8 @@
-import "@nomiclabs/hardhat-waffle";
-import "hardhat-ethernal";
-import "@nomiclabs/hardhat-web3";
-import { task, HardhatUserConfig } from "hardhat/config";
-import dotenv from "dotenv";
+import '@nomiclabs/hardhat-waffle';
+import 'hardhat-ethernal';
+import '@nomiclabs/hardhat-web3';
+import { task, HardhatUserConfig } from 'hardhat/config';
+import dotenv from 'dotenv';
 
 dotenv.config();
 
@@ -15,12 +15,10 @@ const {
   GOERLI_API_URL,
 } = process.env;
 
-task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
+task('accounts', 'Prints the list of accounts', async (taskArgs, hre) => {
   const accounts = await hre.ethers.getSigners();
 
-  for (const account of accounts) {
-    console.log(account.address);
-  }
+  accounts.forEach((account) => console.log(account.address));
 });
 
 const accounts = {
@@ -58,7 +56,7 @@ const config: HardhatUserConfig = {
   solidity: {
     compilers: [
       {
-        version: "0.5.16",
+        version: '0.5.16',
         settings: {
           optimizer: {
             enabled: true,
@@ -67,7 +65,7 @@ const config: HardhatUserConfig = {
         },
       },
       {
-        version: "0.6.6",
+        version: '0.6.6',
         settings: {
           optimizer: {
             enabled: true,
@@ -76,7 +74,7 @@ const config: HardhatUserConfig = {
         },
       },
       {
-        version: "0.7.6",
+        version: '0.7.6',
         settings: {
           optimizer: {
             enabled: true,
@@ -87,8 +85,8 @@ const config: HardhatUserConfig = {
     ],
     // if it is in compilers it catches the @uniswap/library contracts
     overrides: {
-      "contracts/gelato/UniswapV2Router02Handler.sol": {
-        version: "0.8.4",
+      'contracts/gelato/UniswapV2Router02Handler.sol': {
+        version: '0.8.4',
         settings: {
           optimizer: {
             enabled: true,
@@ -99,9 +97,9 @@ const config: HardhatUserConfig = {
     },
   },
   paths: {
-    sources: "./contracts",
-    cache: "./cache",
-    artifacts: "./artifacts",
+    sources: './contracts',
+    cache: './cache',
+    artifacts: './artifacts',
   },
   mocha: {
     timeout: 20000,

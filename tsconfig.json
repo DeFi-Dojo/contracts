@@ -10,6 +10,6 @@
     "paths": { "~/*": ["./*"] }
   },
   "include": ["./scripts", "./test"],
-  "files": ["./hardhat.config.ts"],
+  "files": ["./hardhat.config.ts", "./test.config.ts"],
   "exclude": ["node_modules"]
 }

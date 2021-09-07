@@ -1,7 +1,4 @@
 import chai, { expect } from 'chai';
-import {
-  describe, beforeEach, it, afterEach,
-} from 'mocha';
 import { solidity } from 'ethereum-waffle';
 import { Contract, BigNumber, constants } from 'ethers';
 import IUniswapV2Pair from '@uniswap/v2-core/build/IUniswapV2Pair.json';
