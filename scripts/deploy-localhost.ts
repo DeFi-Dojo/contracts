@@ -49,7 +49,7 @@ async function main() {
 
   const balanceAfterAddLp = await lpnft.balanceOf(nftTokenId);
 
-  console.log("balanceAfterAddLp:", balanceAfterAddLp.toString());
+  console.log("BalanceAfterAddLp:", balanceAfterAddLp.toString());
 
   const redeemLPTokensTransaction = await lpnft.redeemLPTokens(nftTokenId, 50);
 
@@ -59,7 +59,7 @@ async function main() {
 
   const balanceAfterReedemLp = await lpnft.balanceOf(nftTokenId);
 
-  console.log("balanceAfterReedemLp:", balanceAfterReedemLp.toString());
+  console.log("BalanceAfterReedemLp:", balanceAfterReedemLp.toString());
 }
 
 main()
