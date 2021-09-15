@@ -1,13 +1,13 @@
 import hre, { ethers } from "hardhat";
 
-const nftTokenId = 2;
+const nftTokenId = 0;
 
 async function main() {
   const [owner] = await ethers.getSigners();
   console.log(`Deploying contracts using address: ${owner.address}`);
 
   const DojoNFT = await ethers.getContractFactory("DojoNFT");
-  const dojoNFT = await DojoNFT.deploy(nftTokenId);
+  const dojoNFT = await DojoNFT.deploy();
   await dojoNFT.deployed();
 
   await hre.ethernal.push({
@@ -16,6 +16,12 @@ async function main() {
   });
 
   console.log("DojoNFT deployed to:", dojoNFT.address);
+
+  const mintNFTTransaction = await dojoNFT.mint();
+
+  await mintNFTTransaction.wait();
+
+  console.log("Minted NFT token");
 
   const TokenERC20 = await ethers.getContractFactory("TokenERC20");
   const tokenERC20 = await TokenERC20.deploy();
