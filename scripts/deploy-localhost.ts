@@ -1,112 +1,65 @@
-import hre, { ethers } from 'hardhat';
+import hre, { ethers } from "hardhat";
+
+const nftTokenId = 2;
 
 async function main() {
   const [owner] = await ethers.getSigners();
   console.log(`Deploying contracts using address: ${owner.address}`);
 
-  // Deploy WETH
-  const WETH = await ethers.getContractFactory('WETH');
-  const weth = await WETH.deploy();
-  await weth.deployed();
+  const DojoNFT = await ethers.getContractFactory("DojoNFT");
+  const dojoNFT = await DojoNFT.deploy(nftTokenId);
+  await dojoNFT.deployed();
 
   await hre.ethernal.push({
-    name: 'WETH',
-    address: weth.address,
+    name: "DojoNFT",
+    address: dojoNFT.address,
   });
 
-  console.log('WETH deployed to:', weth.address);
+  console.log("DojoNFT deployed to:", dojoNFT.address);
 
-  // Deploy Factory
-  const UniswapV2Factory = await ethers.getContractFactory('UniswapV2Factory');
-  const uniswapV2Factory = await UniswapV2Factory.deploy(owner.address);
-
-  await uniswapV2Factory.deployed();
+  const TokenERC20 = await ethers.getContractFactory("TokenERC20");
+  const tokenERC20 = await TokenERC20.deploy();
+  await tokenERC20.deployed();
 
   await hre.ethernal.push({
-    name: 'UniswapV2Factory',
-    address: uniswapV2Factory.address,
+    name: "TokenERC20",
+    address: tokenERC20.address,
   });
 
-  console.log('UniswapV2Factory deployed to:', uniswapV2Factory.address);
+  console.log("TokenERC20 deployed to:", tokenERC20.address);
 
-  // Deploy Router
-  const UniswapV2Router02 = await ethers.getContractFactory(
-    'UniswapV2Router02',
-  );
-  const uniswapV2Router02 = await UniswapV2Router02.deploy(
-    uniswapV2Factory.address,
-    weth.address,
-  );
-
-  await uniswapV2Router02.deployed();
+  const LPNFT = await ethers.getContractFactory("LPNFT");
+  const lpnft = await LPNFT.deploy(tokenERC20.address, dojoNFT.address);
+  await lpnft.deployed();
 
   await hre.ethernal.push({
-    name: 'UniswapV2Router02',
-    address: uniswapV2Router02.address,
+    name: "LPNFT",
+    address: lpnft.address,
   });
 
-  console.log('UniswapV2Router02 deployed to:', uniswapV2Router02.address);
+  console.log("LPNFT deployed to:", lpnft.address);
 
-  const UniswapV2Router02Handler = await ethers.getContractFactory(
-    'UniswapV2Router02Handler',
-  );
+  await tokenERC20.approve(lpnft.address, 100);
 
-  const uniswapV2Router02Handler = await UniswapV2Router02Handler.deploy(
-    uniswapV2Router02.address,
-    weth.address,
-  );
+  const addLPTransaction = await lpnft.addLPtoNFT(nftTokenId, 100);
 
-  await uniswapV2Router02Handler.deployed();
+  await addLPTransaction.wait();
 
-  await hre.ethernal.push({
-    name: 'UniswapV2Router02Handler',
-    address: uniswapV2Router02Handler.address,
-  });
+  console.log("Add lp done");
 
-  console.log(
-    'UniswapV2Router02Handler deployed to:',
-    uniswapV2Router02Handler.address,
-  );
+  const balanceAfterAddLp = await lpnft.balanceOf(nftTokenId);
 
-  // Deploy Multicall
-  const UniswapInterfaceMulticall = await ethers.getContractFactory(
-    'UniswapInterfaceMulticall',
-  );
-  const uniswapInterfaceMulticall = await UniswapInterfaceMulticall.deploy();
+  console.log("balanceAfterAddLp:", balanceAfterAddLp.toString());
 
-  await uniswapInterfaceMulticall.deployed();
+  const redeemLPTokensTransaction = await lpnft.redeemLPTokens(nftTokenId, 50);
 
-  await hre.ethernal.push({
-    name: 'UniswapInterfaceMulticall',
-    address: uniswapInterfaceMulticall.address,
-  });
+  await redeemLPTokensTransaction.wait();
 
-  console.log(
-    'UniswapInterfaceMulticall deployed to:',
-    uniswapInterfaceMulticall.address,
-  );
+  console.log("Redeem done");
 
-  // Deploy Tokens
-  const Token1 = await ethers.getContractFactory('Token1');
-  const Token2 = await ethers.getContractFactory('Token2');
-  const token1 = await Token1.deploy(owner.address);
-  const token2 = await Token2.deploy(owner.address);
+  const balanceAfterReedemLp = await lpnft.balanceOf(nftTokenId);
 
-  await token1.deployed();
-  await token2.deployed();
-
-  await hre.ethernal.push({
-    name: 'Token1',
-    address: token1.address,
-  });
-
-  await hre.ethernal.push({
-    name: 'Token2',
-    address: token2.address,
-  });
-
-  console.log('Token1 deployed to:', token1.address);
-  console.log('Token2 deployed to:', token2.address);
+  console.log("balanceAfterReedemLp:", balanceAfterReedemLp.toString());
 }
 
 main()
