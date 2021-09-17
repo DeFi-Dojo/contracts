@@ -1,7 +1,7 @@
 import { Contract, ContractTransaction } from "ethers";
 import hre, { ethers } from "hardhat";
 import { Libraries } from "hardhat/types";
-import { AToken, DummyReserveInterestRateStrategy, FeeProvider, LendingPool, LendingPoolAddressesProvider, LendingPoolConfigurator, LendingPoolCore, LendingPoolDataProvider, LendingPoolParametersProvider, TokenERC20 } from "../typechain";
+import { AToken, DojoNFT, DummyReserveInterestRateStrategy, FeeProvider, LendingPool, LendingPoolAddressesProvider, LendingPoolConfigurator, LendingPoolCore, LendingPoolDataProvider, LendingPoolParametersProvider, LPNFT, TokenERC20 } from "../typechain";
 
 
 const wait = (res: ContractTransaction) => res.wait();
@@ -70,19 +70,27 @@ async function main() {
   
   const balanceBeforeDeposit = await underlyingToken.balanceOf(owner.address);
 
-  const depositReceipt = await lendingPool.deposit(underlyingToken.address, 1000000, 0).then(wait);
+  await lendingPool.deposit(underlyingToken.address, 1000000, 0).then(wait);
   
   const balanceAfterDeposit = await underlyingToken.balanceOf(owner.address);
 
-  const aMockDAI: AToken = await ethers.getContractAt("AToken", aTokenAddress);
+  const aToken: AToken = await ethers.getContractAt("AToken", aTokenAddress);
 
-  await aMockDAI.redeem(1000000).then(wait);
+  await aToken.redeem(500000).then(wait);
 
   const balanceAfterRedeem = await underlyingToken.balanceOf(owner.address);
 
-  console.log(`Balances: ${balanceBeforeDeposit}, ${balanceAfterDeposit}, ${balanceAfterRedeem}`)
-
-
+  const nft = await deployContract<DojoNFT>("DojoNFT", []);
+  await nft.mint().then(wait);
+  
+  const nlp = await deployContract<LPNFT>("LPNFT", [aTokenAddress, nft.address]);
+  
+  await aToken.approve(nlp.address, 500000).then(wait);
+  await nlp.addLPtoNFT(0, 500000).then(wait);
+  await nlp.redeemLPTokens(0, 500000).then(wait);
+  
+  const balanceAfterNLPRedeem = await underlyingToken.balanceOf(owner.address);
+  console.log(`Balances: ${balanceBeforeDeposit}, ${balanceAfterDeposit}, ${balanceAfterRedeem}, ${balanceAfterNLPRedeem}`)
 }
 
 main()
