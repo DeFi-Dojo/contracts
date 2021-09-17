@@ -1,5 +1,5 @@
 import { Contract, ContractTransaction } from "ethers";
-import { ethers } from "hardhat";
+import hre, { ethers } from "hardhat";
 import { Libraries } from "hardhat/types";
 import * as TypeChain from "../typechain";
 

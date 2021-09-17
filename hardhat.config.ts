@@ -8,14 +8,14 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-// const {
-//   RINKEBY_API_URL,
-//   ROPSTEN_API_URL,
-//   DEFAULT_NETWORK,
-//   POLYGON_MUMBAI_API_URL,
-//   WALLET_MNEMONIC,
-//   GOERLI_API_URL,
-// } = process.env;
+const {
+  RINKEBY_API_URL,
+  ROPSTEN_API_URL,
+  DEFAULT_NETWORK,
+  POLYGON_MUMBAI_API_URL,
+  WALLET_MNEMONIC,
+  GOERLI_API_URL,
+} = process.env;
 
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   const accounts = await hre.ethers.getSigners();
@@ -23,37 +23,37 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   accounts.forEach((account) => console.log(account.address));
 });
 
-// const accounts = {
-//   mnemonic: WALLET_MNEMONIC,
-// };
+const accounts = {
+  mnemonic: WALLET_MNEMONIC,
+};
 
 const config: HardhatUserConfig = {
-  defaultNetwork: 'hardhat',
+  defaultNetwork: DEFAULT_NETWORK,
   networks: {
     hardhat: {
       chainId: 1337,
       mining: {
-        auto: true,
+        auto: false,
         interval: 5000,
       },
-      // accounts,
+      accounts,
     },
-    // ropsten: {
-    //   url: ROPSTEN_API_URL,
-    //   accounts,
-    // },
-    // rinkeby: {
-    //   url: RINKEBY_API_URL,
-    //   accounts,
-    // },
-    // matic: {
-    //   url: POLYGON_MUMBAI_API_URL,
-    //   accounts,
-    // },
-    // goerli: {
-    //   url: GOERLI_API_URL,
-    //   accounts,
-    // },
+    ropsten: {
+      url: ROPSTEN_API_URL,
+      accounts,
+    },
+    rinkeby: {
+      url: RINKEBY_API_URL,
+      accounts,
+    },
+    matic: {
+      url: POLYGON_MUMBAI_API_URL,
+      accounts,
+    },
+    goerli: {
+      url: GOERLI_API_URL,
+      accounts,
+    },
   },
   solidity: {
     compilers: [

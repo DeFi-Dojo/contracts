@@ -19,7 +19,7 @@ async function main() {
   const TOKENS_IN_LPNFT = 500000;
   await underlyingToken.approve(aaveLendingPoolCoreAddress, TOKENS_IN_LPNFT).then(wait);
   await aaveLendingPool.deposit(underlyingToken.address, TOKENS_IN_LPNFT, 0).then(wait);
-  console.log('Depositing tokens in AAVE done');
+  console.log('Deposing tokens in AAVE done');
 
   await aToken.approve(lpnft.address, TOKENS_IN_LPNFT).then(wait);
   await lpnft.addLPtoNFT(0, TOKENS_IN_LPNFT).then(wait);
