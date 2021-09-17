@@ -6,7 +6,6 @@ import "../libraries/openzeppelin-upgradeability/VersionedInitializable.sol";
 import "../configuration/LendingPoolAddressesProvider.sol";
 import "./LendingPoolCore.sol";
 import "../tokenization/AToken.sol";
-import "hardhat/console.sol";
 
 /**
 * @title LendingPoolConfigurator contract

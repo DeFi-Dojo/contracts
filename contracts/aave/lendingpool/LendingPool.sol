@@ -18,8 +18,6 @@ import "./LendingPoolDataProvider.sol";
 import "./LendingPoolLiquidationManager.sol";
 import "../libraries/EthAddressLib.sol";
 
-import "hardhat/console.sol";
-
 /**
 * @title LendingPool contract
 * @notice Implements the actions of the LendingPool, and exposes accessory methods to fetch the users and reserve data
@@ -284,8 +282,6 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
     function initialize(LendingPoolAddressesProvider _addressesProvider) public initializer {
         addressesProvider = _addressesProvider;
         core = LendingPoolCore(addressesProvider.getLendingPoolCore());
-        console.log("Address of core from LP");
-        console.log(addressesProvider.getLendingPoolCore());
         dataProvider = LendingPoolDataProvider(addressesProvider.getLendingPoolDataProvider());
         parametersProvider = LendingPoolParametersProvider(
             addressesProvider.getLendingPoolParametersProvider()
@@ -319,7 +315,6 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
 
         //transfer to the core contract
         core.transferToReserve.value(msg.value)(_reserve, msg.sender, _amount);
-        console.log("Transfered to reserve");
 
         //solium-disable-next-line
         emit Deposit(_reserve, msg.sender, _amount, _referralCode, block.timestamp);
@@ -344,17 +339,14 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
         onlyAmountGreaterThanZero(_amount)
     {
         uint256 currentAvailableLiquidity = core.getReserveAvailableLiquidity(_reserve);
-        console.log(currentAvailableLiquidity);
         require(
             currentAvailableLiquidity >= _amount,
             "There is not enough liquidity available to redeem"
         );
 
         core.updateStateOnRedeem(_reserve, _user, _amount, _aTokenBalanceAfterRedeem == 0);
-        console.log("Dunno1");
         core.transferToUser(_reserve, _user, _amount);
 
-        console.log("Dunno2");
         //solium-disable-next-line
         emit RedeemUnderlying(_reserve, _user, _amount, block.timestamp);
 
@@ -993,9 +985,6 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
     * @dev internal function to save on code size for the onlyActiveReserve modifier
     **/
     function requireReserveActiveInternal(address _reserve) internal view {
-        console.log("Ready to check if reserve is active");
-        console.log(address(core));
-        console.log(core.getReserveIsActive(_reserve));
         require(core.getReserveIsActive(_reserve), "Action requires an active reserve");
     }
 

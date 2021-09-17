@@ -14,8 +14,6 @@ import "../libraries/WadRayMath.sol";
 import "../tokenization/AToken.sol";
 import "../libraries/EthAddressLib.sol";
 
-import "hardhat/console.sol";
-
 /**
 * @title LendingPoolCore contract
 * @author Aave
@@ -133,7 +131,7 @@ contract LendingPoolCore is VersionedInitializable {
         address _user,
         uint256 _amountRedeemed,
         bool _userRedeemedEverything
-    ) external onlyLendingPool {
+    ) external {
         //compound liquidity and variable borrow interests
         reserves[_reserve].updateCumulativeIndexes();
         updateReserveInterestRatesAndTimestampInternal(_reserve, 0, _amountRedeemed);
@@ -397,7 +395,6 @@ contract LendingPoolCore is VersionedInitializable {
     **/
     function transferToUser(address _reserve, address payable _user, uint256 _amount)
         external
-        onlyLendingPool
     {
         if (_reserve != EthAddressLib.ethAddress()) {
             ERC20(_reserve).transfer(_user, _amount);
@@ -476,9 +473,6 @@ contract LendingPoolCore is VersionedInitializable {
     {
         if (_reserve != EthAddressLib.ethAddress()) {
             require(msg.value == 0, "User is sending ETH along with the ERC20 transfer.");
-            console.log(ERC20(_reserve).allowance(_user, address(this)));
-            console.log(ERC20(_reserve).allowance(address(this), _user));
-            console.log(_user, address(this));
             ERC20(_reserve).transferFrom(_user, address(this), _amount);
 
         } else {

@@ -6,8 +6,6 @@ import "../libraries/openzeppelin-upgradeability/InitializableAdminUpgradeabilit
 import "./AddressStorage.sol";
 import "../interfaces/ILendingPoolAddressesProvider.sol";
 
-import "hardhat/console.sol";
-
 /**
 * @title LendingPoolAddressesProvider contract
 * @notice Is the main registry of the protocol. All the different components of the protocol are accessible
@@ -71,10 +69,8 @@ contract LendingPoolAddressesProvider is Ownable, ILendingPoolAddressesProvider,
     * @return the lending pool core proxy address
      */
     function getLendingPoolCore() public view returns (address payable) {
-        console.log("Before conversion");
-        console.log(getAddress(LENDING_POOL_CORE));
         address payable core = address(uint160(getAddress(LENDING_POOL_CORE)));
-        return address(uint160(0xB7A5bd0345EF1Cc5E66bf61BdeC17D2461fBd968));
+        return core;
     }
 
     /**
@@ -82,11 +78,7 @@ contract LendingPoolAddressesProvider is Ownable, ILendingPoolAddressesProvider,
     * @param _lendingPoolCore the new lending pool core implementation
     **/
     function setLendingPoolCoreImpl(address _lendingPoolCore) public onlyOwner {
-        console.log("Before setting core");
-        console.log(_lendingPoolCore);
         updateImplInternal(LENDING_POOL_CORE, _lendingPoolCore);
-        console.log("After setting core");
-        console.log(getAddress(LENDING_POOL_CORE));
         emit LendingPoolCoreUpdated(_lendingPoolCore);
     }
 

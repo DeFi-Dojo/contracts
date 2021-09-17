@@ -9,8 +9,6 @@ import "../lendingpool/LendingPoolDataProvider.sol";
 import "../lendingpool/LendingPoolCore.sol";
 import "../libraries/WadRayMath.sol";
 
-import "hardhat/console.sol";
-
 /**
  * @title Aave ERC20 AToken
  *
@@ -253,8 +251,6 @@ contract AToken is ERC20, ERC20Detailed {
             userIndexReset = resetDataOnZeroBalanceInternal(msg.sender);
         }
         // executes redeem of the underlying asset
-        console.log(address(pool));
-
         pool.redeemUnderlying(
             underlyingAssetAddress,
             msg.sender,
