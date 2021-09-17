@@ -11,6 +11,7 @@
   "license": "ISC",
   "devDependencies": {
     "@ethersproject/solidity": "^5.4.0",
+    "@typechain/ethers-v5": "^7.1.0",
     "@types/chai": "^4.2.21",
     "@types/mocha": "^9.0.0",
     "@types/node": "^16.4.10",
@@ -25,6 +26,7 @@
     "ethereum-waffle": "^3.4.0",
     "ethers": "^5.4.5",
     "ts-node": "^10.1.0",
+    "typechain": "^5.1.2",
     "typescript": "^4.3.5"
   },
   "dependencies": {
@@ -35,11 +37,13 @@
     "@nomiclabs/hardhat-web3": "^2.0.0",
     "@openzeppelin/contracts": "^4.3.1",
     "@truffle/hdwallet-provider": "^1.5.0",
+    "@typechain/hardhat": "^2.3.0",
     "@uniswap/lib": "^4.0.1-alpha",
     "@uniswap/v2-core": "^1.0.1",
     "dotenv": "^10.0.0",
     "hardhat": "^2.5.0",
     "hardhat-ethernal": "^0.3.8",
+    "openzeppelin-solidity": "^2.5.1",
     "web3": "^1.5.2",
     "web3-core": "^1.5.2"
   }

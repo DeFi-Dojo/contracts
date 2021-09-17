@@ -1,3 +1,5 @@
+import '@typechain/hardhat';
+import '@nomiclabs/hardhat-ethers'
 import "@nomiclabs/hardhat-waffle";
 import "hardhat-ethernal";
 import "@nomiclabs/hardhat-web3";
@@ -6,14 +8,14 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const {
-  RINKEBY_API_URL,
-  ROPSTEN_API_URL,
-  DEFAULT_NETWORK,
-  POLYGON_MUMBAI_API_URL,
-  WALLET_MNEMONIC,
-  GOERLI_API_URL,
-} = process.env;
+// const {
+//   RINKEBY_API_URL,
+//   ROPSTEN_API_URL,
+//   DEFAULT_NETWORK,
+//   POLYGON_MUMBAI_API_URL,
+//   WALLET_MNEMONIC,
+//   GOERLI_API_URL,
+// } = process.env;
 
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   const accounts = await hre.ethers.getSigners();
@@ -21,37 +23,37 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   accounts.forEach((account) => console.log(account.address));
 });
 
-const accounts = {
-  mnemonic: WALLET_MNEMONIC,
-};
+// const accounts = {
+//   mnemonic: WALLET_MNEMONIC,
+// };
 
 const config: HardhatUserConfig = {
-  defaultNetwork: DEFAULT_NETWORK,
+  defaultNetwork: 'hardhat',
   networks: {
     hardhat: {
       chainId: 1337,
       mining: {
-        auto: false,
+        auto: true,
         interval: 5000,
       },
-      accounts,
+      // accounts,
     },
-    ropsten: {
-      url: ROPSTEN_API_URL,
-      accounts,
-    },
-    rinkeby: {
-      url: RINKEBY_API_URL,
-      accounts,
-    },
-    matic: {
-      url: POLYGON_MUMBAI_API_URL,
-      accounts,
-    },
-    goerli: {
-      url: GOERLI_API_URL,
-      accounts,
-    },
+    // ropsten: {
+    //   url: ROPSTEN_API_URL,
+    //   accounts,
+    // },
+    // rinkeby: {
+    //   url: RINKEBY_API_URL,
+    //   accounts,
+    // },
+    // matic: {
+    //   url: POLYGON_MUMBAI_API_URL,
+    //   accounts,
+    // },
+    // goerli: {
+    //   url: GOERLI_API_URL,
+    //   accounts,
+    // },
   },
   solidity: {
     compilers: [
@@ -64,6 +66,24 @@ const config: HardhatUserConfig = {
           },
         },
       },
+      {
+        version: "0.5.0",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
+      },
+      {
+        version: "0.5.5",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
+      }
     ],
     // if it is in compilers it catches the @uniswap/library contracts
     overrides: {

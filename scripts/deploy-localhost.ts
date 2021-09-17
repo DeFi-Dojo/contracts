@@ -24,7 +24,7 @@ async function main() {
   console.log("Minted NFT token");
 
   const TokenERC20 = await ethers.getContractFactory("TokenERC20");
-  const tokenERC20 = await TokenERC20.deploy();
+  const tokenERC20 = await TokenERC20.deploy("Token1", "TK1");
   await tokenERC20.deployed();
 
   await hre.ethernal.push({
