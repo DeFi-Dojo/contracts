@@ -1,5 +1,5 @@
 import "@typechain/hardhat";
-import "@nomiclabs/hardhat-ethers"
+import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-waffle";
 import "hardhat-ethernal";
 import "@nomiclabs/hardhat-web3";
@@ -83,7 +83,7 @@ const config: HardhatUserConfig = {
             runs: 200,
           },
         },
-      }
+      },
     ],
     // if it is in compilers it catches the @uniswap/library contracts
     overrides: {

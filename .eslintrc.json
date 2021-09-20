@@ -12,6 +12,6 @@
   "rules": {
     "import/prefer-default-export": "warn",
     "no-console": "off",
-    "quotes": ["warn", "double"]
+    "@typescript-eslint/quotes": ["warn", "double"]
   }
 }

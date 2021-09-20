@@ -16,7 +16,7 @@ export const deployContract = async <T extends Contract>(contractName: string, c
   });
   console.log(`${contractName} deployed to: `, contract.address);
   return contract as T;
-}
+};
 
 export const deployAaveContracts = async () => {
   const [owner] = await ethers.getSigners();
@@ -32,7 +32,7 @@ export const deployAaveContracts = async () => {
     lendingPoolConfigurator,
     lendingPoolAddressesProvider,
     feeProvider,
-    dummyReserveInterestStrategy, 
+    dummyReserveInterestStrategy,
   ] = await Promise.all([
     deployContract<TypeChain.TokenERC20>("TokenERC20", ["Token1", "TK1"]),
     deployContract<TypeChain.LendingPool>("LendingPool", []),
@@ -44,7 +44,7 @@ export const deployAaveContracts = async () => {
     deployContract<TypeChain.FeeProvider>("FeeProvider", []),
     deployContract<TypeChain.DummyReserveInterestRateStrategy>("DummyReserveInterestRateStrategy", []),
   ]);
-  
+
   await lendingPoolAddressesProvider.setLendingPoolCoreImpl(lendingPoolCore.address).then(wait);
   await lendingPoolAddressesProvider.setLendingPoolImpl(lendingPool.address).then(wait);
   await lendingPoolAddressesProvider.setLendingPoolDataProviderImpl(lendingPoolDataProvider.address).then(wait);
@@ -62,13 +62,13 @@ export const deployAaveContracts = async () => {
 
   const initReserveReceipt = await lendingPoolConfigurator.initReserve(underlyingToken.address, 18, dummyReserveInterestStrategy.address).then(wait);
   const aTokenAddress: string = initReserveReceipt.events![0].args![1];
-  
+
   const aToken: TypeChain.AToken = await ethers.getContractAt("AToken", aTokenAddress);
- 
+
   return {
     aToken,
     underlyingToken,
     aaveLendingPool: lendingPool,
-    aaveLendingPoolCoreAddress: await lendingPoolAddressesProvider.getLendingPoolCore() 
-  }
-}
+    aaveLendingPoolCoreAddress: await lendingPoolAddressesProvider.getLendingPoolCore(),
+  };
+};
