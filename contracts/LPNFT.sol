@@ -3,20 +3,26 @@ pragma solidity ^0.8.6;
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
+interface IAToken is IERC20 {
+    function underlyingAssetAddress() external returns(address);
+    function redeem(uint256 _amount) external;
+}
+
 contract LPNFT {
+    using SafeERC20 for IAToken;
     using SafeERC20 for IERC20;
 
     mapping (uint256 => uint) public balanceOf;
-    IERC20 public erc20Token;
+    IAToken public aToken;
     IERC721 public nftToken;
 
-    constructor(IERC20 _erc20Token, IERC721 _nftToken) {
-      erc20Token = _erc20Token;
+    constructor(IAToken _aToken, IERC721 _nftToken) {
+      aToken = _aToken;
       nftToken = _nftToken;
     }
 
     function addLPtoNFT(uint256 nftTokenId, uint tokenAmount) public returns (bool) {
-        erc20Token.safeTransferFrom(msg.sender, address(this), tokenAmount);
+        aToken.safeTransferFrom(msg.sender, address(this), tokenAmount);
         balanceOf[nftTokenId] += tokenAmount;
         return true;
     }
@@ -27,8 +33,10 @@ contract LPNFT {
         address owner = nftToken.ownerOf(nftTokenId);
         require(owner == msg.sender, 'Sender is not owner of the NFT');
 
-        // TODO: add aave cashout  support here
-        // erc20Token.safeTransfer(msg.sender, tokenAmount);
+        aToken.redeem(tokenAmount);
+
+        IERC20 underlyingERC20 = IERC20(aToken.underlyingAssetAddress());
+        underlyingERC20.safeTransfer(msg.sender, tokenAmount);
 
         balanceOf[nftTokenId] -= tokenAmount;
         return true;

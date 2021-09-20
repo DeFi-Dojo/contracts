@@ -1,4 +1,6 @@
-import hre, { ethers } from "hardhat";
+import { ethers } from "hardhat";
+import { DojoNFT, LPNFT } from "../typechain";
+import { deployContract, waitForReceipt, deployAaveContracts } from "../utils/deployment";
 
 const nftTokenId = 0;
 
@@ -6,66 +8,31 @@ async function main() {
   const [owner] = await ethers.getSigners();
   console.log(`Deploying contracts using address: ${owner.address}`);
 
-  const DojoNFT = await ethers.getContractFactory("DojoNFT");
-  const dojoNFT = await DojoNFT.deploy();
-  await dojoNFT.deployed();
+  const { aToken, underlyingToken, aaveLendingPool, aaveLendingPoolCoreAddress } = await deployAaveContracts();
 
-  await hre.ethernal.push({
-    name: "DojoNFT",
-    address: dojoNFT.address,
-  });
-
-  console.log("DojoNFT deployed to:", dojoNFT.address);
-
-  const mintNFTTransaction = await dojoNFT.mint();
-
-  await mintNFTTransaction.wait();
-
+  const dojoNft = await deployContract<DojoNFT>("DojoNFT", []);
+  await dojoNft.mint().then(waitForReceipt);
   console.log("Minted NFT token");
+  
+  const lpnft = await deployContract<LPNFT>("LPNFT", [aToken.address, dojoNft.address]);
 
-  const TokenERC20 = await ethers.getContractFactory("TokenERC20");
-  const tokenERC20 = await TokenERC20.deploy();
-  await tokenERC20.deployed();
+  const TOKENS_IN_LPNFT = 500000;
+  await underlyingToken.approve(aaveLendingPoolCoreAddress, TOKENS_IN_LPNFT).then(waitForReceipt);
+  await aaveLendingPool.deposit(underlyingToken.address, TOKENS_IN_LPNFT, 0).then(waitForReceipt);
+  console.log("Deposing tokens in AAVE done");
 
-  await hre.ethernal.push({
-    name: "TokenERC20",
-    address: tokenERC20.address,
-  });
-
-  console.log("TokenERC20 deployed to:", tokenERC20.address);
-
-  const LPNFT = await ethers.getContractFactory("LPNFT");
-  const lpnft = await LPNFT.deploy(tokenERC20.address, dojoNFT.address);
-  await lpnft.deployed();
-
-  await hre.ethernal.push({
-    name: "LPNFT",
-    address: lpnft.address,
-  });
-
-  console.log("LPNFT deployed to:", lpnft.address);
-
-  await tokenERC20.approve(lpnft.address, 100);
-
-  const addLPTransaction = await lpnft.addLPtoNFT(nftTokenId, 100);
-
-  await addLPTransaction.wait();
-
-  console.log("Add lp done");
+  await aToken.approve(lpnft.address, TOKENS_IN_LPNFT).then(waitForReceipt);
+  await lpnft.addLPtoNFT(0, TOKENS_IN_LPNFT).then(waitForReceipt);
+  console.log("Adding LP done");
 
   const balanceAfterAddLp = await lpnft.balanceOf(nftTokenId);
+  console.log("Balance after adding LP:", balanceAfterAddLp.toString());
 
-  console.log("BalanceAfterAddLp:", balanceAfterAddLp.toString());
-
-  const redeemLPTokensTransaction = await lpnft.redeemLPTokens(nftTokenId, 50);
-
-  await redeemLPTokensTransaction.wait();
-
+  await lpnft.redeemLPTokens(nftTokenId, TOKENS_IN_LPNFT).then(waitForReceipt);
   console.log("Redeem done");
 
   const balanceAfterReedemLp = await lpnft.balanceOf(nftTokenId);
-
-  console.log("BalanceAfterReedemLp:", balanceAfterReedemLp.toString());
+  console.log("Balance after redeeming LP:", balanceAfterReedemLp.toString());
 }
 
 main()
