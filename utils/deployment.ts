@@ -3,7 +3,7 @@ import hre, { ethers } from "hardhat";
 import { Libraries } from "hardhat/types";
 import * as TypeChain from "../typechain";
 
-export const wait = (res: ContractTransaction) => res.wait();
+export const waitForReceipt = (res: ContractTransaction) => res.wait();
 
 export const deployContract = async <T extends Contract>(contractName: string, constructorArgs: any[], libraries?: Libraries) => {
   const contractFactory = await ethers.getContractFactory(contractName, { libraries });
@@ -45,22 +45,22 @@ export const deployAaveContracts = async () => {
     deployContract<TypeChain.DummyReserveInterestRateStrategy>("DummyReserveInterestRateStrategy", []),
   ]);
 
-  await lendingPoolAddressesProvider.setLendingPoolCoreImpl(lendingPoolCore.address).then(wait);
-  await lendingPoolAddressesProvider.setLendingPoolImpl(lendingPool.address).then(wait);
-  await lendingPoolAddressesProvider.setLendingPoolDataProviderImpl(lendingPoolDataProvider.address).then(wait);
-  await lendingPoolAddressesProvider.setLendingPoolParametersProviderImpl(lendingPoolParametersProvider.address).then(wait);
-  await lendingPoolAddressesProvider.setLendingPoolConfiguratorImpl(lendingPoolConfigurator.address).then(wait);
-  await lendingPoolAddressesProvider.setFeeProviderImpl(feeProvider.address).then(wait);
-  await lendingPoolAddressesProvider.setLendingPoolManager(owner.address).then(wait);
+  await lendingPoolAddressesProvider.setLendingPoolCoreImpl(lendingPoolCore.address).then(waitForReceipt);
+  await lendingPoolAddressesProvider.setLendingPoolImpl(lendingPool.address).then(waitForReceipt);
+  await lendingPoolAddressesProvider.setLendingPoolDataProviderImpl(lendingPoolDataProvider.address).then(waitForReceipt);
+  await lendingPoolAddressesProvider.setLendingPoolParametersProviderImpl(lendingPoolParametersProvider.address).then(waitForReceipt);
+  await lendingPoolAddressesProvider.setLendingPoolConfiguratorImpl(lendingPoolConfigurator.address).then(waitForReceipt);
+  await lendingPoolAddressesProvider.setFeeProviderImpl(feeProvider.address).then(waitForReceipt);
+  await lendingPoolAddressesProvider.setLendingPoolManager(owner.address).then(waitForReceipt);
 
-  await lendingPoolCore.initialize(lendingPoolAddressesProvider.address).then(wait);
-  await lendingPoolDataProvider.initialize(lendingPoolAddressesProvider.address).then(wait);
-  await lendingPoolParametersProvider.initialize(lendingPoolAddressesProvider.address).then(wait);
-  await lendingPoolConfigurator.initialize(lendingPoolAddressesProvider.address).then(wait);
-  await feeProvider.initialize(lendingPoolAddressesProvider.address).then(wait);
-  await lendingPool.initialize(lendingPoolAddressesProvider.address).then(wait);
+  await lendingPoolCore.initialize(lendingPoolAddressesProvider.address).then(waitForReceipt);
+  await lendingPoolDataProvider.initialize(lendingPoolAddressesProvider.address).then(waitForReceipt);
+  await lendingPoolParametersProvider.initialize(lendingPoolAddressesProvider.address).then(waitForReceipt);
+  await lendingPoolConfigurator.initialize(lendingPoolAddressesProvider.address).then(waitForReceipt);
+  await feeProvider.initialize(lendingPoolAddressesProvider.address).then(waitForReceipt);
+  await lendingPool.initialize(lendingPoolAddressesProvider.address).then(waitForReceipt);
 
-  const initReserveReceipt = await lendingPoolConfigurator.initReserve(underlyingToken.address, 18, dummyReserveInterestStrategy.address).then(wait);
+  const initReserveReceipt = await lendingPoolConfigurator.initReserve(underlyingToken.address, 18, dummyReserveInterestStrategy.address).then(waitForReceipt);
   const aTokenAddress: string = initReserveReceipt.events![0].args![1];
 
   const aToken: TypeChain.AToken = await ethers.getContractAt("AToken", aTokenAddress);
