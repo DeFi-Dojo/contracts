@@ -18,7 +18,7 @@ export const deployContract = async <T extends Contract>(contractName: string, c
   return contract as T;
 }
 
-export default async function deployAaveContracts() {
+export const deployAaveContracts = async () => {
   const [owner] = await ethers.getSigners();
   console.log(`Deploying AAVE using address: ${owner.address}`);
 
@@ -71,5 +71,4 @@ export default async function deployAaveContracts() {
     aaveLendingPool: lendingPool,
     aaveLendingPoolCoreAddress: await lendingPoolAddressesProvider.getLendingPoolCore() 
   }
-  // console.log(`Balances: ${balanceBeforeDeposit}, ${balanceAfterDeposit}, ${balanceAfterRedeem}, ${balanceAfterNLPRedeem}`)  
 }

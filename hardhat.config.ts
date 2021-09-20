@@ -1,5 +1,5 @@
-import '@typechain/hardhat';
-import '@nomiclabs/hardhat-ethers'
+import "@typechain/hardhat";
+import "@nomiclabs/hardhat-ethers"
 import "@nomiclabs/hardhat-waffle";
 import "hardhat-ethernal";
 import "@nomiclabs/hardhat-web3";

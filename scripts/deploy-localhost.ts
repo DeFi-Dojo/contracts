@@ -1,6 +1,6 @@
 import { ethers } from "hardhat";
 import { DojoNFT, LPNFT } from "../typechain";
-import deployAaveContracts, { deployContract, wait } from "../utils/deployment";
+import { deployContract, wait, deployAaveContracts } from "../utils/deployment";
 
 const nftTokenId = 0;
 
@@ -19,7 +19,7 @@ async function main() {
   const TOKENS_IN_LPNFT = 500000;
   await underlyingToken.approve(aaveLendingPoolCoreAddress, TOKENS_IN_LPNFT).then(wait);
   await aaveLendingPool.deposit(underlyingToken.address, TOKENS_IN_LPNFT, 0).then(wait);
-  console.log('Deposing tokens in AAVE done');
+  console.log("Deposing tokens in AAVE done");
 
   await aToken.approve(lpnft.address, TOKENS_IN_LPNFT).then(wait);
   await lpnft.addLPtoNFT(0, TOKENS_IN_LPNFT).then(wait);
