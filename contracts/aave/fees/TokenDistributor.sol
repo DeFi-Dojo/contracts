@@ -1,8 +1,8 @@
 pragma solidity ^0.5.0;
 
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
+import "@openzeppelin/contracts-v2/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts-v2/math/SafeMath.sol";
+import "@openzeppelin/contracts-v2/token/ERC20/SafeERC20.sol";
 import "../libraries/openzeppelin-upgradeability/VersionedInitializable.sol";
 import "../libraries/EthAddressLib.sol";
 
