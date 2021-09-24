@@ -1,5 +1,5 @@
 import { ethers } from "hardhat";
-import { DojoNFT, LPNFT } from "../typechain";
+import { AaveLPNFT, DojoNFT } from "../typechain";
 import { deployContract, waitForReceipt, deployAaveContracts } from "../utils/deployment";
 
 const nftTokenId = 0;
@@ -14,7 +14,7 @@ async function main() {
   await dojoNft.mint().then(waitForReceipt);
   console.log("Minted NFT token");
   
-  const lpnft = await deployContract<LPNFT>("LPNFT", [aToken.address, dojoNft.address]);
+  const lpnft = await deployContract<AaveLPNFT>("AaveLPNFT", [aToken.address, dojoNft.address]);
 
   const TOKENS_IN_LPNFT = 500000;
   await underlyingToken.approve(aaveLendingPoolCoreAddress, TOKENS_IN_LPNFT).then(waitForReceipt);
