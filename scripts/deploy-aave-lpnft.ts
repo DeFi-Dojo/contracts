@@ -1,5 +1,5 @@
 import { ethers } from "hardhat";
-import { AaveLPNFT, DojoNFT } from "../typechain";
+import { AaveLPNFT, DojoNFT, NFTMarketplace } from "../typechain";
 import { deployContract, waitForReceipt, deployAaveContracts } from "../utils/deployment";
 
 const nftTokenId = 0;
@@ -9,8 +9,9 @@ async function main() {
   console.log(`Deploying contracts using address: ${owner.address}`);
 
   const { aToken, underlyingToken, aaveLendingPool, aaveLendingPoolCoreAddress } = await deployAaveContracts();
+  const marketplace = await deployContract<NFTMarketplace>("NFTMarketplace", []);
 
-  const dojoNft = await deployContract<DojoNFT>("DojoNFT", []);
+  const dojoNft = await deployContract<DojoNFT>("DojoNFT", [marketplace.address]);
   await dojoNft.mint().then(waitForReceipt);
   console.log("Minted NFT token");
   

@@ -1,5 +1,5 @@
 import { ethers } from "hardhat";
-import { DojoNFT, SushiLPNFT, TokenERC20, UniswapV2Factory, UniswapV2Pair, UniswapV2Router02, WETH9Mock } from "../typechain";
+import { DojoNFT, SushiLPNFT, TokenERC20, NFTMarketplace, UniswapV2Factory, UniswapV2Pair, UniswapV2Router02, WETH9Mock } from "../typechain";
 import { deployContract, waitForReceipt } from "../utils/deployment";
 
 
@@ -40,7 +40,8 @@ async function main() {
   const liquidity = await pair.balanceOf(owner.address);
   console.log(`Balance of SLP after adding liquidity: ${liquidity}`); 
 
-  const dojoNft = await deployContract<DojoNFT>("DojoNFT", []);
+  const marketplace = await deployContract<NFTMarketplace>("NFTMarketplace", []);
+  const dojoNft = await deployContract<DojoNFT>("DojoNFT", [marketplace.address]);
   await dojoNft.mint().then(waitForReceipt);
   console.log("Minted NFT token");
 
