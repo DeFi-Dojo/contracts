@@ -35,6 +35,8 @@ contract SushiLPNFT {
         address owner = nftToken.ownerOf(nftTokenId);
         require(owner == msg.sender, 'Sender is not owner of the NFT');
 
+        balanceOf[nftTokenId] -= tokenAmount;
+        
         uint totalSupply = pair.totalSupply();
         address token0 = pair.token0();
         address token1 = pair.token1();
@@ -55,7 +57,6 @@ contract SushiLPNFT {
             block.timestamp + 10000
         );
 
-        balanceOf[nftTokenId] -= tokenAmount;
         return true;
     }
 
