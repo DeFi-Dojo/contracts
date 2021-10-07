@@ -8,7 +8,7 @@ interface IAToken is IERC20 {
     function redeem(uint256 _amount) external;
 }
 
-contract LPNFT {
+contract AaveLPNFT {
     using SafeERC20 for IAToken;
     using SafeERC20 for IERC20;
 
