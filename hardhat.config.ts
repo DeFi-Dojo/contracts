@@ -3,6 +3,8 @@ import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-waffle";
 import "hardhat-ethernal";
 import "@nomiclabs/hardhat-web3";
+import "hardhat-gas-reporter";
+
 import { task, HardhatUserConfig } from "hardhat/config";
 import dotenv from "dotenv";
 
@@ -32,6 +34,8 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {
       chainId: 1337,
+      // minting on the DojoNFT takes about 325354 gas
+      gas: 400000,
       mining: {
         auto: false,
         interval: 5000,

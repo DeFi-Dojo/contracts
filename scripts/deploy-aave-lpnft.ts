@@ -6,9 +6,14 @@ import {
   deployAaveContracts,
 } from "../utils/deployment";
 
-const nftTokenId = 0;
+const NFT_TOKEN_ID = 0;
+
+const { NFT_BASE_URI } = process.env;
 
 async function main() {
+  if (!NFT_BASE_URI) {
+    throw new Error("NFT_BASE_URI not declared");
+  }
   const [owner] = await ethers.getSigners();
   console.log(`Deploying contracts using address: ${owner.address}`);
 
@@ -25,9 +30,8 @@ async function main() {
 
   const dojoNft = await deployContract<DojoNFT>("DojoNFT", [
     marketplace.address,
+    NFT_BASE_URI,
   ]);
-  await dojoNft.mint().then(waitForReceipt);
-  console.log("Minted NFT token");
 
   const lpnft = await deployContract<AaveLPNFT>("AaveLPNFT", [
     aToken.address,
@@ -47,13 +51,15 @@ async function main() {
   await lpnft.addLPtoNFT(0, TOKENS_IN_LPNFT).then(waitForReceipt);
   console.log("Adding LP done");
 
-  const balanceAfterAddLp = await lpnft.balanceOf(nftTokenId);
+  const balanceAfterAddLp = await lpnft.balanceOf(NFT_TOKEN_ID);
   console.log("Balance after adding LP:", balanceAfterAddLp.toString());
 
-  await lpnft.redeemLPTokens(nftTokenId, TOKENS_IN_LPNFT).then(waitForReceipt);
+  await lpnft
+    .redeemLPTokens(NFT_TOKEN_ID, TOKENS_IN_LPNFT)
+    .then(waitForReceipt);
   console.log("Redeem done");
 
-  const balanceAfterReedemLp = await lpnft.balanceOf(nftTokenId);
+  const balanceAfterReedemLp = await lpnft.balanceOf(NFT_TOKEN_ID);
   console.log("Balance after redeeming LP:", balanceAfterReedemLp.toString());
 }
 
