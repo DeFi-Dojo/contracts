@@ -8,3 +8,5 @@ typechain
 .history
 
 .env
+
+yarn-error.log
