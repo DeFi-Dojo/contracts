@@ -19,7 +19,7 @@ async function main() {
 
   const res = await contract.connect(ownerOfLootBox).unpack(TOKEN_ID);
 
-  console.log("method called");
+  console.log("unpack called");
 
   await res.wait();
 
