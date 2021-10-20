@@ -18,7 +18,7 @@ contract OpenSeaFactory is FactoryERC721, Ownable {
 
     address public proxyRegistryAddress;
     address public nftAddress;
-    string public baseURI = "https://creatures-api.opensea.io/api/factory/";
+    string public baseURI;
 
     /*
      * Enforce the existence of only 1000 OpenSea creatures.
@@ -31,10 +31,11 @@ contract OpenSeaFactory is FactoryERC721, Ownable {
     uint256 NUM_OPTIONS = 1;
     uint256 SINGLE_CREATURE_OPTION = 0;
 
-    constructor(address _proxyRegistryAddress, address _nftAddress, uint256 _creatureSupply) {
+    constructor(address _proxyRegistryAddress, address _nftAddress, uint256 _creatureSupply, string memory _baseURI) {
         proxyRegistryAddress = _proxyRegistryAddress;
         nftAddress = _nftAddress;
         CREATURE_SUPPLY = _creatureSupply;
+        baseURI = _baseURI;
 
         fireTransferEvents(address(0), owner());
     }

@@ -8,8 +8,9 @@ import Web3ProviderEngine from "web3-provider-engine";
 import { DojoNFT, OpenSeaFactory } from "../typechain";
 import { deployContract, waitForReceipt } from "../utils/deployment";
 import { PROXY_REGISTRY_ADDRESS_RINKEBY, MAX_SUPPLY_OF_NFT } from "../consts";
+import configEnv from "../config";
 
-const { RINKEBY_API_URL, WALLET_MNEMONIC, NFT_BASE_URI } = process.env;
+const { RINKEBY_API_URL, WALLET_MNEMONIC, NFT_BASE_URI } = configEnv;
 
 const NUM_FIXED_PRICE_AUCTIONS = 5;
 const FIXED_PRICE = 0.05;
@@ -17,10 +18,6 @@ const BASE_DERIVATION_PATH = "44'/60'/0'/0";
 
 async function main() {
   const [owner] = await ethers.getSigners();
-
-  if (!WALLET_MNEMONIC || !RINKEBY_API_URL || !NFT_BASE_URI) {
-    return;
-  }
 
   const mnemonicWalletSubprovider = new MnemonicWalletSubprovider({
     mnemonic: WALLET_MNEMONIC,

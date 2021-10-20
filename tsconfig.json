@@ -9,7 +9,14 @@
     "outDir": "dist",
     "paths": { "~/*": ["./*"] }
   },
-  "include": ["./scripts", "./test", "./typechain", "./utils", "./consts"],
+  "include": [
+    "./scripts",
+    "./test",
+    "./typechain",
+    "./utils",
+    "./consts",
+    "./config"
+  ],
   "files": ["./hardhat.config.ts", "./test.config.ts"],
   "exclude": ["node_modules"]
 }
