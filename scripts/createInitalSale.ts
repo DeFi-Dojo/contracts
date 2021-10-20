@@ -7,9 +7,7 @@ import Web3ProviderEngine from "web3-provider-engine";
 
 import { DojoNFT, OpenSeaFactory } from "../typechain";
 import { deployContract, waitForReceipt } from "../utils/deployment";
-
-const PROXY_REGISTRY_ADDRESS_RINKEBY =
-  "0xf57b2c51ded3a29e6891aba85459d600256cf317";
+import { PROXY_REGISTRY_ADDRESS_RINKEBY, MAX_SUPPLY_OF_NFT } from "../consts";
 
 const { RINKEBY_API_URL, WALLET_MNEMONIC, NFT_BASE_URI } = process.env;
 
@@ -56,7 +54,7 @@ async function main() {
 
   const openSeaFactory = await deployContract<OpenSeaFactory>(
     "OpenSeaFactory",
-    [PROXY_REGISTRY_ADDRESS_RINKEBY, openSeaNFT.address]
+    [PROXY_REGISTRY_ADDRESS_RINKEBY, openSeaNFT.address, MAX_SUPPLY_OF_NFT]
   );
 
   await openSeaNFT

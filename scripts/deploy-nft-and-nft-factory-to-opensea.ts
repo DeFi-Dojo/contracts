@@ -2,9 +2,8 @@ import { ethers } from "hardhat";
 
 import { DojoNFT, OpenSeaFactory } from "../typechain";
 import { deployContract, waitForReceipt } from "../utils/deployment";
+import { PROXY_REGISTRY_ADDRESS_RINKEBY, MAX_SUPPLY_OF_NFT } from "../consts";
 
-const PROXY_REGISTRY_ADDRESS_RINKEBY =
-  "0xf57b2c51ded3a29e6891aba85459d600256cf317";
 const { NFT_BASE_URI } = process.env;
 
 async function main() {
@@ -23,7 +22,7 @@ async function main() {
 
   const openSeaFactory = await deployContract<OpenSeaFactory>(
     "OpenSeaFactory",
-    [PROXY_REGISTRY_ADDRESS_RINKEBY, dojoNFT.address]
+    [PROXY_REGISTRY_ADDRESS_RINKEBY, dojoNFT.address, MAX_SUPPLY_OF_NFT]
   );
 
   await dojoNFT.transferOwnership(openSeaFactory.address).then(waitForReceipt);
