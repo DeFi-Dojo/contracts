@@ -6,9 +6,11 @@ import {
   deployAaveContracts,
 } from "../utils/deployment";
 
-const NFT_TOKEN_ID = 0;
+import configEnv from "../config";
 
-const { NFT_BASE_URI } = process.env;
+const { NFT_BASE_URI } = configEnv;
+
+const NFT_TOKEN_ID = 0;
 
 async function main() {
   if (!NFT_BASE_URI) {

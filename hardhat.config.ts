@@ -6,18 +6,14 @@ import "@nomiclabs/hardhat-web3";
 import "hardhat-gas-reporter";
 
 import { task, HardhatUserConfig } from "hardhat/config";
-import dotenv from "dotenv";
-
-dotenv.config();
+import configEnv from "./config";
 
 const {
   RINKEBY_API_URL,
-  ROPSTEN_API_URL,
   DEFAULT_NETWORK,
   POLYGON_MUMBAI_API_URL,
   WALLET_MNEMONIC,
-  GOERLI_API_URL,
-} = process.env;
+} = configEnv;
 
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   const accounts = await hre.ethers.getSigners();
@@ -42,20 +38,12 @@ const config: HardhatUserConfig = {
       },
       accounts,
     },
-    ropsten: {
-      url: ROPSTEN_API_URL,
-      accounts,
-    },
     rinkeby: {
       url: RINKEBY_API_URL,
       accounts,
     },
     matic: {
       url: POLYGON_MUMBAI_API_URL,
-      accounts,
-    },
-    goerli: {
-      url: GOERLI_API_URL,
       accounts,
     },
   },

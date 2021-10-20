@@ -11,13 +11,11 @@ import {
 } from "../typechain";
 import { deployContract, waitForReceipt } from "../utils/deployment";
 
-const { NFT_BASE_URI } = process.env;
+import configEnv from "../config";
+
+const { NFT_BASE_URI } = configEnv;
 
 async function main() {
-  if (!NFT_BASE_URI) {
-    throw new Error("NFT_BASE_URI not declared");
-  }
-
   const [owner] = await ethers.getSigners();
   const [uniswapv2SushiFactory, weth9Mock] = await Promise.all([
     deployContract<UniswapV2Factory>("UniswapV2Factory", [owner.address]),

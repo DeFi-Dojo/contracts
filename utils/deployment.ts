@@ -2,6 +2,9 @@ import { Contract, ContractTransaction } from "ethers";
 import hre, { ethers } from "hardhat";
 import { Libraries } from "hardhat/types";
 import * as TypeChain from "../typechain";
+import configEnv from "../config";
+
+const { USE_ETHERNAL } = configEnv;
 
 export const waitForReceipt = (res: ContractTransaction) => res.wait();
 
@@ -9,7 +12,7 @@ export const deployContract = async <T extends Contract>(
   contractName: string,
   constructorArgs: any[],
   libraries?: Libraries,
-  useEthernal = true
+  useEthernal = USE_ETHERNAL
 ) => {
   const contractFactory = await ethers.getContractFactory(contractName, {
     libraries,
