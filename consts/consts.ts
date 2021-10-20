@@ -1,0 +1,4 @@
+export const PROXY_REGISTRY_ADDRESS_RINKEBY =
+  "0xf57b2c51ded3a29e6891aba85459d600256cf317";
+
+export const MAX_SUPPLY_OF_NFT = 1000;

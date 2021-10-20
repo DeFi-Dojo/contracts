@@ -75,11 +75,11 @@ contract DojoNFT is ContextMixin, ERC721Enumerable, NativeMetaTransaction, Ownab
         return "https://creatures-api.opensea.io/contract/opensea-creatures";
     }
 
-    function _randPercentage(uint256 tokenId, string memory prefix) private view returns (uint) {
-        return uint(keccak256(abi.encodePacked(tokenId, prefix, block.timestamp, block.difficulty, msg.sender))) % 100;
+    function _randPercentage(uint256 tokenId, string memory prefix, uint256 _blockTimestamp, uint256 _blockDifficulty) internal view returns (uint) {
+        return uint(keccak256(abi.encodePacked(tokenId, prefix, _blockTimestamp, _blockDifficulty, msg.sender))) % 100;
     }
 
-    function _getOption(uint rarity, uint16[] memory distribution) pure private returns (uint8 option) {
+    function _getOption(uint rarity, uint16[] memory distribution) pure internal returns (uint8 option) {
         uint256 arrayLength = distribution.length;
         for (uint8 i=0; i<arrayLength; i++) {
             if(distribution[i] > rarity) {
@@ -88,24 +88,28 @@ contract DojoNFT is ContextMixin, ERC721Enumerable, NativeMetaTransaction, Ownab
         }
     }
 
+    function mintTo(address _to) public onlyOwner returns (uint256)  {
+        return _mintTo(_to, block.timestamp, block.difficulty);
+    }
+
     /**
      * @dev Mints a token to an address with a tokenURI.
      * @param _to address of the future owner of the token
      */
-    function mintTo(address _to) public onlyOwner returns (uint256)  {
+    function _mintTo(address _to, uint256 _blockTimestamp, uint256 _blockDifficulty) internal returns (uint256)  {
         uint256 newTokenId = _getNextTokenId();
 
         characteristics[newTokenId] = Characteristics(
             {
-            faceMask: _getOption( _randPercentage(newTokenId, "faceMask"), equipmentDistributionMatrix[0]),
-            eyes: _getOption(_randPercentage(newTokenId, "eyes"), equipmentDistributionMatrix[1]),
-            symbol: _getOption(_randPercentage(newTokenId, "symbol"), equipmentDistributionMatrix[2]),
-            horn: _getOption(_randPercentage(newTokenId, "horn"), equipmentDistributionMatrix[3]),
-            weapon: _getOption(_randPercentage(newTokenId, "weapon"), equipmentDistributionMatrix[4]),
-            helmetMaterial: _getOption(_randPercentage(newTokenId, "helmetMaterial"), rarityDistributionMatrix[0]),
-            faceMaskColor: _getOption(_randPercentage(newTokenId, "faceMaskColor"), rarityDistributionMatrix[1]),
-            faceMaskPattern: _getOption(_randPercentage(newTokenId, "faceMaskPattern"), rarityDistributionMatrix[2]),
-            samuraiSex: _getOption(_randPercentage(newTokenId, "samuraiSex"), rarityDistributionMatrix[3])
+            faceMask: _getOption( _randPercentage(newTokenId, "faceMask", _blockTimestamp, _blockDifficulty), equipmentDistributionMatrix[0]),
+            eyes: _getOption(_randPercentage(newTokenId, "eyes", _blockTimestamp, _blockDifficulty), equipmentDistributionMatrix[1]),
+            symbol: _getOption(_randPercentage(newTokenId, "symbol", _blockTimestamp, _blockDifficulty), equipmentDistributionMatrix[2]),
+            horn: _getOption(_randPercentage(newTokenId, "horn", _blockTimestamp, _blockDifficulty), equipmentDistributionMatrix[3]),
+            weapon: _getOption(_randPercentage(newTokenId, "weapon", _blockTimestamp, _blockDifficulty), equipmentDistributionMatrix[4]),
+            helmetMaterial: _getOption(_randPercentage(newTokenId, "helmetMaterial", _blockTimestamp, _blockDifficulty), rarityDistributionMatrix[0]),
+            faceMaskColor: _getOption(_randPercentage(newTokenId, "faceMaskColor", _blockTimestamp, _blockDifficulty), rarityDistributionMatrix[1]),
+            faceMaskPattern: _getOption(_randPercentage(newTokenId, "faceMaskPattern", _blockTimestamp, _blockDifficulty), rarityDistributionMatrix[2]),
+            samuraiSex: _getOption(_randPercentage(newTokenId, "samuraiSex", _blockTimestamp, _blockDifficulty), rarityDistributionMatrix[3])
         }
         );
 
@@ -119,14 +123,14 @@ contract DojoNFT is ContextMixin, ERC721Enumerable, NativeMetaTransaction, Ownab
      * @dev calculates the next token ID based on value of _currentTokenId
      * @return uint256 for the next token ID
      */
-    function _getNextTokenId() private view returns (uint256) {
+    function _getNextTokenId() internal view returns (uint256) {
         return _currentTokenId;
     }
 
     /**
      * @dev increments the value of _currentTokenId
      */
-    function _incrementTokenId() private {
+    function _incrementTokenId() internal {
         _currentTokenId++;
     }
 

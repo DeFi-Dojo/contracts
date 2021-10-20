@@ -23,7 +23,7 @@ contract OpenSeaFactory is FactoryERC721, Ownable {
     /*
      * Enforce the existence of only 1000 OpenSea creatures.
      */
-    uint256 CREATURE_SUPPLY = 1000;
+    uint256 CREATURE_SUPPLY;
 
     /*
      * One option for minting.
@@ -31,9 +31,10 @@ contract OpenSeaFactory is FactoryERC721, Ownable {
     uint256 NUM_OPTIONS = 1;
     uint256 SINGLE_CREATURE_OPTION = 0;
 
-    constructor(address _proxyRegistryAddress, address _nftAddress) {
+    constructor(address _proxyRegistryAddress, address _nftAddress, uint256 _creatureSupply) {
         proxyRegistryAddress = _proxyRegistryAddress;
         nftAddress = _nftAddress;
+        CREATURE_SUPPLY = _creatureSupply;
 
         fireTransferEvents(address(0), owner());
     }
@@ -93,7 +94,7 @@ contract OpenSeaFactory is FactoryERC721, Ownable {
         if (_optionId == SINGLE_CREATURE_OPTION) {
             numItemsAllocated = 1;
         }
-        return creatureSupply < (CREATURE_SUPPLY - numItemsAllocated);
+        return creatureSupply <= (CREATURE_SUPPLY - numItemsAllocated);
     }
 
     function tokenURI(uint256 _optionId) override external view returns (string memory) {
