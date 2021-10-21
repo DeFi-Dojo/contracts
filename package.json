@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "run:node": "hardhat node",
+    "deploy:nft:and:opensea:factory": "hardhat run scripts/deploy-nft-and-nft-factory-to-opensea.ts",
     "pretest": "hardhat compile",
     "test": "hardhat test --config test.config.ts"
   },
