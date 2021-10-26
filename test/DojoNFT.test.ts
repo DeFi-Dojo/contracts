@@ -50,6 +50,19 @@ describe("DojoNFT", () => {
     expect(tokenURI).to.equal(`${NFT_BASE_URI}${TOKEN_ID}`);
   });
 
+  it("exist", async () => {
+    const TOKEN_ID = 0;
+    const [owner] = await ethers.getSigners();
+
+    expect(await dojoNFT.exist(TOKEN_ID)).to.equal(false);
+
+    await dojoNFT
+      .public_mintTo(owner.address, BLOCK_TIMESTAMP, BLOCK_DIFFUCLTY)
+      .then(waitForReceipt);
+
+    expect(await dojoNFT.exist(TOKEN_ID)).to.equal(true);
+  });
+
   it("_mintTo", async () => {
     const [owner] = await ethers.getSigners();
 
@@ -59,6 +72,7 @@ describe("DojoNFT", () => {
 
     const balance = await dojoNFT.balanceOf(owner.address);
 
+    // eslint-disable-next-line no-underscore-dangle
     expect(balance._hex).to.equal("0x01");
 
     const {
