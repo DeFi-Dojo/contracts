@@ -108,6 +108,10 @@ describe("DojoNFT", () => {
       symbol: 2,
       weapon: 1,
     });
+
+    const rarityIndex = await dojoNFT.rarityIndex(0);
+
+    expect(rarityIndex).to.equal(0);
   });
 
   it("_randPercentage", async () => {
@@ -125,12 +129,36 @@ describe("DojoNFT", () => {
   it("_getOption", async () => {
     const DISTRIBUTION = [50, 60, 85, 95, 100];
 
-    expect(await dojoNFT.public_getOption(99, DISTRIBUTION)).to.equal(4);
+    const { optionId: optionId1, rarity: rarity1 } =
+      await dojoNFT.public_getOption(99, DISTRIBUTION);
 
-    expect(await dojoNFT.public_getOption(0, DISTRIBUTION)).to.equal(0);
+    expect({ optionId: optionId1, rarity: rarity1 }).to.deep.equal({
+      optionId: 4,
+      rarity: 5,
+    });
 
-    expect(await dojoNFT.public_getOption(50, DISTRIBUTION)).to.equal(1);
+    const { optionId: optionId2, rarity: rarity2 } =
+      await dojoNFT.public_getOption(0, DISTRIBUTION);
 
-    expect(await dojoNFT.public_getOption(70, DISTRIBUTION)).to.equal(2);
+    expect({ optionId: optionId2, rarity: rarity2 }).to.deep.equal({
+      optionId: 0,
+      rarity: 50,
+    });
+
+    const { optionId: optionId3, rarity: rarity3 } =
+      await dojoNFT.public_getOption(50, DISTRIBUTION);
+
+    expect({ optionId: optionId3, rarity: rarity3 }).to.deep.equal({
+      optionId: 1,
+      rarity: 10,
+    });
+
+    const { optionId: optionId4, rarity: rarity4 } =
+      await dojoNFT.public_getOption(70, DISTRIBUTION);
+
+    expect({ optionId: optionId4, rarity: rarity4 }).to.deep.equal({
+      optionId: 2,
+      rarity: 25,
+    });
   });
 });
