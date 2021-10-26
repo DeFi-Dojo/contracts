@@ -24,7 +24,7 @@ contract ExposedDojoNFT is DojoNFT {
         return _randPercentage(tokenId, prefix, _blockTimestamp, _blockDifficulty);
     }
 
-    function public_getOption(uint rarity, uint16[] memory distribution) pure public returns (uint8 option) {
+    function public_getOption(uint rarity, uint8[] memory distribution) pure public returns (RarityOption memory rarityOption) {
         return _getOption(rarity, distribution);
     }
 
