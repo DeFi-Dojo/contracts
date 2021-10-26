@@ -58,7 +58,7 @@ contract DojoNFT is ContextMixin, ERC721Enumerable, NativeMetaTransaction, Ownab
 
     struct RarityOption {
         uint8 optionId;
-        uint8 rarity;
+        uint256 rarity;
     }
 
     struct RarityInfo {
@@ -145,7 +145,7 @@ contract DojoNFT is ContextMixin, ERC721Enumerable, NativeMetaTransaction, Ownab
             samuraiSex: rarityInfo.samuraiSex.optionId
         });
 
-        // rarityIndex[newTokenId] = rarityInfo.faceMask.rarity + rarityInfo.eyes.rarity + rarityInfo.symbol.rarity + rarityInfo.horn.rarity + rarityInfo.weapon.rarity + rarityInfo.helmetMaterial.rarity + rarityInfo.faceMaskColor.rarity + rarityInfo.faceMaskPattern.rarity + rarityInfo.samuraiSex.rarity;
+        rarityIndex[newTokenId] = rarityInfo.faceMask.rarity + rarityInfo.eyes.rarity + rarityInfo.symbol.rarity + rarityInfo.horn.rarity + rarityInfo.weapon.rarity + rarityInfo.helmetMaterial.rarity + rarityInfo.faceMaskColor.rarity + rarityInfo.faceMaskPattern.rarity + rarityInfo.samuraiSex.rarity;
 
         _safeMint(_to, newTokenId);
         _incrementTokenId();

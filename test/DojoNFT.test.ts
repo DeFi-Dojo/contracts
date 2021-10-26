@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import { Contract } from "ethers";
@@ -72,7 +73,6 @@ describe("DojoNFT", () => {
 
     const balance = await dojoNFT.balanceOf(owner.address);
 
-    // eslint-disable-next-line no-underscore-dangle
     expect(balance._hex).to.equal("0x01");
 
     const {
@@ -111,7 +111,7 @@ describe("DojoNFT", () => {
 
     const rarityIndex = await dojoNFT.rarityIndex(0);
 
-    expect(rarityIndex).to.equal(0);
+    expect(rarityIndex).to.equal(320);
   });
 
   it("_randPercentage", async () => {
@@ -132,33 +132,33 @@ describe("DojoNFT", () => {
     const { optionId: optionId1, rarity: rarity1 } =
       await dojoNFT.public_getOption(99, DISTRIBUTION);
 
-    expect({ optionId: optionId1, rarity: rarity1 }).to.deep.equal({
+    expect({ optionId: optionId1, rarity: rarity1._hex }).to.deep.equal({
       optionId: 4,
-      rarity: 5,
+      rarity: "0x05",
     });
 
     const { optionId: optionId2, rarity: rarity2 } =
       await dojoNFT.public_getOption(0, DISTRIBUTION);
 
-    expect({ optionId: optionId2, rarity: rarity2 }).to.deep.equal({
+    expect({ optionId: optionId2, rarity: rarity2._hex }).to.deep.equal({
       optionId: 0,
-      rarity: 50,
+      rarity: "0x32",
     });
 
     const { optionId: optionId3, rarity: rarity3 } =
       await dojoNFT.public_getOption(50, DISTRIBUTION);
 
-    expect({ optionId: optionId3, rarity: rarity3 }).to.deep.equal({
+    expect({ optionId: optionId3, rarity: rarity3._hex }).to.deep.equal({
       optionId: 1,
-      rarity: 10,
+      rarity: "0x0a",
     });
 
     const { optionId: optionId4, rarity: rarity4 } =
       await dojoNFT.public_getOption(70, DISTRIBUTION);
 
-    expect({ optionId: optionId4, rarity: rarity4 }).to.deep.equal({
+    expect({ optionId: optionId4, rarity: rarity4._hex }).to.deep.equal({
       optionId: 2,
-      rarity: 25,
+      rarity: "0x19",
     });
   });
 });
