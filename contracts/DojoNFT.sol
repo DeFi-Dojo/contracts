@@ -71,8 +71,8 @@ contract DojoNFT is ContextMixin, ERC721Enumerable, NativeMetaTransaction, Ownab
         return baseURI;
     }
 
-    function contractURI() public pure returns (string memory) {
-        return "https://creatures-api.opensea.io/contract/opensea-creatures";
+     function exist(uint256 tokenId) public view returns (bool) {
+        return tokenId < _currentTokenId;
     }
 
     function _randPercentage(uint256 tokenId, string memory prefix, uint256 _blockTimestamp, uint256 _blockDifficulty) internal view returns (uint) {
