@@ -2,8 +2,8 @@
 pragma solidity ^0.8.6;
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "./aaveV2/ILendingPool.sol";
-import "./aaveV2/IAToken.sol";
+import "./interfaces/aave/ILendingPool.sol";
+import "./interfaces/aave/IAToken.sol";
 
 
 contract AaveLPNFT {
@@ -33,8 +33,8 @@ contract AaveLPNFT {
     function redeemLPTokens(uint256 nftTokenId, uint tokenAmount) public returns (bool) {
         require(tokenAmount <= balanceOf[nftTokenId], 'Amount exeeds balance');
 
-        // address owner = nftToken.ownerOf(nftTokenId);
-        // require(owner == msg.sender, 'Sender is not owner of the NFT');
+        address owner = nftToken.ownerOf(nftTokenId);
+        require(owner == msg.sender, 'Sender is not owner of the NFT');
         balanceOf[nftTokenId] -= tokenAmount;
 
         pool.withdraw(address(underlyingToken), tokenAmount, msg.sender);
