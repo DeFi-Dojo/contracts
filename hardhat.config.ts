@@ -13,6 +13,7 @@ const {
   DEFAULT_NETWORK,
   POLYGON_MUMBAI_API_URL,
   WALLET_MNEMONIC,
+  KOVAN_API_URL,
 } = configEnv;
 
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
@@ -28,15 +29,20 @@ const accounts = {
 const config: HardhatUserConfig = {
   defaultNetwork: DEFAULT_NETWORK,
   networks: {
-    hardhat: {
-      chainId: 1337,
-      // minting on the DojoNFT takes about 325354 gas
-      gas: 400000,
-      mining: {
-        auto: false,
-        interval: 5000,
-      },
+    // hardhat: {
+    //   chainId: 1337,
+    //   // minting on the DojoNFT takes about 325354 gas
+    //   gas: 400000,
+    //   mining: {
+    //     auto: false,
+    //     interval: 5000,
+    //   },
+    //   accounts,
+    // },
+    kovan: {
+      url: KOVAN_API_URL,
       accounts,
+      gas: 12500000,
     },
     rinkeby: {
       url: RINKEBY_API_URL,
