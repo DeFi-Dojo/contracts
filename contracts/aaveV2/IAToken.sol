@@ -79,4 +79,6 @@ interface IAToken is IERC20, IScaledBalanceToken {
   function transferUnderlyingTo(address user, uint256 amount) external returns (uint256);
 
   function POOL() external returns (address);
+
+  function UNDERLYING_ASSET_ADDRESS() external returns (address);
 }
