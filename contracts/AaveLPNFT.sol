@@ -33,8 +33,8 @@ contract AaveLPNFT {
     function redeemLPTokens(uint256 nftTokenId, uint tokenAmount) public returns (bool) {
         require(tokenAmount <= balanceOf[nftTokenId], 'Amount exeeds balance');
 
-        address owner = nftToken.ownerOf(nftTokenId);
-        require(owner == msg.sender, 'Sender is not owner of the NFT');
+        // address owner = nftToken.ownerOf(nftTokenId);
+        // require(owner == msg.sender, 'Sender is not owner of the NFT');
         balanceOf[nftTokenId] -= tokenAmount;
 
         pool.withdraw(address(underlyingToken), tokenAmount, msg.sender);
