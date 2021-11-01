@@ -22,6 +22,8 @@ async function main() {
     PROXY_REGISTRY_ADDRESS_RINKEBY,
   ]);
 
+  await dojoNft.mintTo(owner.address).then(waitForReceipt);
+
   const lpnft = await deployContract<AaveLPNFT>("AaveLPNFT", [
     A_WETH_ADDRESS,
     dojoNft.address,
