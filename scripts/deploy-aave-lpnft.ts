@@ -1,68 +1,45 @@
 import { ethers } from "hardhat";
-import { AaveLPNFT, DojoNFT, NFTMarketplace } from "../typechain";
-import {
-  deployContract,
-  waitForReceipt,
-  deployAaveContracts,
-} from "../utils/deployment";
+import { AaveLPNFT, DojoNFT } from "../typechain";
+import { deployContract, waitForReceipt } from "../utils/deployment";
 
 import configEnv from "../config";
+import { PROXY_REGISTRY_ADDRESS_RINKEBY } from "../consts";
 
 const { NFT_BASE_URI } = configEnv;
 
 const NFT_TOKEN_ID = 0;
 
+const TOKENS_IN_LPNFT = 5000;
+
+const A_WETH_ADDRESS = "0x87b1f4cf9BD63f7BBD3eE1aD04E8F52540349347";
+
 async function main() {
-  if (!NFT_BASE_URI) {
-    throw new Error("NFT_BASE_URI not declared");
-  }
   const [owner] = await ethers.getSigners();
   console.log(`Deploying contracts using address: ${owner.address}`);
 
-  const {
-    aToken,
-    underlyingToken,
-    aaveLendingPool,
-    aaveLendingPoolCoreAddress,
-  } = await deployAaveContracts();
-  const marketplace = await deployContract<NFTMarketplace>(
-    "NFTMarketplace",
-    []
-  );
-
   const dojoNft = await deployContract<DojoNFT>("DojoNFT", [
-    marketplace.address,
     NFT_BASE_URI,
+    PROXY_REGISTRY_ADDRESS_RINKEBY,
   ]);
 
+  await dojoNft.mintTo(owner.address).then(waitForReceipt);
+
   const lpnft = await deployContract<AaveLPNFT>("AaveLPNFT", [
-    aToken.address,
+    A_WETH_ADDRESS,
     dojoNft.address,
   ]);
 
-  const TOKENS_IN_LPNFT = 500000;
-  await underlyingToken
-    .approve(aaveLendingPoolCoreAddress, TOKENS_IN_LPNFT)
-    .then(waitForReceipt);
-  await aaveLendingPool
-    .deposit(underlyingToken.address, TOKENS_IN_LPNFT, 0)
-    .then(waitForReceipt);
-  console.log("Deposing tokens in AAVE done");
+  const aWETH = await ethers.getContractAt("IAToken", A_WETH_ADDRESS);
 
-  await aToken.approve(lpnft.address, TOKENS_IN_LPNFT).then(waitForReceipt);
-  await lpnft.addLPtoNFT(0, TOKENS_IN_LPNFT).then(waitForReceipt);
+  await aWETH.approve(lpnft.address, TOKENS_IN_LPNFT).then(waitForReceipt);
+
+  await lpnft.addLPtoNFT(NFT_TOKEN_ID, TOKENS_IN_LPNFT).then(waitForReceipt);
   console.log("Adding LP done");
-
-  const balanceAfterAddLp = await lpnft.balanceOf(NFT_TOKEN_ID);
-  console.log("Balance after adding LP:", balanceAfterAddLp.toString());
 
   await lpnft
     .redeemLPTokens(NFT_TOKEN_ID, TOKENS_IN_LPNFT)
     .then(waitForReceipt);
   console.log("Redeem done");
-
-  const balanceAfterReedemLp = await lpnft.balanceOf(NFT_TOKEN_ID);
-  console.log("Balance after redeeming LP:", balanceAfterReedemLp.toString());
 }
 
 main()

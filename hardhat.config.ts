@@ -13,6 +13,7 @@ const {
   DEFAULT_NETWORK,
   POLYGON_MUMBAI_API_URL,
   WALLET_MNEMONIC,
+  KOVAN_API_URL,
 } = configEnv;
 
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
@@ -36,6 +37,10 @@ const config: HardhatUserConfig = {
         auto: false,
         interval: 5000,
       },
+      accounts,
+    },
+    kovan: {
+      url: KOVAN_API_URL,
       accounts,
     },
     rinkeby: {
