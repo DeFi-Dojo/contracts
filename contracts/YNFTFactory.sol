@@ -11,7 +11,7 @@ import "./YNFT.sol";
 contract YNFTFactory {
     YNFT public immutable yNFT;
     IUniswapV2Router02 public immutable dexRouter;
-    address private multiDaiKovan = 0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa;
+    address private daiAddress = 0x639cB7b21ee2161DF9c882483C9D55c90c20Ca3e;
 
     constructor(address _dexRouter) {
         yNFT = new YNFT();
@@ -21,7 +21,7 @@ contract YNFTFactory {
     function createYNFT(address user) public payable {
         uint256 tokenId = yNFT.mint(user);
         uint deadline = block.timestamp + 15; // using 'now' for convenience, for mainnet pass deadline from frontend!
-        dexRouter.swapETHForExactTokens{ value: msg.value }(getEstimatedDAIforETH(msg.value), getPathForDAItoETH(), address(this), deadline);
+        uint[] memory amounts = dexRouter.swapETHForExactTokens{ value: msg.value }(getEstimatedDAIforETH(msg.value), getPathForDAItoETH(), address(this), deadline);
 
         // refund leftover ETH to user
         (bool success,) = msg.sender.call{ value: address(this).balance }("");
@@ -34,7 +34,7 @@ contract YNFTFactory {
 
   function getPathForDAItoETH() private view returns (address[] memory) {
     address[] memory path = new address[](2);
-    path[0] = multiDaiKovan;
+    path[0] = daiAddress;
     path[1] = dexRouter.WETH();
     return path;
   }
