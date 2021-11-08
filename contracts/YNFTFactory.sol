@@ -40,6 +40,18 @@ contract YNFTFactory {
         dexRouter.swapExactTokensForETH(_amountIn, _amountOutMin, path, user, deadline);
     }
 
+    function createYNFTForEther(address user, uint _amountOutMin) public payable {
+        uint256 tokenId = yNFT.mint(user);
+
+        uint deadline = block.timestamp + 15; // using 'now' for convenience, for mainnet pass deadline from frontend!
+        address[] memory path = new address[](2);
+        path[0] = dexRouter.WETH();
+        path[1] = daiAddress;
+
+        dexRouter.swapExactETHForTokens{ value: msg.value }(_amountOutMin, path, msg.sender, deadline);
+
+    }
+
     // function getAmountOutMin(uint256 _amountIn) external view returns (uint256) {
 
     //     address[] memory path = new address[](2);
