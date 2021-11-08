@@ -20,7 +20,6 @@ contract YNFTVault is Ownable {
     IAToken public aToken;
     IERC721 public nftToken;
     ILendingPool public pool;
-    IERC20 public underlyingAToken;
 
     YNFT public immutable yNFT;
     IUniswapV2Router02 public immutable dexRouter;
@@ -29,29 +28,30 @@ contract YNFTVault is Ownable {
     constructor(address _dexRouter, IAToken _aToken) {
         aToken = _aToken;
         pool = ILendingPool(aToken.POOL());
-        underlyingAToken = IERC20(aToken.UNDERLYING_ASSET_ADDRESS());
         yNFT = new YNFT();
         dexRouter = IUniswapV2Router02(_dexRouter);
-        token = IERC20(underlyingAToken);
+        token = IERC20(aToken.UNDERLYING_ASSET_ADDRESS());
     }
 
-      function addLPtoNFT(uint256 nftTokenId, uint tokenAmount) public returns (bool) {
-        aToken.safeTransferFrom(msg.sender, address(this), tokenAmount);
+    function addLPtoNFT(uint256 nftTokenId, uint tokenAmount) internal returns (bool) {
+       require(token.approve(address(pool), tokenAmount), 'approve failed.');
+
+        pool.deposit(address(token), tokenAmount, address(this), 0);
         balanceOf[nftTokenId] += tokenAmount;
         return true;
     }
 
-    function redeemLPTokens(uint256 nftTokenId, uint tokenAmount) public returns (bool) {
-        require(tokenAmount <= balanceOf[nftTokenId], 'Amount exeeds balance');
+    // function redeemLPTokens(uint256 nftTokenId, uint tokenAmount) public returns (bool) {
+    //     require(tokenAmount <= balanceOf[nftTokenId], 'Amount exeeds balance');
 
-        address owner = nftToken.ownerOf(nftTokenId);
-        require(owner == msg.sender, 'Sender is not owner of the NFT');
-        balanceOf[nftTokenId] -= tokenAmount;
+    //     address owner = nftToken.ownerOf(nftTokenId);
+    //     require(owner == msg.sender, 'Sender is not owner of the NFT');
+    //     balanceOf[nftTokenId] -= tokenAmount;
 
-        pool.withdraw(address(underlyingAToken), tokenAmount, msg.sender);
+    //     pool.withdraw(address(underlyingToken), tokenAmount, msg.sender);
 
-        return true;
-    }
+    //     return true;
+    // }
 
     function createYNFT(address user, uint _amountIn, uint _amountOutMin) public {
         uint256 tokenId = yNFT.mint(user);
