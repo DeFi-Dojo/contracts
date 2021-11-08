@@ -37,39 +37,38 @@ contract YNFTVault is Ownable {
        require(token.approve(address(pool), tokenAmount), 'approve failed.');
 
         pool.deposit(address(token), tokenAmount, address(this), 0);
-        balanceOf[nftTokenId] += tokenAmount;
+        balanceOf[nftTokenId] = tokenAmount;
         return true;
     }
 
-    // function redeemLPTokens(uint256 nftTokenId, uint tokenAmount) public returns (bool) {
-    //     require(tokenAmount <= balanceOf[nftTokenId], 'Amount exeeds balance');
+    function withdraw(uint256 nftTokenId) public returns (bool) {
+        address owner = yNFT.ownerOf(nftTokenId);
+        require(owner == msg.sender, 'Sender is not owner of the NFT');
 
-    //     address owner = nftToken.ownerOf(nftTokenId);
-    //     require(owner == msg.sender, 'Sender is not owner of the NFT');
-    //     balanceOf[nftTokenId] -= tokenAmount;
+        pool.withdraw(address(token), balanceOf[nftTokenId], msg.sender);
 
-    //     pool.withdraw(address(underlyingToken), tokenAmount, msg.sender);
+        yNFT.burn(nftTokenId);
 
-    //     return true;
-    // }
+        return true;
+    }
 
-    function createYNFT(address user, uint _amountIn, uint _amountOutMin) public {
-        uint256 tokenId = yNFT.mint(user);
+    function createYNFT(address tokenIn, uint _amountIn, uint _amountOutMin) public {
+        uint256 tokenId = yNFT.mint(msg.sender);
 
         require(token.transferFrom(msg.sender, address(this), _amountIn), 'transferFrom failed.');
 
         uint deadline = block.timestamp + 15; // using 'now' for convenience, for mainnet pass deadline from frontend!
         address[] memory path = new address[](2);
-        path[0] = address(token);
-        path[1] = dexRouter.WETH();
+        path[0] = tokenIn;
+        path[1] = address(token);
 
         require(token.approve(address(dexRouter), _amountIn), 'approve failed.');
 
-        dexRouter.swapExactTokensForETH(_amountIn, _amountOutMin, path, user, deadline);
+        dexRouter.swapExactTokensForETH(_amountIn, _amountOutMin, path, msg.sender, deadline);
     }
 
-    function createYNFTForEther(address user, uint _amountOutMin) public payable {
-        uint256 tokenId = yNFT.mint(user);
+    function createYNFTForEther(uint _amountOutMin) public payable {
+        uint256 tokenId = yNFT.mint(msg.sender);
 
         uint deadline = block.timestamp + 15; // using 'now' for convenience, for mainnet pass deadline from frontend!
         address[] memory path = new address[](2);
