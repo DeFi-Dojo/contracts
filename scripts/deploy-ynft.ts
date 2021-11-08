@@ -1,5 +1,5 @@
 import { ethers } from "hardhat";
-import { AaveLPNFT, YNFTFactory } from "../typechain";
+import { AaveLPNFT, YNFTVault } from "../typechain";
 import { deployContract, waitForReceipt } from "../utils/deployment";
 
 import configEnv from "../config";
@@ -24,19 +24,19 @@ async function main() {
   const [owner] = await ethers.getSigners();
   console.log(`Deploying contracts using address: ${owner.address}`);
 
-  const yNFTFactory = await deployContract<YNFTFactory>("YNFTFactory", [
+  const YNFTVault = await deployContract<YNFTVault>("YNFTVault", [
     ROUTER_DEX_KOVAN_SUSHISWAP,
   ]);
 
-  // await yNFTFactory
+  // await YNFTVault
   //   .createYNFT(owner.address, {
   //     value: ethers.utils.parseEther("1.0"),
   //   })
   //   .then(waitForReceipt);
 
-  // const YNFTFactoryContract = await ethers.getContractFactory("YNFTFactory");
+  // const YNFTVaultContract = await ethers.getContractFactory("YNFTVault");
 
-  // const yNFTFactory = await YNFTFactoryContract.attach(FACTORY_ADDRESS);
+  // const YNFTVault = await YNFTVaultContract.attach(FACTORY_ADDRESS);
 
   const amountIn = BigInt(10 * 10 ** 18);
 
@@ -46,21 +46,21 @@ async function main() {
 
   const dai = await DAI.attach(DAI_KOVAN_ADDRESS);
 
-  await dai.approve(yNFTFactory.address, amountIn).then(waitForReceipt);
+  await dai.approve(YNFTVault.address, amountIn).then(waitForReceipt);
 
   console.log("APPROVED");
 
-  await yNFTFactory
-    .createYNFT(owner.address, amountIn, amountOutMin)
-    .then(waitForReceipt);
+  await YNFTVault.createYNFT(owner.address, amountIn, amountOutMin).then(
+    waitForReceipt
+  );
 
   console.log("CREATED");
 
-  // const YNFTFactoryContract = await ethers.getContractFactory("YNFTFactory");
+  // const YNFTVaultContract = await ethers.getContractFactory("YNFTVault");
 
-  // const yNFTFactory = await YNFTFactoryContract.attach(FACTORY_ADDRESS);
+  // const YNFTVault = await YNFTVaultContract.attach(FACTORY_ADDRESS);
 
-  // const amount = await yNFTFactory.getAmountOutMin(1);
+  // const amount = await YNFTVault.getAmountOutMin(1);
 
   // console.log("amount");
 
