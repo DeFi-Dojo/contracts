@@ -4,11 +4,12 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./sushiswap/uniswapv2/interfaces/IUniswapV2Router02.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "./sushiswap/uniswapv2/interfaces/IUniswapV2Router02.sol";
 import "./interfaces/aave/ILendingPool.sol";
 import "./interfaces/aave/IAToken.sol";
+import "./interfaces/aave/IAaveIncentivesController.sol";
 import "./YNFT.sol";
 
 
@@ -20,17 +21,46 @@ contract YNFTVault is Ownable {
     IAToken public aToken;
     IERC721 public nftToken;
     ILendingPool public pool;
-
+    IAaveIncentivesController public incentivesController;
+    IERC20 public rewardToken;
     YNFT public immutable yNFT;
     IUniswapV2Router02 public immutable dexRouter;
     IERC20 public immutable token;
 
-    constructor(address _dexRouter, IAToken _aToken) {
+    constructor(
+        IUniswapV2Router02 _dexRouter,
+        IAToken _aToken,
+        IAaveIncentivesController _incentivesController
+    ) {
+        incentivesController = _incentivesController;
+        rewardToken = REWARD_TOKEN();
         aToken = _aToken;
         pool = ILendingPool(aToken.POOL());
         yNFT = new YNFT();
-        dexRouter = IUniswapV2Router02(_dexRouter);
+        dexRouter = _dexRouter;
         token = IERC20(aToken.UNDERLYING_ASSET_ADDRESS());
+    }
+
+    function claimRewards() external returns (bool) {
+        uint256 amountToClaim = incentivesController.getUserUnclaimedRewards(address(this));
+
+        uint256 amountClaimed = incentivesController.claimRewards([address(token)], amountToClaim, address(this));
+
+        require(rewardToken.approve(address(dexRouter), amountClaimed), 'approve failed.');
+
+        uint deadline = block.timestamp + 15; // using 'now' for convenience, for mainnet pass deadline from frontend!
+        address[] memory path = new address[](2);
+        path[0] = address(rewardToken);
+        path[1] = address(token);
+
+
+        uint amountOutMin = 0;
+
+        uint[] memory amounts = dexRouter.swapExactTokensForTokens(_amountIn, amountOutMin, path, address(this), deadline);
+
+        pool.deposit(address(token), amounts[1], address(this), 0);
+
+        return true;
     }
 
     function addLPtoNFT(uint256 nftTokenId, uint tokenAmount) internal returns (bool) {
