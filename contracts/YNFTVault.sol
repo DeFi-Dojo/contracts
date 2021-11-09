@@ -55,16 +55,18 @@ contract YNFTVault is Ownable {
     function createYNFT(address tokenIn, uint _amountIn, uint _amountOutMin) public {
         uint256 tokenId = yNFT.mint(msg.sender);
 
-        require(token.transferFrom(msg.sender, address(this), _amountIn), 'transferFrom failed.');
+        require(IERC20(tokenIn).transferFrom(msg.sender, address(this), _amountIn), 'transferFrom failed.');
 
         uint deadline = block.timestamp + 15; // using 'now' for convenience, for mainnet pass deadline from frontend!
         address[] memory path = new address[](2);
         path[0] = tokenIn;
         path[1] = address(token);
 
-        require(token.approve(address(dexRouter), _amountIn), 'approve failed.');
+        require(IERC20(tokenIn).approve(address(dexRouter), _amountIn), 'approve failed.');
 
-        dexRouter.swapExactTokensForETH(_amountIn, _amountOutMin, path, msg.sender, deadline);
+        uint[] memory amounts = dexRouter.swapExactTokensForTokens(_amountIn, _amountOutMin, path, address(this), deadline);
+
+        addLPtoNFT(tokenId, amounts[1]);
     }
 
     function createYNFTForEther(uint _amountOutMin) public payable {
