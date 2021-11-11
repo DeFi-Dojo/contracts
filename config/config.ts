@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import * as consts from "../consts";
 
 dotenv.config();
 
@@ -11,6 +12,7 @@ const {
   NFT_FACTORY_BASE_URI,
   KOVAN_API_URL,
   USE_ETHERNAL,
+  POLYGON_MAINNET_API_URL,
 } = process.env;
 
 if (
@@ -21,7 +23,8 @@ if (
   NFT_BASE_URI === undefined ||
   NFT_FACTORY_BASE_URI === undefined ||
   USE_ETHERNAL === undefined ||
-  KOVAN_API_URL === undefined
+  KOVAN_API_URL === undefined ||
+  POLYGON_MAINNET_API_URL === undefined
 ) {
   throw new Error("ENV not valid");
 }
@@ -35,4 +38,6 @@ export default {
   NFT_FACTORY_BASE_URI,
   KOVAN_API_URL,
   USE_ETHERNAL: JSON.parse(USE_ETHERNAL),
+  POLYGON_MAINNET_API_URL,
+  ADDRESSES: consts.NETWORK_ADDRESSES[DEFAULT_NETWORK.toUpperCase()],
 };

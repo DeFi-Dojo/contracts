@@ -1,10 +1,10 @@
 import { ethers } from "hardhat";
 import { YNFTVault } from "../typechain";
 import { deployContract, waitForReceipt } from "../utils/deployment";
+import configEnv from "../config";
+import * as consts from "../consts";
 
-const ROUTER_DEX_KOVAN_SUSHISWAP = "0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506";
-
-const ADAI_KOVAN_ADDRESS = "0xdcf0af9e59c002fa3aa091a46196b37530fd48a8";
+const { ADDRESSES } = configEnv;
 
 const NFT_TOKEN_ID = 0;
 
@@ -13,18 +13,22 @@ async function main() {
   console.log(`Deploying contracts using address: ${owner.address}`);
 
   const yNFTVault = await deployContract<YNFTVault>("YNFTVault", [
-    ROUTER_DEX_KOVAN_SUSHISWAP,
-    ADAI_KOVAN_ADDRESS,
+    ADDRESSES.ROUTER_02_SUSHISWAP,
+    ADDRESSES.A_DAI,
+    ADDRESSES.INCENTIVES_CONTROLLER,
+    ADDRESSES.MATIC_USD_PRICE_FEED,
+    consts.MATIC_DECIMALS,
+    consts.MATIC_PRICE_FEED_DECIMALS,
   ]);
 
-  const amountOutMin = BigInt(12 * 10 ** 18);
+  // current price of MATIC/DAI
+  const amountOutMin = BigInt(1.79 * 10 ** 18);
 
   await yNFTVault
     .createYNFTForEther(amountOutMin, {
-      value: ethers.utils.parseEther("0.001"),
+      value: ethers.utils.parseEther("1"),
     })
     .then(waitForReceipt);
-
   console.log("created");
 
   await yNFTVault.withdraw(NFT_TOKEN_ID).then(waitForReceipt);
