@@ -14,6 +14,7 @@ const {
   POLYGON_MUMBAI_API_URL,
   WALLET_MNEMONIC,
   KOVAN_API_URL,
+  POLYGON_MAINNET_API_URL,
 } = configEnv;
 
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
@@ -48,6 +49,10 @@ const config: HardhatUserConfig = {
       accounts,
     },
     matic: {
+      url: POLYGON_MAINNET_API_URL,
+      accounts,
+    },
+    mumbai: {
       url: POLYGON_MUMBAI_API_URL,
       accounts,
     },

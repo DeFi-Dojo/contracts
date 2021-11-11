@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
@@ -17,11 +18,14 @@ contract YNFTVault is Ownable {
     using SafeERC20 for IAToken;
     using SafeERC20 for IERC20;
 
+    AggregatorV3Interface internal incentiveTokenPriceFeed;
+    uint public incentiveTokenPriceFeedDecimals;
+    uint public incentiveTokenDecimals;
+    IAaveIncentivesController public incentivesController;
     mapping (uint256 => uint) public balanceOf;
     IAToken public aToken;
     IERC721 public nftToken;
     ILendingPool public pool;
-    IAaveIncentivesController public incentivesController;
     IERC20 public rewardToken;
     YNFT public immutable yNFT;
     IUniswapV2Router02 public immutable dexRouter;
@@ -30,21 +34,48 @@ contract YNFTVault is Ownable {
     constructor(
         IUniswapV2Router02 _dexRouter,
         IAToken _aToken,
-        IAaveIncentivesController _incentivesController
+        IAaveIncentivesController _incentivesController,
+        AggregatorV3Interface _incentiveTokenPriceFeed,
+        uint _incentiveTokenDecimals,
+        uint _incentiveTokenPriceFeedDecimals
     ) {
         incentivesController = _incentivesController;
-        rewardToken = REWARD_TOKEN();
+        rewardToken = IERC20(incentivesController.REWARD_TOKEN());
         aToken = _aToken;
         pool = ILendingPool(aToken.POOL());
         yNFT = new YNFT();
         dexRouter = _dexRouter;
         token = IERC20(aToken.UNDERLYING_ASSET_ADDRESS());
+        incentiveTokenPriceFeed = _incentiveTokenPriceFeed;
+        incentiveTokenDecimals = _incentiveTokenDecimals;
+        incentiveTokenPriceFeedDecimals = _incentiveTokenPriceFeedDecimals;
+    }
+
+    /**
+     * Returns the latest price
+     */
+    function getLatestPrice() public view returns (uint) {
+        (,int price,,,) = incentiveTokenPriceFeed.latestRoundData();
+        uint power = incentiveTokenDecimals-incentiveTokenPriceFeedDecimals;
+        // slipage 2%
+        return ((uint(price) * 10 ** power) / 50) * 49;
+    }
+
+    function getAmountToClaim() external view returns (uint256) {
+        address[] memory assets = new address[](1);
+        assets[0] = address(aToken);
+
+        uint256 amountToClaim = incentivesController.getRewardsBalance(assets, address(this));
+
+        return amountToClaim;
     }
 
     function claimRewards() external returns (bool) {
-        uint256 amountToClaim = incentivesController.getUserUnclaimedRewards(address(this));
+        address[] memory claimAssets = new address[](1);
+        claimAssets[0] = address(aToken);
 
-        uint256 amountClaimed = incentivesController.claimRewards([address(token)], amountToClaim, address(this));
+        uint256 amountToClaim = incentivesController.getRewardsBalance(claimAssets, address(this));
+        uint256 amountClaimed = incentivesController.claimRewards(claimAssets, amountToClaim, address(this));
 
         require(rewardToken.approve(address(dexRouter), amountClaimed), 'approve failed.');
 
@@ -53,17 +84,18 @@ contract YNFTVault is Ownable {
         path[0] = address(rewardToken);
         path[1] = address(token);
 
+        uint amountOutMin = (getLatestPrice() * amountClaimed) / 10**incentiveTokenDecimals;
 
-        uint amountOutMin = 0;
+        uint[] memory amounts = dexRouter.swapExactTokensForTokens(amountClaimed, amountOutMin, path, address(this), deadline);
 
-        uint[] memory amounts = dexRouter.swapExactTokensForTokens(_amountIn, amountOutMin, path, address(this), deadline);
+        require(token.approve(address(pool), amounts[1]), 'approve failed.');
 
         pool.deposit(address(token), amounts[1], address(this), 0);
 
         return true;
     }
 
-    function addLPtoNFT(uint256 nftTokenId, uint tokenAmount) internal returns (bool) {
+    function deposit(uint256 nftTokenId, uint tokenAmount) internal returns (bool) {
        require(token.approve(address(pool), tokenAmount), 'approve failed.');
 
         pool.deposit(address(token), tokenAmount, address(this), 0);
@@ -96,7 +128,7 @@ contract YNFTVault is Ownable {
 
         uint[] memory amounts = dexRouter.swapExactTokensForTokens(_amountIn, _amountOutMin, path, address(this), deadline);
 
-        addLPtoNFT(tokenId, amounts[1]);
+        deposit(tokenId, amounts[1]);
     }
 
     function createYNFTForEther(uint _amountOutMin) public payable {
@@ -109,6 +141,6 @@ contract YNFTVault is Ownable {
 
         uint[] memory amounts = dexRouter.swapExactETHForTokens{ value: msg.value }(_amountOutMin, path, address(this), deadline);
 
-        addLPtoNFT(tokenId, amounts[1]);
+        deposit(tokenId, amounts[1]);
     }
 }

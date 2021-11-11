@@ -8,6 +8,12 @@ const { ADDRESSES } = configEnv;
 
 const NFT_TOKEN_ID = 0;
 
+const AMOUNT_IN_OF_USDT = 1;
+const DECIMALS_OF_USDT = 6;
+
+const AMOUNT_OUT_OF_DAI = 11;
+const DECIMALS_OF_DAI = 18;
+
 async function main() {
   const [owner] = await ethers.getSigners();
   console.log(`Deploying contracts using address: ${owner.address}`);
@@ -21,14 +27,22 @@ async function main() {
     consts.MATIC_PRICE_FEED_DECIMALS,
   ]);
 
-  // current price of MATIC/DAI
-  const amountOutMin = BigInt(1.79 * 10 ** 18);
+  const amountIn = BigInt(AMOUNT_IN_OF_USDT * 10 ** DECIMALS_OF_USDT);
+
+  const amountOutMin = BigInt(AMOUNT_OUT_OF_DAI * 10 * DECIMALS_OF_DAI);
+
+  const USDT = await ethers.getContractFactory("TokenERC20");
+
+  const usdt = await USDT.attach(ADDRESSES.USDT);
+
+  await usdt.approve(yNFTVault.address, amountIn).then(waitForReceipt);
+
+  console.log("approved");
 
   await yNFTVault
-    .createYNFTForEther(amountOutMin, {
-      value: ethers.utils.parseEther("1"),
-    })
+    .createYNFT(ADDRESSES.USDT, amountIn, amountOutMin)
     .then(waitForReceipt);
+
   console.log("created");
 
   await yNFTVault.withdraw(NFT_TOKEN_ID).then(waitForReceipt);
