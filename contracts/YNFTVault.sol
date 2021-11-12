@@ -70,7 +70,7 @@ contract YNFTVault is Ownable {
 
     function getLatestPriceOfEtherToUnderlyingToken() public view returns (uint) {
         (,int price,,,) = etherPriceFeed.latestRoundData();
-        uint power = etherDecimals-etherPriceFeedDecimals;
+        uint power = etherDecimals - etherPriceFeedDecimals;
         // slipage 2%
         return ((uint(price) * 10 ** power) / 50) * 49;
     }
@@ -143,11 +143,9 @@ contract YNFTVault is Ownable {
 
         uint deadline = block.timestamp + 15; // using 'now' for convenience, for mainnet pass deadline from frontend!
 
-        uint power = (etherDecimals - tokenDecimals) + etherDecimals;
+        uint amountOutMin = (amount * 10 ** (etherDecimals - tokenDecimals) / getLatestPriceOfEtherToUnderlyingToken()) * 10 ** etherDecimals;
 
-        uint amountOutMin = (amount * 10 ** power ) / getLatestPriceOfEtherToUnderlyingToken();
-
-        dexRouter.swapExactTokensForETH(amount, amountOutMin, path, msg.sender, deadline);
+        dexRouter.swapExactTokensForETH(amount, amountOutMin  * 10 ** etherDecimals, path, msg.sender, deadline);
 
         yNFT.burn(nftTokenId);
 

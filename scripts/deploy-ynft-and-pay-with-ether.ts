@@ -25,7 +25,7 @@ async function main() {
   ]);
 
   // current price of MATIC/DAI
-  const amountOutMin = BigInt(131 * 10 ** consts.DECIMALS.DAI);
+  const amountOutMin = BigInt(40 * 10 ** consts.DECIMALS.DAI);
 
   await yNFTVault
     .createYNFTForEther(amountOutMin, {
