@@ -9,10 +9,8 @@ const { ADDRESSES } = configEnv;
 const NFT_TOKEN_ID = 0;
 
 const AMOUNT_IN_OF_USDT = 1;
-const DECIMALS_OF_USDT = 6;
 
 const AMOUNT_OUT_OF_DAI = 11;
-const DECIMALS_OF_DAI = 18;
 
 async function main() {
   const [owner] = await ethers.getSigners();
@@ -22,14 +20,14 @@ async function main() {
     ADDRESSES.ROUTER_02_SUSHISWAP,
     ADDRESSES.A_DAI,
     ADDRESSES.INCENTIVES_CONTROLLER,
-    ADDRESSES.MATIC_USD_PRICE_FEED,
-    consts.MATIC_DECIMALS,
-    consts.MATIC_PRICE_FEED_DECIMALS,
+    ADDRESSES.NATIVE_TOKEN_USD_PRICE_FEED,
+    consts.DECIMALS.MATIC,
+    consts.NATIVE_TOKEN_PRICE_FEED_DECIMALS,
   ]);
 
-  const amountIn = BigInt(AMOUNT_IN_OF_USDT * 10 ** DECIMALS_OF_USDT);
+  const amountIn = BigInt(AMOUNT_IN_OF_USDT * 10 ** consts.DECIMALS.USDT);
 
-  const amountOutMin = BigInt(AMOUNT_OUT_OF_DAI * 10 * DECIMALS_OF_DAI);
+  const amountOutMin = BigInt(AMOUNT_OUT_OF_DAI * 10 * consts.DECIMALS.DAI);
 
   const USDT = await ethers.getContractFactory("TokenERC20");
 
