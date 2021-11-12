@@ -35,6 +35,13 @@ contract YNFTVault is Ownable {
     AggregatorV3Interface public etherPriceFeed;
     uint public etherPriceFeedDecimals;
 
+
+    modifier onlyNftOwner(uint nftTokenId) {
+        address owner = yNFT.ownerOf(nftTokenId);
+        require(owner == msg.sender, 'Sender is not owner of the NFT');
+        _;
+    }
+
     constructor(
         IUniswapV2Router02 _dexRouter,
         IAToken _aToken,
@@ -61,18 +68,23 @@ contract YNFTVault is Ownable {
         etherPriceFeedDecimals = _etherPriceFeedDecimals;
     }
 
+    function calcSlipage(uint price) internal pure returns (uint) {
+        // slipage 2%
+        return (price / 50) * 49;
+    }
+
     function getLatestPriceOfIncetiveTokenToUnderlyingToken() public view returns (uint) {
         (,int price,,,) = incentiveTokenPriceFeed.latestRoundData();
+        // normalize to 10^18
         uint power = incentiveTokenDecimals-incentiveTokenPriceFeedDecimals+(etherDecimals - incentiveTokenDecimals);
-        // slipage 2%
-        return ((uint(price) * 10 ** power) / 50) * 49;
+        return calcSlipage(uint(price) * 10 ** power);
     }
 
     function getLatestPriceOfEtherToUnderlyingToken() public view returns (uint) {
         (,int price,,,) = etherPriceFeed.latestRoundData();
+        // normalize to 10^18
         uint power = etherDecimals - etherPriceFeedDecimals;
-        // slipage 2%
-        return ((uint(price) * 10 ** power) / 50) * 49;
+        return calcSlipage(uint(price) * 10 ** power);
     }
 
     function getAmountToClaim() external view returns (uint256) {
@@ -117,9 +129,7 @@ contract YNFTVault is Ownable {
         return true;
     }
 
-    function withdraw(uint256 nftTokenId) public returns (bool) {
-        address owner = yNFT.ownerOf(nftTokenId);
-        require(owner == msg.sender, 'Sender is not owner of the NFT');
+    function withdraw(uint256 nftTokenId) public onlyNftOwner(nftTokenId) returns (bool) {
 
         pool.withdraw(address(underlyingToken), balanceOf[nftTokenId], msg.sender);
 
@@ -128,10 +138,7 @@ contract YNFTVault is Ownable {
         return true;
     }
 
-    function withdrawToEther(uint256 nftTokenId) public returns (bool) {
-        address owner = yNFT.ownerOf(nftTokenId);
-        require(owner == msg.sender, 'Sender is not owner of the NFT');
-
+    function withdrawToEther(uint256 nftTokenId) public onlyNftOwner(nftTokenId) returns (bool) {
         uint amount = pool.withdraw(address(underlyingToken), balanceOf[nftTokenId], address(this));
 
         require(underlyingToken.approve(address(dexRouter), amount), 'approve failed.');
