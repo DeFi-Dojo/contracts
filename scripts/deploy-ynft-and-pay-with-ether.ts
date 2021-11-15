@@ -16,22 +16,25 @@ async function main() {
     ADDRESSES.ROUTER_02_SUSHISWAP,
     ADDRESSES.A_DAI,
     ADDRESSES.INCENTIVES_CONTROLLER,
-    ADDRESSES.MATIC_USD_PRICE_FEED,
-    consts.MATIC_DECIMALS,
-    consts.MATIC_PRICE_FEED_DECIMALS,
+    ADDRESSES.NATIVE_TOKEN_USD_PRICE_FEED,
+    consts.DECIMALS.MATIC,
+    consts.NATIVE_TOKEN_PRICE_FEED_DECIMALS,
+    consts.DECIMALS.DAI,
+    ADDRESSES.NATIVE_TOKEN_USD_PRICE_FEED,
+    consts.NATIVE_TOKEN_PRICE_FEED_DECIMALS,
   ]);
 
   // current price of MATIC/DAI
-  const amountOutMin = BigInt(1.79 * 10 ** 18);
+  const amountOutMin = BigInt(40 * 10 ** consts.DECIMALS.DAI);
 
   await yNFTVault
     .createYNFTForEther(amountOutMin, {
-      value: ethers.utils.parseEther("1"),
+      value: ethers.utils.parseEther("0.01"),
     })
     .then(waitForReceipt);
   console.log("created");
 
-  await yNFTVault.withdraw(NFT_TOKEN_ID).then(waitForReceipt);
+  await yNFTVault.withdrawToEther(NFT_TOKEN_ID).then(waitForReceipt);
 
   console.log("withdrawn");
 }
