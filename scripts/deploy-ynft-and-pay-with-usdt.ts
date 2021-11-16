@@ -6,11 +6,9 @@ import * as consts from "../consts";
 
 const { ADDRESSES } = configEnv;
 
-const NFT_TOKEN_ID = 0;
-
 const AMOUNT_IN_OF_USDT = 1;
 
-const AMOUNT_OUT_OF_DAI = 11;
+const AMOUNT_OUT_OF_DAI = 0.9;
 
 async function main() {
   const [owner] = await ethers.getSigners();
@@ -23,11 +21,14 @@ async function main() {
     ADDRESSES.NATIVE_TOKEN_USD_PRICE_FEED,
     consts.DECIMALS.MATIC,
     consts.NATIVE_TOKEN_PRICE_FEED_DECIMALS,
+    consts.DECIMALS.DAI,
+    ADDRESSES.NATIVE_TOKEN_USD_PRICE_FEED,
+    consts.NATIVE_TOKEN_PRICE_FEED_DECIMALS,
   ]);
 
   const amountIn = BigInt(AMOUNT_IN_OF_USDT * 10 ** consts.DECIMALS.USDT);
 
-  const amountOutMin = BigInt(AMOUNT_OUT_OF_DAI * 10 * consts.DECIMALS.DAI);
+  const amountOutMin = BigInt(AMOUNT_OUT_OF_DAI * 10 ** consts.DECIMALS.DAI);
 
   const USDT = await ethers.getContractFactory("TokenERC20");
 
@@ -42,10 +43,6 @@ async function main() {
     .then(waitForReceipt);
 
   console.log("created");
-
-  await yNFTVault.withdraw(NFT_TOKEN_ID).then(waitForReceipt);
-
-  console.log("withdrawn");
 }
 
 main()

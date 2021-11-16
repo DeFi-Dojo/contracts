@@ -84,7 +84,7 @@ contract YNFTVault is Ownable {
         (,int price,,,) = etherPriceFeed.latestRoundData();
         // normalize to 10^18
         uint power = etherDecimals - etherPriceFeedDecimals;
-        return calcSlipage(uint(price) * 10 ** power);
+        return uint(price) * 10 ** power;
     }
 
     function getAmountToClaim() external view returns (uint256) {
@@ -152,7 +152,7 @@ contract YNFTVault is Ownable {
 
         uint amountOutMin = (amount * 10 ** (etherDecimals - tokenDecimals) / getLatestPriceOfEtherToUnderlyingToken()) * 10 ** etherDecimals;
 
-        dexRouter.swapExactTokensForETH(amount, amountOutMin  * 10 ** etherDecimals, path, msg.sender, deadline);
+        dexRouter.swapExactTokensForETH(amount, calcSlipage(amountOutMin  * 10 ** etherDecimals), path, msg.sender, deadline);
 
         yNFT.burn(nftTokenId);
 
