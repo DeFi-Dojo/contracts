@@ -13,6 +13,7 @@ const {
   KOVAN_API_URL,
   USE_ETHERNAL,
   POLYGON_MAINNET_API_URL,
+  VAULT_ADDRESS,
 } = process.env;
 
 if (
@@ -24,7 +25,8 @@ if (
   NFT_FACTORY_BASE_URI === undefined ||
   USE_ETHERNAL === undefined ||
   KOVAN_API_URL === undefined ||
-  POLYGON_MAINNET_API_URL === undefined
+  POLYGON_MAINNET_API_URL === undefined ||
+  VAULT_ADDRESS === undefined
 ) {
   throw new Error("ENV not valid");
 }
@@ -40,4 +42,5 @@ export default {
   USE_ETHERNAL: JSON.parse(USE_ETHERNAL),
   POLYGON_MAINNET_API_URL,
   ADDRESSES: consts.NETWORK_ADDRESSES[DEFAULT_NETWORK.toUpperCase()],
+  VAULT_ADDRESS,
 };

@@ -6,8 +6,6 @@ import * as consts from "../consts";
 
 const { ADDRESSES } = configEnv;
 
-const NFT_TOKEN_ID = 0;
-
 async function main() {
   const [owner] = await ethers.getSigners();
   console.log(`Deploying contracts using address: ${owner.address}`);
@@ -25,18 +23,14 @@ async function main() {
   ]);
 
   // current price of MATIC/DAI
-  const amountOutMin = BigInt(40 * 10 ** consts.DECIMALS.DAI);
+  const amountOutMin = BigInt(1.7 * 10 ** consts.DECIMALS.DAI);
 
   await yNFTVault
     .createYNFTForEther(amountOutMin, {
-      value: ethers.utils.parseEther("0.01"),
+      value: ethers.utils.parseEther("1"),
     })
     .then(waitForReceipt);
   console.log("created");
-
-  await yNFTVault.withdrawToEther(NFT_TOKEN_ID).then(waitForReceipt);
-
-  console.log("withdrawn");
 }
 
 main()

@@ -19,12 +19,12 @@ export const deployContract = async <T extends Contract>(
   const contract = await contractFactory.deploy(...constructorArgs);
   await contract.deployed();
 
-  if (useEthernal) {
-    await hre.ethernal.push({
-      name: contractName,
-      address: contract.address,
-    });
-  }
+  // if (useEthernal) {
+  //   await hre.ethernal.push({
+  //     name: contractName,
+  //     address: contract.address,
+  //   });
+  // }
 
   console.log(`${contractName} deployed to: `, contract.address);
   return contract as T;
