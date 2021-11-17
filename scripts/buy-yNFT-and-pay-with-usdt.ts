@@ -1,10 +1,9 @@
 import { ethers } from "hardhat";
-import { YNFTVault } from "../typechain";
-import { deployContract, waitForReceipt } from "../utils/deployment";
+import { waitForReceipt } from "../utils/deployment";
 import configEnv from "../config";
 import * as consts from "../consts";
 
-const { ADDRESSES } = configEnv;
+const { ADDRESSES, VAULT_ADDRESS } = configEnv;
 
 const AMOUNT_IN_OF_USDT = 1;
 
@@ -14,17 +13,9 @@ async function main() {
   const [owner] = await ethers.getSigners();
   console.log(`Deploying contracts using address: ${owner.address}`);
 
-  const yNFTVault = await deployContract<YNFTVault>("YNFTVault", [
-    ADDRESSES.ROUTER_02_SUSHISWAP,
-    ADDRESSES.A_DAI,
-    ADDRESSES.INCENTIVES_CONTROLLER,
-    ADDRESSES.NATIVE_TOKEN_USD_PRICE_FEED,
-    consts.DECIMALS.MATIC,
-    consts.NATIVE_TOKEN_PRICE_FEED_DECIMALS,
-    consts.DECIMALS.DAI,
-    ADDRESSES.NATIVE_TOKEN_USD_PRICE_FEED,
-    consts.NATIVE_TOKEN_PRICE_FEED_DECIMALS,
-  ]);
+  const YNFTVaultContract = await ethers.getContractFactory("YNFTVault");
+
+  const yNFTVault = await YNFTVaultContract.attach(VAULT_ADDRESS);
 
   const amountIn = BigInt(AMOUNT_IN_OF_USDT * 10 ** consts.DECIMALS.USDT);
 
