@@ -34,6 +34,7 @@ contract YNFTVault is Ownable {
     uint public tokenDecimals;
     AggregatorV3Interface public etherPriceFeed;
     uint public etherPriceFeedDecimals;
+    uint public totalSupply;
 
 
     modifier onlyNftOwner(uint nftTokenId) {
@@ -121,17 +122,43 @@ contract YNFTVault is Ownable {
         return true;
     }
 
+    function withdraw(uint256 nftTokenId, address receiver) internal returns (uint) {
+
+        uint currentAmountOfAToken = aToken.balanceOf(address(this));
+
+        uint amountToWithdraw = balanceOf[nftTokenId] * currentAmountOfAToken / totalSupply;
+
+        totalSupply = totalSupply - balanceOf[nftTokenId];
+
+        balanceOf[nftTokenId] = 0;
+
+        return pool.withdraw(address(underlyingToken), amountToWithdraw, receiver);
+    }
+
     function deposit(uint256 nftTokenId, uint tokenAmount) internal returns (bool) {
        require(underlyingToken.approve(address(pool), tokenAmount), 'approve failed.');
 
+        uint currentAmountOfAToken = aToken.balanceOf(address(this));
+
         pool.deposit(address(underlyingToken), tokenAmount, address(this), 0);
-        balanceOf[nftTokenId] = tokenAmount;
+
+        if (totalSupply == 0) {
+            balanceOf[nftTokenId] = tokenAmount;
+            totalSupply = tokenAmount;
+        } else {
+            uint balance = tokenAmount * totalSupply / currentAmountOfAToken;
+
+            balanceOf[nftTokenId] = balance;
+
+            totalSupply = totalSupply + balance;
+        }
+
         return true;
     }
 
-    function withdraw(uint256 nftTokenId) public onlyNftOwner(nftTokenId) returns (bool) {
+    function withdrawToUnderlyingToken(uint256 nftTokenId) public onlyNftOwner(nftTokenId) returns (bool) {
 
-        pool.withdraw(address(underlyingToken), balanceOf[nftTokenId], msg.sender);
+        withdraw(nftTokenId, msg.sender);
 
         yNFT.burn(nftTokenId);
 
@@ -139,7 +166,7 @@ contract YNFTVault is Ownable {
     }
 
     function withdrawToEther(uint256 nftTokenId) public onlyNftOwner(nftTokenId) returns (bool) {
-        uint amount = pool.withdraw(address(underlyingToken), balanceOf[nftTokenId], address(this));
+        uint amount = withdraw(nftTokenId, address(this));
 
         require(underlyingToken.approve(address(dexRouter), amount), 'approve failed.');
 

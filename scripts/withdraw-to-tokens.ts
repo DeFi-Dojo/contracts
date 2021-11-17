@@ -5,7 +5,7 @@ import configEnv from "../config";
 
 const { VAULT_ADDRESS } = configEnv;
 
-const NFT_TOKEN_ID = 1;
+const NFT_TOKEN_ID = 0;
 
 async function main() {
   const [owner] = await ethers.getSigners();
@@ -15,7 +15,7 @@ async function main() {
 
   const yNFTVault = await YNFTVaultContract.attach(VAULT_ADDRESS);
 
-  await yNFTVault.withdraw(NFT_TOKEN_ID).then(waitForReceipt);
+  await yNFTVault.withdrawToUnderlyingToken(NFT_TOKEN_ID).then(waitForReceipt);
 
   console.log("withdrawn");
 }

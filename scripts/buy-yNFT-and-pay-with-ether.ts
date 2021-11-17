@@ -1,11 +1,9 @@
 import { ethers } from "hardhat";
 import { waitForReceipt } from "../utils/deployment";
-
+import * as consts from "../consts";
 import configEnv from "../config";
 
 const { VAULT_ADDRESS } = configEnv;
-
-const NFT_TOKEN_ID = 1;
 
 async function main() {
   const [owner] = await ethers.getSigners();
@@ -15,9 +13,15 @@ async function main() {
 
   const yNFTVault = await YNFTVaultContract.attach(VAULT_ADDRESS);
 
-  await yNFTVault.withdrawToEther(NFT_TOKEN_ID).then(waitForReceipt);
+  // current price of MATIC/DAI
+  const amountOutMin = BigInt(0.2 * 10 ** consts.DECIMALS.DAI);
 
-  console.log("withdrawn");
+  await yNFTVault
+    .createYNFTForEther(amountOutMin, {
+      value: ethers.utils.parseEther("0.2"),
+    })
+    .then(waitForReceipt);
+  console.log("created");
 }
 
 main()
