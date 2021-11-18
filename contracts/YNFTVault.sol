@@ -35,6 +35,7 @@ contract YNFTVault is Ownable {
     AggregatorV3Interface public etherPriceFeed;
     uint public etherPriceFeedDecimals;
     uint public totalSupply;
+    uint public feePercentage = 1;
 
 
     modifier onlyNftOwner(uint nftTokenId) {
@@ -70,8 +71,17 @@ contract YNFTVault is Ownable {
     }
 
     function calcSlipage(uint price) internal pure returns (uint) {
-        // slipage 2%
-        return (price / 50) * 49;
+        // slipage 3%
+        return (price / 100) * 97;
+    }
+
+    function setFee(uint _feePercentage)  external onlyOwner returns (uint) {
+        feePercentage = _feePercentage;
+        return feePercentage;
+    }
+
+    function calcFee(uint price) internal view returns (uint) {
+        return (price * feePercentage) / 100;
     }
 
     function getLatestPriceOfIncetiveTokenToUnderlyingToken() public view returns (uint) {
@@ -189,16 +199,22 @@ contract YNFTVault is Ownable {
     function createYNFT(address tokenIn, uint _amountIn, uint _amountOutMin) public {
         uint256 tokenId = yNFT.mint(msg.sender);
 
-        require(IERC20(tokenIn).transferFrom(msg.sender, address(this), _amountIn), 'transferFrom failed.');
+        uint fee = calcFee(_amountIn);
+
+        require(IERC20(tokenIn).transferFrom(msg.sender, owner(), fee), 'transferFrom failed.');
+
+        uint amountInToBuy = _amountIn - fee;
+
+        require(IERC20(tokenIn).transferFrom(msg.sender, address(this), amountInToBuy), 'transferFrom failed.');
 
         uint deadline = block.timestamp + 15; // using 'now' for convenience, for mainnet pass deadline from frontend!
         address[] memory path = new address[](2);
         path[0] = tokenIn;
         path[1] = address(underlyingToken);
 
-        require(IERC20(tokenIn).approve(address(dexRouter), _amountIn), 'approve failed.');
+        require(IERC20(tokenIn).approve(address(dexRouter), amountInToBuy), 'approve failed.');
 
-        uint[] memory amounts = dexRouter.swapExactTokensForTokens(_amountIn, _amountOutMin, path, address(this), deadline);
+        uint[] memory amounts = dexRouter.swapExactTokensForTokens(amountInToBuy, _amountOutMin, path, address(this), deadline);
 
         deposit(tokenId, amounts[1]);
     }
@@ -206,12 +222,16 @@ contract YNFTVault is Ownable {
     function createYNFTForEther(uint _amountOutMin) public payable {
         uint256 tokenId = yNFT.mint(msg.sender);
 
+        uint fee = calcFee(msg.value);
+
+        payable(owner()).transfer(fee);
+
         uint deadline = block.timestamp + 15; // using 'now' for convenience, for mainnet pass deadline from frontend!
         address[] memory path = new address[](2);
         path[0] = dexRouter.WETH();
         path[1] = address(underlyingToken);
 
-        uint[] memory amounts = dexRouter.swapExactETHForTokens{ value: msg.value }(_amountOutMin, path, address(this), deadline);
+        uint[] memory amounts = dexRouter.swapExactETHForTokens{ value: msg.value - fee }(_amountOutMin, path, address(this), deadline);
 
         deposit(tokenId, amounts[1]);
     }

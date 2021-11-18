@@ -5,9 +5,9 @@ import * as consts from "../consts";
 
 const { ADDRESSES, VAULT_ADDRESS } = configEnv;
 
-const AMOUNT_IN_OF_USDT = 1;
+const AMOUNT_IN_OF_USDT = 0.1;
 
-const AMOUNT_OUT_OF_DAI = 0.9;
+const AMOUNT_OUT_OF_DAI = 0.08;
 
 async function main() {
   const [owner] = await ethers.getSigners();
