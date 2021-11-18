@@ -1,5 +1,6 @@
 import { ethers } from "hardhat";
 import { waitForReceipt } from "../utils/deployment";
+import { IERC20, YNFTVault } from "../typechain";
 import configEnv from "../config";
 import * as consts from "../consts";
 
@@ -13,15 +14,16 @@ async function main() {
   const [owner] = await ethers.getSigners();
   console.log(`Deploying contracts using address: ${owner.address}`);
 
-  const YNFTVaultContract = await ethers.getContractFactory("YNFTVault");
-
-  const yNFTVault = await YNFTVaultContract.attach(VAULT_ADDRESS);
+  const yNFTVault = await ethers.getContractAt<YNFTVault>(
+    "YNFTVault",
+    VAULT_ADDRESS
+  );
 
   const amountIn = BigInt(AMOUNT_IN_OF_USDT * 10 ** consts.DECIMALS.USDT);
 
   const amountOutMin = BigInt(AMOUNT_OUT_OF_DAI * 10 ** consts.DECIMALS.DAI);
 
-  const usdt = await ethers.getContractAt("IERC20", ADDRESSES.USDT);
+  const usdt = await ethers.getContractAt<IERC20>("IERC20", ADDRESSES.USDT);
 
   await usdt.approve(yNFTVault.address, amountIn).then(waitForReceipt);
 
