@@ -21,9 +21,7 @@ async function main() {
 
   const amountOutMin = BigInt(AMOUNT_OUT_OF_DAI * 10 ** consts.DECIMALS.DAI);
 
-  const USDT = await ethers.getContractFactory("TokenERC20");
-
-  const usdt = await USDT.attach(ADDRESSES.USDT);
+  const usdt = await ethers.getContractAt("IERC20", ADDRESSES.USDT);
 
   await usdt.approve(yNFTVault.address, amountIn).then(waitForReceipt);
 
