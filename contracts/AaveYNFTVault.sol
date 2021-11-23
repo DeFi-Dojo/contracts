@@ -14,7 +14,7 @@ import "./interfaces/aave/IAaveIncentivesController.sol";
 import "./YNFT.sol";
 
 
-contract YNFTVault is Ownable {
+contract AaveYNFTVault is Ownable {
     using SafeERC20 for IAToken;
     using SafeERC20 for IERC20;
 
