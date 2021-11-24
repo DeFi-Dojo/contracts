@@ -36,8 +36,6 @@ async function main() {
     )
     .then(waitForReceipt);
   console.log("created");
-
-  console.log((await yNFTVault.balanceOf(0)).toString());
 }
 
 main()
