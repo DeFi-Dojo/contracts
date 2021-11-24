@@ -81,25 +81,39 @@ contract DexYNFTVault is Ownable {
       ) public payable {
         uint amountToBuyOneAsstet = (msg.value - _collectFee()) / 2;
 
-        uint amountFirstToken = _swapETHToToken(amountToBuyOneAsstet, _amountOutMinFirstToken, address(firstToken), deadline);
-
         uint amountSecondToken = _swapETHToToken(amountToBuyOneAsstet, _amountOutMinSecondToken, address(secondToken), deadline);
 
-       require(firstToken.approve(address(dexRouter), amountFirstToken), 'approve failed.');
+        require(secondToken.approve(address(dexRouter), amountSecondToken), 'approve failed.');
 
-       require(secondToken.approve(address(dexRouter), amountSecondToken), 'approve failed.');
+        uint liquidity;
+        if (address(firstToken) == dexRouter.WETH()) {
+            (,, liquidity) = dexRouter.addLiquidityETH{ value: amountToBuyOneAsstet }(
+                address(secondToken),
+                amountSecondToken,
+                _amountMinLiquditySecondToken,
+                _amountMinLiqudityFirstToken,
+                address(this),
+                deadline
+            );
+        } else {
+            uint amountFirstToken = _swapETHToToken(amountToBuyOneAsstet, _amountOutMinFirstToken, address(firstToken), deadline);
+            require(firstToken.approve(address(dexRouter), amountFirstToken), 'approve failed.');
+            (,, liquidity) = dexRouter.addLiquidity(
+                    address(firstToken),
+                    address(secondToken),
+                    amountFirstToken,
+                    amountSecondToken,
+                    _amountMinLiqudityFirstToken,
+                    _amountMinLiquditySecondToken,
+                    address(this),
+                    deadline
+                );
 
-        (,, uint liquidity) = dexRouter.addLiquidity(
-            address(firstToken),
-            address(secondToken),
-            amountFirstToken,
-            amountSecondToken,
-            _amountMinLiqudityFirstToken,
-            _amountMinLiquditySecondToken,
-            address(this),
-            deadline
-        );
-
+        }
         _mintYNFTForLiquidity(liquidity);
+
     }
+
+     receive() external payable {
+     }
 }
