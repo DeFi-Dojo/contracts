@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./sushiswap/uniswapv2/interfaces/IUniswapV2Router02.sol";
+import "./sushiswap/uniswapv2/interfaces/IUniswapV2Pair.sol";
 import "./YNFT.sol";
 
 
@@ -20,6 +21,7 @@ contract DexYNFTVault is Ownable {
     uint public feePercentage = 1;
     IERC20 public firstToken;
     IERC20 public secondToken;
+    IUniswapV2Pair public pair;
 
     modifier onlyNftOwner(uint nftTokenId) {
         address owner = yNFT.ownerOf(nftTokenId);
@@ -29,13 +31,13 @@ contract DexYNFTVault is Ownable {
 
     constructor(
         IUniswapV2Router02 _dexRouter,
-        IERC20 _firstToken,
-        IERC20 _secondToken
+        IUniswapV2Pair _pair
     ) {
         yNFT = new YNFT();
         dexRouter = _dexRouter;
-        firstToken = _firstToken;
-        secondToken = _secondToken;
+        pair = _pair;
+        firstToken = IERC20(pair.token0());
+        secondToken = IERC20(pair.token1());
     }
 
     function setFee(uint _feePercentage)  external onlyOwner returns (uint) {
@@ -59,6 +61,17 @@ contract DexYNFTVault is Ownable {
     }
 
 
+    function _swapETHToToken(uint _amountInEth, uint _amountOutToken, address token, uint deadline) private returns (uint){
+        address[] memory path = new address[](2);
+        path[0] = dexRouter.WETH();
+        path[1] = token;
+
+        uint[] memory amounts = dexRouter.swapExactETHForTokens{ value: _amountInEth }(_amountOutToken, path, address(this), deadline);
+
+        return amounts[1];
+    }
+
+
     function createYNFTForEther(
      uint _amountOutMinFirstToken,
      uint _amountOutMinSecondToken,
@@ -68,33 +81,39 @@ contract DexYNFTVault is Ownable {
       ) public payable {
         uint amountToBuyOneAsstet = (msg.value - _collectFee()) / 2;
 
-        address[] memory pathFirstToken = new address[](2);
-        pathFirstToken[0] = dexRouter.WETH();
-        pathFirstToken[1] = address(firstToken);
+        uint amountSecondToken = _swapETHToToken(amountToBuyOneAsstet, _amountOutMinSecondToken, address(secondToken), deadline);
 
-        uint[] memory amountsFirstToken = dexRouter.swapExactETHForTokens{ value: amountToBuyOneAsstet }(_amountOutMinFirstToken, pathFirstToken, address(this), deadline);
+        require(secondToken.approve(address(dexRouter), amountSecondToken), 'approve failed.');
 
-        address[] memory pathSecondToken = new address[](2);
-        pathSecondToken[0] = dexRouter.WETH();
-        pathSecondToken[1] = address(secondToken);
+        uint liquidity;
+        if (address(firstToken) == dexRouter.WETH()) {
+            (,, liquidity) = dexRouter.addLiquidityETH{ value: amountToBuyOneAsstet }(
+                address(secondToken),
+                amountSecondToken,
+                _amountMinLiquditySecondToken,
+                _amountMinLiqudityFirstToken,
+                address(this),
+                deadline
+            );
+        } else {
+            uint amountFirstToken = _swapETHToToken(amountToBuyOneAsstet, _amountOutMinFirstToken, address(firstToken), deadline);
+            require(firstToken.approve(address(dexRouter), amountFirstToken), 'approve failed.');
+            (,, liquidity) = dexRouter.addLiquidity(
+                    address(firstToken),
+                    address(secondToken),
+                    amountFirstToken,
+                    amountSecondToken,
+                    _amountMinLiqudityFirstToken,
+                    _amountMinLiquditySecondToken,
+                    address(this),
+                    deadline
+                );
 
-        uint[] memory amountsSecondToken = dexRouter.swapExactETHForTokens{ value: amountToBuyOneAsstet }(_amountOutMinSecondToken, pathSecondToken, address(this), deadline);
-
-       require(firstToken.approve(address(dexRouter), amountsFirstToken[1]), 'approve failed.');
-
-       require(secondToken.approve(address(dexRouter), amountsSecondToken[1]), 'approve failed.');
-
-        (,, uint liquidity) = dexRouter.addLiquidity(
-            address(firstToken),
-            address(secondToken),
-            amountsFirstToken[1],
-            amountsSecondToken[1],
-            _amountMinLiqudityFirstToken,
-            _amountMinLiquditySecondToken,
-            address(this),
-            deadline
-        );
-
+        }
         _mintYNFTForLiquidity(liquidity);
+
     }
+
+     receive() external payable {
+     }
 }

@@ -11,8 +11,7 @@ async function main() {
 
   const yNFTVault = await deployContract<DexYNFTVault>("DexYNFTVault", [
     ADDRESSES.ROUTER_02_SUSHISWAP,
-    ADDRESSES.USDT,
-    ADDRESSES.USDC,
+    ADDRESSES.PAIR_WETH_USDT_SUSHISWAP,
   ]);
 
   // frontend should calculate and pass it to the function, using "0" for convenience
