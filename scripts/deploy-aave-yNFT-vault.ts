@@ -1,5 +1,5 @@
 import { ethers } from "hardhat";
-import { YNFTVault } from "../typechain";
+import { AaveYNFTVault } from "../typechain";
 import { deployContract } from "../utils/deployment";
 import configEnv from "../config";
 import * as consts from "../consts";
@@ -10,7 +10,7 @@ async function main() {
   const [owner] = await ethers.getSigners();
   console.log(`Deploying contracts using address: ${owner.address}`);
 
-  await deployContract<YNFTVault>("YNFTVault", [
+  await deployContract<AaveYNFTVault>("AaveYNFTVault", [
     ADDRESSES.ROUTER_02_SUSHISWAP,
     ADDRESSES.A_DAI,
     ADDRESSES.INCENTIVES_CONTROLLER,
