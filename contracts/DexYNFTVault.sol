@@ -23,8 +23,8 @@ contract DexYNFTVault is Ownable {
     IERC20 public secondToken;
     IUniswapV2Pair public pair;
 
-    modifier onlyNftOwner(uint nftTokenId) {
-        address owner = yNFT.ownerOf(nftTokenId);
+    modifier onlyNftOwner(uint _nftTokenId) {
+        address owner = yNFT.ownerOf(_nftTokenId);
         require(owner == msg.sender, 'Sender is not owner of the NFT');
         _;
     }
@@ -45,13 +45,13 @@ contract DexYNFTVault is Ownable {
         return feePercentage;
     }
 
-    function _calcFee(uint price) private view returns (uint) {
-        return (price * feePercentage) / 100;
+    function _calcFee(uint _price) private view returns (uint) {
+        return (_price * feePercentage) / 100;
     }
 
-    function _mintYNFTForLiquidity(uint liquidity) private {
+    function _mintYNFTForLiquidity(uint _liquidity) private {
         uint256 tokenId = yNFT.mint(msg.sender);
-        balanceOf[tokenId] = liquidity;
+        balanceOf[tokenId] = _liquidity;
     }
 
     function _collectFeeEther() private returns (uint){
@@ -60,19 +60,19 @@ contract DexYNFTVault is Ownable {
         return fee;
     }
 
-    function _collectFeeToken(address tokenIn, uint tokenAmount) private returns (uint){
-        uint fee = _calcFee(tokenAmount);
-        IERC20(tokenIn).safeTransferFrom(msg.sender, owner(), fee);
+    function _collectFeeToken(address _tokenIn, uint _tokenAmount) private returns (uint){
+        uint fee = _calcFee(_tokenAmount);
+        IERC20(_tokenIn).safeTransferFrom(msg.sender, owner(), fee);
         return fee;
     }
 
 
-    function _swapETHToToken(uint _amountInEth, uint _amountOutToken, address token, uint deadline) private returns (uint){
+    function _swapETHToToken(uint _amountInEth, uint _amountOutToken, address _token, uint _deadline) private returns (uint){
         address[] memory path = new address[](2);
         path[0] = dexRouter.WETH();
-        path[1] = token;
+        path[1] = _token;
 
-        uint[] memory amounts = dexRouter.swapExactETHForTokens{ value: _amountInEth }(_amountOutToken, path, address(this), deadline);
+        uint[] memory amounts = dexRouter.swapExactETHForTokens{ value: _amountInEth }(_amountOutToken, path, address(this), _deadline);
 
         return amounts[1];
     }
@@ -139,11 +139,11 @@ contract DexYNFTVault is Ownable {
      uint _amountOutMinSecondToken,
      uint _amountMinLiqudityFirstToken,
      uint _amountMinLiquditySecondToken,
-     uint deadline
+     uint _deadline
       ) public payable {
         uint amountToBuyOneAsstet = (msg.value - _collectFeeEther()) / 2;
 
-        uint amountSecondToken = _swapETHToToken(amountToBuyOneAsstet, _amountOutMinSecondToken, address(secondToken), deadline);
+        uint amountSecondToken = _swapETHToToken(amountToBuyOneAsstet, _amountOutMinSecondToken, address(secondToken), _deadline);
 
         require(secondToken.approve(address(dexRouter), amountSecondToken), 'approve failed.');
 
@@ -155,7 +155,7 @@ contract DexYNFTVault is Ownable {
                 _amountMinLiquditySecondToken,
                 _amountMinLiqudityFirstToken,
                 address(this),
-                deadline
+                _deadline
             );
         } else {
             uint amountFirstToken = _swapETHToToken(amountToBuyOneAsstet, _amountOutMinFirstToken, address(firstToken), deadline);
@@ -168,7 +168,7 @@ contract DexYNFTVault is Ownable {
                     _amountMinLiqudityFirstToken,
                     _amountMinLiquditySecondToken,
                     address(this),
-                    deadline
+                    _deadline
                 );
 
         }
