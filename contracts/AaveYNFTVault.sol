@@ -70,25 +70,25 @@ contract AaveYNFTVault is Ownable {
         etherPriceFeedDecimals = _etherPriceFeedDecimals;
     }
 
-    function calcSlipage(uint price) internal pure returns (uint) {
+    function _calcSlipage(uint _price) private pure returns (uint) {
         // slipage 3%
-        return (price / 100) * 97;
+        return (_price / 100) * 97;
     }
 
-    function setFee(uint _feePercentage)  external onlyOwner returns (uint) {
+    function setFee(uint _feePercentage) external onlyOwner returns (uint) {
         feePercentage = _feePercentage;
         return feePercentage;
     }
 
-    function calcFee(uint price) internal view returns (uint) {
-        return (price * feePercentage) / 100;
+    function _calcFee(uint _price) private view returns (uint) {
+        return (_price * feePercentage) / 100;
     }
 
     function getLatestPriceOfIncetiveTokenToUnderlyingToken() public view returns (uint) {
         (,int price,,,) = incentiveTokenPriceFeed.latestRoundData();
         // normalize to 10^18
         uint power = incentiveTokenDecimals-incentiveTokenPriceFeedDecimals+(etherDecimals - incentiveTokenDecimals);
-        return calcSlipage(uint(price) * 10 ** power);
+        return uint(price) * 10 ** power;
     }
 
     function getLatestPriceOfEtherToUnderlyingToken() public view returns (uint) {
@@ -107,7 +107,7 @@ contract AaveYNFTVault is Ownable {
         return amountToClaim;
     }
 
-    function claimRewards() external returns (bool) {
+    function claimRewards(uint _deadline) external returns (bool) {
         address[] memory claimAssets = new address[](1);
         claimAssets[0] = address(aToken);
 
@@ -116,14 +116,13 @@ contract AaveYNFTVault is Ownable {
 
         require(rewardToken.approve(address(dexRouter), amountClaimed), 'approve failed.');
 
-        uint deadline = block.timestamp + 15; // using 'now' for convenience, for mainnet pass deadline from frontend!
         address[] memory path = new address[](2);
         path[0] = address(rewardToken);
         path[1] = address(underlyingToken);
 
-        uint amountOutMin = (getLatestPriceOfIncetiveTokenToUnderlyingToken() * amountClaimed) / 10**incentiveTokenDecimals;
+        uint amountOutMin = (_calcSlipage(getLatestPriceOfIncetiveTokenToUnderlyingToken()) * amountClaimed) / 10**incentiveTokenDecimals;
 
-        uint[] memory amounts = dexRouter.swapExactTokensForTokens(amountClaimed, amountOutMin, path, address(this), deadline);
+        uint[] memory amounts = dexRouter.swapExactTokensForTokens(amountClaimed, amountOutMin, path, address(this), _deadline);
 
         require(underlyingToken.approve(address(pool), amounts[1]), 'approve failed.');
 
@@ -132,33 +131,33 @@ contract AaveYNFTVault is Ownable {
         return true;
     }
 
-    function withdraw(uint256 nftTokenId, address receiver) internal returns (uint) {
+    function _withdraw(uint256 _nftTokenId, address _receiver) private returns (uint) {
 
         uint currentAmountOfAToken = aToken.balanceOf(address(this));
 
-        uint amountToWithdraw = balanceOf[nftTokenId] * currentAmountOfAToken / totalSupply;
+        uint amountToWithdraw = balanceOf[_nftTokenId] * currentAmountOfAToken / totalSupply;
 
-        totalSupply = totalSupply - balanceOf[nftTokenId];
+        totalSupply = totalSupply - balanceOf[_nftTokenId];
 
-        balanceOf[nftTokenId] = 0;
+        balanceOf[_nftTokenId] = 0;
 
-        return pool.withdraw(address(underlyingToken), amountToWithdraw, receiver);
+        return pool.withdraw(address(underlyingToken), amountToWithdraw, _receiver);
     }
 
-    function deposit(uint256 nftTokenId, uint tokenAmount) internal returns (bool) {
-       require(underlyingToken.approve(address(pool), tokenAmount), 'approve failed.');
+    function _deposit(uint256 _nftTokenId, uint _tokenAmount) private returns (bool) {
+       require(underlyingToken.approve(address(pool), _tokenAmount), 'approve failed.');
 
         uint currentAmountOfAToken = aToken.balanceOf(address(this));
 
-        pool.deposit(address(underlyingToken), tokenAmount, address(this), 0);
+        pool.deposit(address(underlyingToken), _tokenAmount, address(this), 0);
 
         if (totalSupply == 0) {
-            balanceOf[nftTokenId] = tokenAmount;
-            totalSupply = tokenAmount;
+            balanceOf[_nftTokenId] = _tokenAmount;
+            totalSupply = _tokenAmount;
         } else {
-            uint balance = tokenAmount * totalSupply / currentAmountOfAToken;
+            uint balance = _tokenAmount * totalSupply / currentAmountOfAToken;
 
-            balanceOf[nftTokenId] = balance;
+            balanceOf[_nftTokenId] = balance;
 
             totalSupply = totalSupply + balance;
         }
@@ -166,17 +165,17 @@ contract AaveYNFTVault is Ownable {
         return true;
     }
 
-    function withdrawToUnderlyingToken(uint256 nftTokenId) public onlyNftOwner(nftTokenId) returns (bool) {
+    function withdrawToUnderlyingToken(uint256 _nftTokenId) external onlyNftOwner(_nftTokenId) returns (bool) {
 
-        withdraw(nftTokenId, msg.sender);
+        _withdraw(_nftTokenId, msg.sender);
 
-        yNFT.burn(nftTokenId);
+        yNFT.burn(_nftTokenId);
 
         return true;
     }
 
-    function withdrawToEther(uint256 nftTokenId) public onlyNftOwner(nftTokenId) returns (bool) {
-        uint amount = withdraw(nftTokenId, address(this));
+    function withdrawToEther(uint256 _nftTokenId, uint _deadline) external onlyNftOwner(_nftTokenId) returns (bool) {
+        uint amount = _withdraw(_nftTokenId, address(this));
 
         require(underlyingToken.approve(address(dexRouter), amount), 'approve failed.');
 
@@ -185,54 +184,49 @@ contract AaveYNFTVault is Ownable {
         path[0] = address(underlyingToken);
         path[1] = dexRouter.WETH();
 
-        uint deadline = block.timestamp + 15; // using 'now' for convenience, for mainnet pass deadline from frontend!
-
         uint amountOutMin = (amount * 10 ** (etherDecimals - tokenDecimals) / getLatestPriceOfEtherToUnderlyingToken()) * 10 ** etherDecimals;
 
-        dexRouter.swapExactTokensForETH(amount, calcSlipage(amountOutMin  * 10 ** etherDecimals), path, msg.sender, deadline);
+        dexRouter.swapExactTokensForETH(amount, _calcSlipage(amountOutMin  * 10 ** etherDecimals), path, msg.sender, _deadline);
 
-        yNFT.burn(nftTokenId);
+        yNFT.burn(_nftTokenId);
 
         return true;
     }
 
-    function createYNFT(address tokenIn, uint _amountIn, uint _amountOutMin) public {
+    function createYNFT(address _tokenIn, uint _amountIn, uint _amountOutMin, uint _deadline) external {
         uint256 tokenId = yNFT.mint(msg.sender);
 
-        uint fee = calcFee(_amountIn);
-
-        require(IERC20(tokenIn).transferFrom(msg.sender, owner(), fee), 'transferFrom failed.');
+        uint fee = _calcFee(_amountIn);
+        IERC20(_tokenIn).safeTransferFrom(msg.sender, owner(), fee);
 
         uint amountInToBuy = _amountIn - fee;
 
-        require(IERC20(tokenIn).transferFrom(msg.sender, address(this), amountInToBuy), 'transferFrom failed.');
+        IERC20(_tokenIn).safeTransferFrom(msg.sender, address(this), amountInToBuy);
 
-        uint deadline = block.timestamp + 15; // using 'now' for convenience, for mainnet pass deadline from frontend!
         address[] memory path = new address[](2);
-        path[0] = tokenIn;
+        path[0] = _tokenIn;
         path[1] = address(underlyingToken);
 
-        require(IERC20(tokenIn).approve(address(dexRouter), amountInToBuy), 'approve failed.');
+        require(IERC20(_tokenIn).approve(address(dexRouter), amountInToBuy), 'approve failed.');
 
-        uint[] memory amounts = dexRouter.swapExactTokensForTokens(amountInToBuy, _amountOutMin, path, address(this), deadline);
+        uint[] memory amounts = dexRouter.swapExactTokensForTokens(amountInToBuy, _amountOutMin, path, address(this), _deadline);
 
-        deposit(tokenId, amounts[1]);
+        _deposit(tokenId, amounts[1]);
     }
 
-    function createYNFTForEther(uint _amountOutMin) public payable {
+    function createYNFTForEther(uint _amountOutMin, uint _deadline) external payable {
         uint256 tokenId = yNFT.mint(msg.sender);
 
-        uint fee = calcFee(msg.value);
+        uint fee = _calcFee(msg.value);
 
         payable(owner()).transfer(fee);
 
-        uint deadline = block.timestamp + 15; // using 'now' for convenience, for mainnet pass deadline from frontend!
         address[] memory path = new address[](2);
         path[0] = dexRouter.WETH();
         path[1] = address(underlyingToken);
 
-        uint[] memory amounts = dexRouter.swapExactETHForTokens{ value: msg.value - fee }(_amountOutMin, path, address(this), deadline);
+        uint[] memory amounts = dexRouter.swapExactETHForTokens{ value: msg.value - fee }(_amountOutMin, path, address(this), _deadline);
 
-        deposit(tokenId, amounts[1]);
+        _deposit(tokenId, amounts[1]);
     }
 }

@@ -2,6 +2,7 @@ import { ethers } from "hardhat";
 import { waitForReceipt } from "../utils/deployment";
 import { AaveYNFTVault } from "../typechain";
 import configEnv from "../config";
+import * as consts from "../consts";
 
 const { VAULT_ADDRESS } = configEnv;
 
@@ -18,7 +19,9 @@ async function main() {
 
   console.log("balanceBefore", balanceBefore.toString());
 
-  await yNFTVault.claimRewards().then(waitForReceipt);
+  const deadline = Math.round(Date.now() / 1000) + consts.SECONDS_IN_ONE_DAY;
+
+  await yNFTVault.claimRewards(deadline).then(waitForReceipt);
 
   console.log("claimed");
 

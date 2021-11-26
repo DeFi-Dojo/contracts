@@ -18,8 +18,10 @@ async function main() {
   // current price of MATIC/DAI
   const amountOutMin = BigInt(0.1 * 10 ** consts.DECIMALS.DAI);
 
+  const deadline = Math.round(Date.now() / 1000) + consts.SECONDS_IN_ONE_DAY;
+
   await yNFTVault
-    .createYNFTForEther(amountOutMin, {
+    .createYNFTForEther(amountOutMin, deadline, {
       value: ethers.utils.parseEther("0.1"),
     })
     .then(waitForReceipt);

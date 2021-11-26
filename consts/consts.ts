@@ -5,6 +5,8 @@ export const MAX_SUPPLY_OF_NFT = 1000;
 
 export const NATIVE_TOKEN_PRICE_FEED_DECIMALS = 8;
 
+export const SECONDS_IN_ONE_DAY = 1440000;
+
 export const DECIMALS = {
   MATIC: 18,
   DAI: 18,
