@@ -40,12 +40,12 @@ contract DexYNFTVault is Ownable {
         secondToken = IERC20(pair.token1());
     }
 
-    function setFee(uint _feePercentage)  external onlyOwner returns (uint) {
+    function setFee(uint _feePercentage) external onlyOwner returns (uint) {
         feePercentage = _feePercentage;
         return feePercentage;
     }
 
-    function calcFee(uint price) internal view returns (uint) {
+    function _calcFee(uint price) private view returns (uint) {
         return (price * feePercentage) / 100;
     }
 
@@ -54,9 +54,15 @@ contract DexYNFTVault is Ownable {
         balanceOf[tokenId] = liquidity;
     }
 
-    function _collectFee() private returns (uint){
-        uint fee = calcFee(msg.value);
+    function _collectFeeEther() private returns (uint){
+        uint fee = _calcFee(msg.value);
         payable(owner()).transfer(fee);
+        return fee;
+    }
+
+    function _collectFeeToken(address tokenIn, uint tokenAmount) private returns (uint){
+        uint fee = _calcFee(tokenAmount);
+        require(IERC20(tokenIn).transferFrom(msg.sender, owner(), fee), 'transferFrom failed.');
         return fee;
     }
 
@@ -71,6 +77,51 @@ contract DexYNFTVault is Ownable {
         return amounts[1];
     }
 
+    function _swapTokenToToken(uint _amountIn, uint _amountOut, address _tokenIn, address _tokenOut, uint _deadline) private returns (uint){
+        address[] memory path = new address[](2);
+        path[0] = _tokenIn;
+        path[1] = _tokenOut;
+
+        require(IERC20(_tokenIn).approve(address(dexRouter), _amountIn), 'approve failed.');
+
+        uint[] memory amounts = dexRouter.swapExactTokensForTokens(_amountIn, _amountOut, path, address(this), _deadline);
+
+        return amounts[1];
+    }
+
+    function createYNFT(
+        address _tokenIn,
+        uint _amountIn,
+        uint _amountOutMinFirstToken,
+        uint _amountOutMinSecondToken,
+        uint _amountMinLiqudityFirstToken,
+        uint _amountMinLiquditySecondToken,
+        uint _deadline
+      ) public {
+        uint amountToBuyOneAsstet = (_amountIn - _collectFeeToken(_tokenIn, _amountIn)) / 2;
+
+        uint amountFirstToken = _swapTokenToToken(amountToBuyOneAsstet, _amountOutMinFirstToken, _tokenIn, address(firstToken), _deadline);
+        require(firstToken.approve(address(dexRouter), amountFirstToken), 'approve failed.');
+
+        uint amountSecondToken = _swapTokenToToken(amountToBuyOneAsstet, _amountOutMinSecondToken, _tokenIn, address(secondToken), _deadline);
+        require(secondToken.approve(address(dexRouter), amountSecondToken), 'approve failed.');
+
+
+        (,, uint liquidity) = dexRouter.addLiquidity(
+                address(firstToken),
+                address(secondToken),
+                amountFirstToken,
+                amountSecondToken,
+                _amountMinLiqudityFirstToken,
+                _amountMinLiquditySecondToken,
+                address(this),
+                _deadline
+            );
+
+        _mintYNFTForLiquidity(liquidity);
+
+    }
+
 
     function createYNFTForEther(
      uint _amountOutMinFirstToken,
@@ -79,7 +130,7 @@ contract DexYNFTVault is Ownable {
      uint _amountMinLiquditySecondToken,
      uint deadline
       ) public payable {
-        uint amountToBuyOneAsstet = (msg.value - _collectFee()) / 2;
+        uint amountToBuyOneAsstet = (msg.value - _collectFeeEther()) / 2;
 
         uint amountSecondToken = _swapETHToToken(amountToBuyOneAsstet, _amountOutMinSecondToken, address(secondToken), deadline);
 
