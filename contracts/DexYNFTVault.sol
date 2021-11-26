@@ -158,7 +158,7 @@ contract DexYNFTVault is Ownable {
                 _deadline
             );
         } else {
-            uint amountFirstToken = _swapETHToToken(amountToBuyOneAsstet, _amountOutMinFirstToken, address(firstToken), deadline);
+            uint amountFirstToken = _swapETHToToken(amountToBuyOneAsstet, _amountOutMinFirstToken, address(firstToken), _deadline);
             require(firstToken.approve(address(dexRouter), amountFirstToken), 'approve failed.');
             (,, liquidity) = dexRouter.addLiquidity(
                     address(firstToken),
