@@ -100,12 +100,22 @@ contract DexYNFTVault is Ownable {
       ) public {
         uint amountToBuyOneAsstet = (_amountIn - _collectFeeToken(_tokenIn, _amountIn)) / 2;
 
-        uint amountFirstToken = _swapTokenToToken(amountToBuyOneAsstet, _amountOutMinFirstToken, _tokenIn, address(firstToken), _deadline);
+        uint amountFirstToken;
+        if (_tokenIn == address(firstToken)) {
+            amountFirstToken = amountToBuyOneAsstet;
+        } else {
+            amountFirstToken = _swapTokenToToken(amountToBuyOneAsstet, _amountOutMinFirstToken, _tokenIn, address(firstToken), _deadline);
+        }
         require(firstToken.approve(address(dexRouter), amountFirstToken), 'approve failed.');
 
-        uint amountSecondToken = _swapTokenToToken(amountToBuyOneAsstet, _amountOutMinSecondToken, _tokenIn, address(secondToken), _deadline);
-        require(secondToken.approve(address(dexRouter), amountSecondToken), 'approve failed.');
 
+        uint amountSecondToken;
+        if (_tokenIn == address(secondToken)) {
+            amountSecondToken = amountToBuyOneAsstet;
+        } else {
+            amountSecondToken = _swapTokenToToken(amountToBuyOneAsstet, _amountOutMinSecondToken, _tokenIn, address(secondToken), _deadline);
+            require(secondToken.approve(address(dexRouter), amountSecondToken), 'approve failed.');
+        }
 
         (,, uint liquidity) = dexRouter.addLiquidity(
                 address(firstToken),
