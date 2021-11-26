@@ -29,8 +29,10 @@ async function main() {
 
   console.log("approved");
 
+  const deadline = Math.round(Date.now() / 1000) + consts.SECONDS_IN_ONE_DAY;
+
   await yNFTVault
-    .createYNFT(ADDRESSES.USDT, amountIn, amountOutMin)
+    .createYNFT(ADDRESSES.USDT, amountIn, amountOutMin, deadline)
     .then(waitForReceipt);
 
   console.log("created");

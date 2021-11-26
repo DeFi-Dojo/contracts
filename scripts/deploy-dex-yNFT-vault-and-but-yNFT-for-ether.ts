@@ -23,18 +23,32 @@ async function main() {
 
   const deadline = Math.round(Date.now() / 1000) + secondsInOneDay;
 
+  const tokenAmountIn = 0;
+
   await yNFTVault
-    .createYNFTForEther(
+    .createYNFT(
+      ADDRESSES.DAI,
+      tokenAmountIn,
       amountOutMinFirstToken,
       amountOutMinSecondToken,
       amountMinLiqudityFirstToken,
       amountMinLiquditySecondToken,
-      deadline,
-      {
-        value: ethers.utils.parseEther("0.01"),
-      }
+      deadline
     )
     .then(waitForReceipt);
+
+  // await yNFTVault
+  //   .createYNFTForEther(
+  //     amountOutMinFirstToken,
+  //     amountOutMinSecondToken,
+  //     amountMinLiqudityFirstToken,
+  //     amountMinLiquditySecondToken,
+  //     deadline,
+  //     {
+  //       value: ethers.utils.parseEther("0.01"),
+  //     }
+  //   )
+  //   .then(waitForReceipt);
   console.log("created");
 }
 

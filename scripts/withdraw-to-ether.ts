@@ -1,6 +1,7 @@
 import { ethers } from "hardhat";
 import { waitForReceipt } from "../utils/deployment";
 import { AaveYNFTVault } from "../typechain";
+import * as consts from "../consts";
 
 import configEnv from "../config";
 
@@ -16,8 +17,9 @@ async function main() {
     "AaveYNFTVault",
     VAULT_ADDRESS
   );
+  const deadline = Math.round(Date.now() / 1000) + consts.SECONDS_IN_ONE_DAY;
 
-  await yNFTVault.withdrawToEther(NFT_TOKEN_ID).then(waitForReceipt);
+  await yNFTVault.withdrawToEther(NFT_TOKEN_ID, deadline).then(waitForReceipt);
 
   console.log("withdrawn");
 }

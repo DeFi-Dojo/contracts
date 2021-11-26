@@ -62,7 +62,7 @@ contract DexYNFTVault is Ownable {
 
     function _collectFeeToken(address tokenIn, uint tokenAmount) private returns (uint){
         uint fee = _calcFee(tokenAmount);
-        require(IERC20(tokenIn).transferFrom(msg.sender, owner(), fee), 'transferFrom failed.');
+        IERC20(tokenIn).safeTransferFrom(msg.sender, owner(), fee);
         return fee;
     }
 
@@ -124,7 +124,8 @@ contract DexYNFTVault is Ownable {
                 amountSecondToken,
                 _amountMinLiqudityFirstToken,
                 _amountMinLiquditySecondToken,
-                address(this),
+                msg.sender,
+                // address(this),
                 _deadline
             );
 
