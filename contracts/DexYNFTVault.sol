@@ -45,13 +45,13 @@ contract DexYNFTVault is Ownable {
         return feePercentage;
     }
 
-    function _calcFee(uint _price) private view returns (uint) {
-        return (_price * feePercentage) / 100;
-    }
-
     function _mintYNFTForLiquidity(uint _liquidity) private {
         uint256 tokenId = yNFT.mint(msg.sender);
         balanceOf[tokenId] = _liquidity;
+    }
+
+    function _calcFee(uint _price) private view returns (uint) {
+        return (_price * feePercentage) / 100;
     }
 
     function _collectFeeEther() private returns (uint){
@@ -97,8 +97,13 @@ contract DexYNFTVault is Ownable {
         uint _amountMinLiqudityFirstToken,
         uint _amountMinLiquditySecondToken,
         uint _deadline
-      ) public {
-        uint amountToBuyOneAsstet = (_amountIn - _collectFeeToken(_tokenIn, _amountIn)) / 2;
+      ) external {
+
+        uint amountInToBuy = _amountIn - _collectFeeToken(_tokenIn, _amountIn);
+
+       IERC20(_tokenIn).safeTransferFrom(msg.sender, address(this), amountInToBuy);
+
+        uint amountToBuyOneAsstet = amountInToBuy / 2;
 
         uint amountFirstToken;
         if (_tokenIn == address(firstToken)) {
@@ -114,8 +119,8 @@ contract DexYNFTVault is Ownable {
             amountSecondToken = amountToBuyOneAsstet;
         } else {
             amountSecondToken = _swapTokenToToken(amountToBuyOneAsstet, _amountOutMinSecondToken, _tokenIn, address(secondToken), _deadline);
-            require(secondToken.approve(address(dexRouter), amountSecondToken), 'approve failed.');
         }
+        require(secondToken.approve(address(dexRouter), amountSecondToken), 'approve failed.');
 
         (,, uint liquidity) = dexRouter.addLiquidity(
                 address(firstToken),
@@ -124,8 +129,7 @@ contract DexYNFTVault is Ownable {
                 amountSecondToken,
                 _amountMinLiqudityFirstToken,
                 _amountMinLiquditySecondToken,
-                msg.sender,
-                // address(this),
+                address(this),
                 _deadline
             );
 
@@ -140,7 +144,7 @@ contract DexYNFTVault is Ownable {
      uint _amountMinLiqudityFirstToken,
      uint _amountMinLiquditySecondToken,
      uint _deadline
-      ) public payable {
+      ) external payable {
         uint amountToBuyOneAsstet = (msg.value - _collectFeeEther()) / 2;
 
         uint amountSecondToken = _swapETHToToken(amountToBuyOneAsstet, _amountOutMinSecondToken, address(secondToken), _deadline);

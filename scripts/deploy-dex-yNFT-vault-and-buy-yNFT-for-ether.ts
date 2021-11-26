@@ -2,6 +2,7 @@ import { ethers } from "hardhat";
 import { DexYNFTVault } from "../typechain";
 import { deployContract, waitForReceipt } from "../utils/deployment";
 import configEnv from "../config";
+import * as consts from "../consts";
 
 const { ADDRESSES } = configEnv;
 
@@ -19,36 +20,21 @@ async function main() {
   const amountOutMinSecondToken = 0;
   const amountMinLiqudityFirstToken = 0;
   const amountMinLiquditySecondToken = 0;
-  const secondsInOneDay = 1440000;
 
-  const deadline = Math.round(Date.now() / 1000) + secondsInOneDay;
-
-  const tokenAmountIn = 0;
+  const deadline = Math.round(Date.now() / 1000) + consts.SECONDS_IN_ONE_DAY;
 
   await yNFTVault
-    .createYNFT(
-      ADDRESSES.DAI,
-      tokenAmountIn,
+    .createYNFTForEther(
       amountOutMinFirstToken,
       amountOutMinSecondToken,
       amountMinLiqudityFirstToken,
       amountMinLiquditySecondToken,
-      deadline
+      deadline,
+      {
+        value: ethers.utils.parseEther("0.01"),
+      }
     )
     .then(waitForReceipt);
-
-  // await yNFTVault
-  //   .createYNFTForEther(
-  //     amountOutMinFirstToken,
-  //     amountOutMinSecondToken,
-  //     amountMinLiqudityFirstToken,
-  //     amountMinLiquditySecondToken,
-  //     deadline,
-  //     {
-  //       value: ethers.utils.parseEther("0.01"),
-  //     }
-  //   )
-  //   .then(waitForReceipt);
   console.log("created");
 }
 

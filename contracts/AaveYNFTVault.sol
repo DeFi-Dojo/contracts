@@ -88,7 +88,7 @@ contract AaveYNFTVault is Ownable {
         (,int price,,,) = incentiveTokenPriceFeed.latestRoundData();
         // normalize to 10^18
         uint power = incentiveTokenDecimals-incentiveTokenPriceFeedDecimals+(etherDecimals - incentiveTokenDecimals);
-        return _calcSlipage(uint(price) * 10 ** power);
+        return uint(price) * 10 ** power;
     }
 
     function getLatestPriceOfEtherToUnderlyingToken() public view returns (uint) {
@@ -120,7 +120,7 @@ contract AaveYNFTVault is Ownable {
         path[0] = address(rewardToken);
         path[1] = address(underlyingToken);
 
-        uint amountOutMin = (getLatestPriceOfIncetiveTokenToUnderlyingToken() * amountClaimed) / 10**incentiveTokenDecimals;
+        uint amountOutMin = (_calcSlipage(getLatestPriceOfIncetiveTokenToUnderlyingToken()) * amountClaimed) / 10**incentiveTokenDecimals;
 
         uint[] memory amounts = dexRouter.swapExactTokensForTokens(amountClaimed, amountOutMin, path, address(this), _deadline);
 
