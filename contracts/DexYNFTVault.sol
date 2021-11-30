@@ -89,6 +89,38 @@ contract DexYNFTVault is Ownable {
         return amounts[1];
     }
 
+    function withdrawToUnderlyingTokens(uint256 _nftTokenId,  uint _amountOutMinFirstToken, uint _amountOutMinSecondToken, uint _deadline) external onlyNftOwner(_nftTokenId) returns (bool) {
+
+        uint balance = balanceOf[_nftTokenId];
+
+        require(pair.approve(address(dexRouter), balance), 'approve failed.');
+
+        if (address(firstToken) == dexRouter.WETH()) {
+            dexRouter.removeLiquidityETH(
+                address(secondToken),
+                balance,
+                _amountOutMinSecondToken,
+                _amountOutMinFirstToken,
+                msg.sender,
+                _deadline
+            );
+        } else {
+            dexRouter.removeLiquidity(
+                address(firstToken),
+                address(secondToken),
+                balance,
+                _amountOutMinFirstToken,
+                _amountOutMinSecondToken,
+                msg.sender,
+                _deadline
+            );
+        }
+
+        yNFT.burn(_nftTokenId);
+
+        return true;
+    }
+
     function createYNFT(
         address _tokenIn,
         uint _amountIn,
