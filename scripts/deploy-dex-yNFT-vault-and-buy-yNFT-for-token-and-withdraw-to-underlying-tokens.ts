@@ -44,6 +44,19 @@ async function main() {
     .then(waitForReceipt);
 
   console.log("created");
+
+  const nftTokenId = 0;
+
+  await yNFTVault
+    .withdrawToUnderlyingTokens(
+      nftTokenId,
+      amountOutMinFirstToken,
+      amountOutMinFirstToken,
+      deadline
+    )
+    .then(waitForReceipt);
+
+  console.log("withdrawn");
 }
 
 main()
