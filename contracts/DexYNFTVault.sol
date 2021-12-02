@@ -7,8 +7,8 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "./sushiswap/uniswapv2/interfaces/IUniswapV2Router02.sol";
-import "./sushiswap/uniswapv2/interfaces/IUniswapV2Pair.sol";
+import "./interfaces/uniswapv2/IUniswapV2Router02.sol";
+import "./interfaces/uniswapv2/IUniswapV2Pair.sol";
 import "./YNFT.sol";
 
 
