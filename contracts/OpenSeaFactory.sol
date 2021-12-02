@@ -56,10 +56,10 @@ contract OpenSeaFactory is FactoryERC721, Ownable {
         return NUM_OPTIONS;
     }
 
-    function transferOwnership(address newOwner) override public onlyOwner {
+    function transferOwnership(address _newOwner) override public onlyOwner {
         address _prevOwner = owner();
-        super.transferOwnership(newOwner);
-        fireTransferEvents(_prevOwner, newOwner);
+        super.transferOwnership(_newOwner);
+        fireTransferEvents(_prevOwner, _newOwner);
     }
 
     function fireTransferEvents(address _from, address _to) private {
