@@ -70,8 +70,8 @@ contract DexYNFTVault is Ownable, ReentrancyGuard {
 
     function _swapTokenToETH(address _receiver, uint _amountInToken, uint _amountOutETH, address _tokenIn, uint _deadline) private returns (uint){
         address[] memory path = new address[](2);
-        path[0] = dexRouter.WETH();
-        path[1] = _tokenIn;
+        path[0] =  _tokenIn;
+        path[1] =  dexRouter.WETH();
 
         require(IERC20(_tokenIn).approve(address(dexRouter), _amountInToken), 'approve failed.');
 

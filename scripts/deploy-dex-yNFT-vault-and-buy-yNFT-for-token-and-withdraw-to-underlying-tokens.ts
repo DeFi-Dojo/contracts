@@ -12,7 +12,7 @@ async function main() {
 
   const yNFTVault = await deployContract<DexYNFTVault>("DexYNFTVault", [
     ADDRESSES.ROUTER_02_SUSHISWAP,
-    ADDRESSES.PAIR_WETH_USDT_SUSHISWAP,
+    ADDRESSES.PAIR_USDC_USDT_SUSHISWAP,
   ]);
 
   const tokenAmountIn = BigInt(1 * 10 ** consts.DECIMALS.USDT);
@@ -47,11 +47,14 @@ async function main() {
 
   const nftTokenId = 0;
 
+  const amountOutEth = 0;
+
   await yNFTVault
-    .withdrawToUnderlyingTokens(
+    .withdrawToEther(
       nftTokenId,
       amountOutMinFirstToken,
-      amountOutMinFirstToken,
+      amountOutMinSecondToken,
+      amountOutEth,
       deadline
     )
     .then(waitForReceipt);
