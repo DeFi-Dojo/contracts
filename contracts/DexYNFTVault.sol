@@ -18,7 +18,7 @@ contract DexYNFTVault is Ownable, ReentrancyGuard {
     mapping (uint256 => uint) public balanceOf;
     IERC721 public nftToken;
     YNFT public immutable yNFT;
-    IUniswapV2Router02 public dexRouter;
+    IUniswapV2Router02 immutable public dexRouter;
     uint public feePercentage = 1;
     IERC20 public firstToken;
     IERC20 public secondToken;

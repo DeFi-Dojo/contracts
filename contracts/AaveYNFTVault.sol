@@ -18,7 +18,6 @@ contract AaveYNFTVault is Ownable, ReentrancyGuard {
     using SafeERC20 for IAToken;
     using SafeERC20 for IERC20;
 
-    uint public incentiveTokenDecimals;
     IAaveIncentivesController public incentivesController;
     mapping (uint256 => uint) public balanceOf;
     IAToken public aToken;
@@ -28,8 +27,6 @@ contract AaveYNFTVault is Ownable, ReentrancyGuard {
     YNFT public immutable yNFT;
     IUniswapV2Router02 public immutable dexRouter;
     IERC20 public immutable underlyingToken;
-    uint etherDecimals = 18;
-    uint public tokenDecimals;
     uint public totalSupply;
     uint public feePercentage = 1;
 
@@ -43,9 +40,7 @@ contract AaveYNFTVault is Ownable, ReentrancyGuard {
     constructor(
         IUniswapV2Router02 _dexRouter,
         IAToken _aToken,
-        IAaveIncentivesController _incentivesController,
-        uint _incentiveTokenDecimals,
-        uint _tokenDecimals
+        IAaveIncentivesController _incentivesController
     ) {
         incentivesController = _incentivesController;
         rewardToken = IERC20(incentivesController.REWARD_TOKEN());
@@ -54,8 +49,6 @@ contract AaveYNFTVault is Ownable, ReentrancyGuard {
         yNFT = new YNFT();
         dexRouter = _dexRouter;
         underlyingToken = IERC20(aToken.UNDERLYING_ASSET_ADDRESS());
-        incentiveTokenDecimals = _incentiveTokenDecimals;
-        tokenDecimals = _tokenDecimals;
     }
 
     function setFee(uint _feePercentage) external onlyOwner returns (uint) {

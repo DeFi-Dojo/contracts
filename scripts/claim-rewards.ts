@@ -21,7 +21,10 @@ async function main() {
 
   const deadline = Math.round(Date.now() / 1000) + consts.SECONDS_IN_ONE_DAY;
 
-  await yNFTVault.claimRewards(deadline).then(waitForReceipt);
+  // frontend should calculate and pass it to the function, using "0" for convenience
+  const amountOutMin = 0;
+
+  await yNFTVault.claimRewards(amountOutMin, deadline).then(waitForReceipt);
 
   console.log("claimed");
 
