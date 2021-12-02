@@ -94,18 +94,18 @@ contract DojoNFT is ContextMixin, ERC721Enumerable, NativeMetaTransaction, Ownab
         return tokenId < _currentTokenId;
     }
 
-    function _randPercentage(uint256 tokenId, string memory prefix, uint256 _blockTimestamp, uint256 _blockDifficulty) internal view returns (uint) {
-        return uint(keccak256(abi.encodePacked(tokenId, prefix, _blockTimestamp, _blockDifficulty, msg.sender))) % 100;
+    function _randPercentage(uint256 _tokenId, string memory _prefix, uint256 _blockTimestamp, uint256 _blockDifficulty) internal view returns (uint) {
+        return uint(keccak256(abi.encodePacked(_tokenId, _prefix, _blockTimestamp, _blockDifficulty, msg.sender))) % 100;
     }
 
-    function _getOption(uint rarity, uint8[] memory distribution) pure internal returns (RarityOption memory rarityOption) {
-        uint256 arrayLength = distribution.length;
+    function _getOption(uint _rarity, uint8[] memory _distribution) pure internal returns (RarityOption memory rarityOption) {
+        uint256 arrayLength = _distribution.length;
         for (uint8 i=0; i<arrayLength; i++) {
-            if(distribution[i] > rarity) {
+            if(_distribution[i] > _rarity) {
                 if(i == 0) {
-                    return RarityOption({optionId: i, rarity: distribution[i] });
+                    return RarityOption({optionId: i, rarity: _distribution[i] });
                 }
-                return RarityOption({optionId: i, rarity: distribution[i] - distribution[i - 1] });
+                return RarityOption({optionId: i, rarity: _distribution[i] - _distribution[i - 1] });
             }
         }
     }
@@ -175,7 +175,7 @@ contract DojoNFT is ContextMixin, ERC721Enumerable, NativeMetaTransaction, Ownab
     /**
      * Override isApprovedForAll to whitelist user's OpenSea proxy accounts to enable gas-less listings.
      */
-    function isApprovedForAll(address owner, address operator)
+    function isApprovedForAll(address _owner, address _operator)
         override
         public
         view
@@ -183,11 +183,11 @@ contract DojoNFT is ContextMixin, ERC721Enumerable, NativeMetaTransaction, Ownab
     {
         // Whitelist OpenSea proxy contract for easy trading.
         ProxyRegistry proxyRegistry = ProxyRegistry(proxyRegistryAddress);
-        if (address(proxyRegistry.proxies(owner)) == operator) {
+        if (address(proxyRegistry.proxies(_owner)) == _operator) {
             return true;
         }
 
-        return super.isApprovedForAll(owner, operator);
+        return super.isApprovedForAll(_owner, _operator);
     }
 
     /**
@@ -197,7 +197,7 @@ contract DojoNFT is ContextMixin, ERC721Enumerable, NativeMetaTransaction, Ownab
         internal
         override
         view
-        returns (address sender)
+        returns (address _sender)
     {
         return ContextMixin.msgSender();
     }
