@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
@@ -14,12 +14,10 @@ import "./interfaces/aave/IAaveIncentivesController.sol";
 import "./YNFT.sol";
 
 
-contract AaveYNFTVault is Ownable {
+contract AaveYNFTVault is Ownable, ReentrancyGuard {
     using SafeERC20 for IAToken;
     using SafeERC20 for IERC20;
 
-    AggregatorV3Interface internal incentiveTokenPriceFeed;
-    uint public incentiveTokenPriceFeedDecimals;
     uint public incentiveTokenDecimals;
     IAaveIncentivesController public incentivesController;
     mapping (uint256 => uint) public balanceOf;
@@ -32,8 +30,6 @@ contract AaveYNFTVault is Ownable {
     IERC20 public immutable underlyingToken;
     uint etherDecimals = 18;
     uint public tokenDecimals;
-    AggregatorV3Interface public etherPriceFeed;
-    uint public etherPriceFeedDecimals;
     uint public totalSupply;
     uint public feePercentage = 1;
 
@@ -48,12 +44,8 @@ contract AaveYNFTVault is Ownable {
         IUniswapV2Router02 _dexRouter,
         IAToken _aToken,
         IAaveIncentivesController _incentivesController,
-        AggregatorV3Interface _incentiveTokenPriceFeed,
         uint _incentiveTokenDecimals,
-        uint _incentiveTokenPriceFeedDecimals,
-        uint _tokenDecimals,
-        AggregatorV3Interface _etherPriceFeed,
-        uint _etherPriceFeedDecimals
+        uint _tokenDecimals
     ) {
         incentivesController = _incentivesController;
         rewardToken = IERC20(incentivesController.REWARD_TOKEN());
@@ -62,17 +54,8 @@ contract AaveYNFTVault is Ownable {
         yNFT = new YNFT();
         dexRouter = _dexRouter;
         underlyingToken = IERC20(aToken.UNDERLYING_ASSET_ADDRESS());
-        incentiveTokenPriceFeed = _incentiveTokenPriceFeed;
         incentiveTokenDecimals = _incentiveTokenDecimals;
-        incentiveTokenPriceFeedDecimals = _incentiveTokenPriceFeedDecimals;
         tokenDecimals = _tokenDecimals;
-        etherPriceFeed = _etherPriceFeed;
-        etherPriceFeedDecimals = _etherPriceFeedDecimals;
-    }
-
-    function _calcSlipage(uint _price) private pure returns (uint) {
-        // slipage 3%
-        return (_price / 100) * 97;
     }
 
     function setFee(uint _feePercentage) external onlyOwner returns (uint) {
@@ -84,20 +67,6 @@ contract AaveYNFTVault is Ownable {
         return (_price * feePercentage) / 100;
     }
 
-    function getLatestPriceOfIncetiveTokenToUnderlyingToken() public view returns (uint) {
-        (,int price,,,) = incentiveTokenPriceFeed.latestRoundData();
-        // normalize to 10^18
-        uint power = incentiveTokenDecimals-incentiveTokenPriceFeedDecimals+(etherDecimals - incentiveTokenDecimals);
-        return uint(price) * 10 ** power;
-    }
-
-    function getLatestPriceOfEtherToUnderlyingToken() public view returns (uint) {
-        (,int price,,,) = etherPriceFeed.latestRoundData();
-        // normalize to 10^18
-        uint power = etherDecimals - etherPriceFeedDecimals;
-        return uint(price) * 10 ** power;
-    }
-
     function getAmountToClaim() external view returns (uint256) {
         address[] memory assets = new address[](1);
         assets[0] = address(aToken);
@@ -107,7 +76,7 @@ contract AaveYNFTVault is Ownable {
         return amountToClaim;
     }
 
-    function claimRewards(uint _deadline) external returns (bool) {
+    function claimRewards(uint _amountOutMin, uint _deadline) external onlyOwner returns (bool) {
         address[] memory claimAssets = new address[](1);
         claimAssets[0] = address(aToken);
 
@@ -120,9 +89,7 @@ contract AaveYNFTVault is Ownable {
         path[0] = address(rewardToken);
         path[1] = address(underlyingToken);
 
-        uint amountOutMin = (_calcSlipage(getLatestPriceOfIncetiveTokenToUnderlyingToken()) * amountClaimed) / 10**incentiveTokenDecimals;
-
-        uint[] memory amounts = dexRouter.swapExactTokensForTokens(amountClaimed, amountOutMin, path, address(this), _deadline);
+        uint[] memory amounts = dexRouter.swapExactTokensForTokens(amountClaimed, _amountOutMin, path, address(this), _deadline);
 
         require(underlyingToken.approve(address(pool), amounts[1]), 'approve failed.');
 
@@ -174,7 +141,7 @@ contract AaveYNFTVault is Ownable {
         return true;
     }
 
-    function withdrawToEther(uint256 _nftTokenId, uint _deadline) external onlyNftOwner(_nftTokenId) returns (bool) {
+    function withdrawToEther(uint256 _nftTokenId, uint _amountOutMin, uint _deadline) external onlyNftOwner(_nftTokenId) returns (bool) {
         uint amount = _withdraw(_nftTokenId, address(this));
 
         require(underlyingToken.approve(address(dexRouter), amount), 'approve failed.');
@@ -184,9 +151,7 @@ contract AaveYNFTVault is Ownable {
         path[0] = address(underlyingToken);
         path[1] = dexRouter.WETH();
 
-        uint amountOutMin = (amount * 10 ** (etherDecimals - tokenDecimals) / getLatestPriceOfEtherToUnderlyingToken()) * 10 ** etherDecimals;
-
-        dexRouter.swapExactTokensForETH(amount, _calcSlipage(amountOutMin  * 10 ** etherDecimals), path, msg.sender, _deadline);
+        dexRouter.swapExactTokensForETH(amount, _amountOutMin, path, msg.sender, _deadline);
 
         yNFT.burn(_nftTokenId);
 
@@ -214,12 +179,13 @@ contract AaveYNFTVault is Ownable {
         _deposit(tokenId, amounts[1]);
     }
 
-    function createYNFTForEther(uint _amountOutMin, uint _deadline) external payable {
+    function createYNFTForEther(uint _amountOutMin, uint _deadline) external nonReentrant payable {
         uint256 tokenId = yNFT.mint(msg.sender);
 
         uint fee = _calcFee(msg.value);
 
-        payable(owner()).transfer(fee);
+        (bool success, ) = owner().call{value: fee}("");
+        require(success, "Transfer failed.");
 
         address[] memory path = new address[](2);
         path[0] = dexRouter.WETH();
