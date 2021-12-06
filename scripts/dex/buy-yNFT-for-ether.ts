@@ -1,19 +1,19 @@
 import { ethers } from "hardhat";
-import { DexYNFTVault } from "../typechain";
-import { deployContract, waitForReceipt } from "../utils/deployment";
-import configEnv from "../config";
-import * as consts from "../consts";
+import { DexYNFTVault } from "../../typechain";
+import { waitForReceipt } from "../../utils/deployment";
+import configEnv from "../../config";
+import * as consts from "../../consts";
 
-const { ADDRESSES } = configEnv;
+const { VAULT_ADDRESS } = configEnv;
 
 async function main() {
   const [owner] = await ethers.getSigners();
   console.log(`Deploying contracts using address: ${owner.address}`);
 
-  const yNFTVault = await deployContract<DexYNFTVault>("DexYNFTVault", [
-    ADDRESSES.ROUTER_02_SUSHISWAP,
-    ADDRESSES.PAIR_WETH_USDT_SUSHISWAP,
-  ]);
+  const yNFTVault = await ethers.getContractAt<DexYNFTVault>(
+    "DexYNFTVault",
+    VAULT_ADDRESS
+  );
 
   // frontend should calculate and pass it to the function, using "0" for convenience
   const amountOutMinFirstToken = 0;

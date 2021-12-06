@@ -1,9 +1,12 @@
 import { ethers } from "hardhat";
 
-import { DojoNFT, OpenSeaFactory } from "../typechain";
-import { deployContract, waitForReceipt } from "../utils/deployment";
-import { PROXY_REGISTRY_ADDRESS_RINKEBY, MAX_SUPPLY_OF_NFT } from "../consts";
-import configEnv from "../config";
+import { DojoNFT, OpenSeaFactory } from "../../typechain";
+import { deployContract, waitForReceipt } from "../../utils/deployment";
+import {
+  PROXY_REGISTRY_ADDRESS_RINKEBY,
+  MAX_SUPPLY_OF_NFT,
+} from "../../consts";
+import configEnv from "../../config";
 
 const { NFT_BASE_URI, NFT_FACTORY_BASE_URI } = configEnv;
 
