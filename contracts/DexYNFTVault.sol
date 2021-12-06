@@ -192,7 +192,7 @@ contract DexYNFTVault is Ownable, ReentrancyGuard {
 
         uint amountInToBuy = _amountIn - _collectFeeToken(_tokenIn, _amountIn);
 
-       IERC20(_tokenIn).safeTransferFrom(msg.sender, address(this), amountInToBuy);
+        IERC20(_tokenIn).safeTransferFrom(msg.sender, address(this), amountInToBuy);
 
         uint amountToBuyOneAsstet = amountInToBuy / 2;
 

@@ -69,6 +69,7 @@ contract AaveYNFTVault is Ownable, ReentrancyGuard {
         return amountToClaim;
     }
 
+    // front run, sandwich attack
     function claimRewards(uint _amountOutMin, uint _deadline) external onlyOwner returns (bool) {
         address[] memory claimAssets = new address[](1);
         claimAssets[0] = address(aToken);
@@ -152,6 +153,8 @@ contract AaveYNFTVault is Ownable, ReentrancyGuard {
     }
 
     function createYNFT(address _tokenIn, uint _amountIn, uint _amountOutMin, uint _deadline) external {
+
+        // check if _tokenIn === underlyingToken
         uint256 tokenId = yNFT.mint(msg.sender);
 
         uint fee = _calcFee(_amountIn);
