@@ -35,3 +35,14 @@ $ yarn run:node
 ```bash
 $ yarn deploy:nft:and:opensea:factory
 ```
+
+# Other
+Run tests
+```
+yarn test
+```
+
+Run solhint
+```
+yarn solhint
+```

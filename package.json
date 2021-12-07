@@ -7,7 +7,8 @@
     "run:node": "hardhat node",
     "deploy:nft:and:opensea:factory": "hardhat run scripts/deploy-nft-and-nft-factory-to-opensea.ts",
     "pretest": "hardhat compile",
-    "test": "hardhat test --config test.config.ts"
+    "test": "hardhat test --config test.config.ts",
+    "solhint": "npx solhint 'contracts/**/*.sol'"
   },
   "author": "",
   "license": "ISC",
@@ -46,6 +47,7 @@
     "hardhat-ethernal": "^0.3.10",
     "hardhat-gas-reporter": "^1.0.4",
     "opensea-js": "^1.2.0",
+    "solhint": "^3.3.6",
     "web3": "^1.5.2",
     "web3-core": "^1.5.2",
     "web3-provider-engine": "^16.0.3"
