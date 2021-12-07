@@ -33,7 +33,7 @@ contract AaveYNFTVault is Ownable, ReentrancyGuard {
 
     modifier onlyNftOwner(uint nftTokenId) {
         address owner = yNFT.ownerOf(nftTokenId);
-        require(owner == msg.sender, 'Sender is not owner of the NFT');
+        require(owner == msg.sender, "Sender is not owner of the NFT");
         _;
     }
 
@@ -76,7 +76,7 @@ contract AaveYNFTVault is Ownable, ReentrancyGuard {
         uint256 amountToClaim = incentivesController.getRewardsBalance(claimAssets, address(this));
         uint256 amountClaimed = incentivesController.claimRewards(claimAssets, amountToClaim, address(this));
 
-        require(rewardToken.approve(address(dexRouter), amountClaimed), 'approve failed.');
+        require(rewardToken.approve(address(dexRouter), amountClaimed), "approve failed.");
 
         address[] memory path = new address[](2);
         path[0] = address(rewardToken);
@@ -84,7 +84,7 @@ contract AaveYNFTVault is Ownable, ReentrancyGuard {
 
         uint[] memory amounts = dexRouter.swapExactTokensForTokens(amountClaimed, _amountOutMin, path, address(this), _deadline);
 
-        require(underlyingToken.approve(address(pool), amounts[1]), 'approve failed.');
+        require(underlyingToken.approve(address(pool), amounts[1]), "approve failed.");
 
         pool.deposit(address(underlyingToken), amounts[1], address(this), 0);
 
@@ -105,7 +105,7 @@ contract AaveYNFTVault is Ownable, ReentrancyGuard {
     }
 
     function _deposit(uint256 _nftTokenId, uint _tokenAmount) private returns (bool) {
-       require(underlyingToken.approve(address(pool), _tokenAmount), 'approve failed.');
+       require(underlyingToken.approve(address(pool), _tokenAmount), "approve failed.");
 
         uint currentAmountOfAToken = aToken.balanceOf(address(this));
 
@@ -137,7 +137,7 @@ contract AaveYNFTVault is Ownable, ReentrancyGuard {
     function withdrawToEther(uint256 _nftTokenId, uint _amountOutMin, uint _deadline) external onlyNftOwner(_nftTokenId) returns (bool) {
         uint amount = _withdraw(_nftTokenId, address(this));
 
-        require(underlyingToken.approve(address(dexRouter), amount), 'approve failed.');
+        require(underlyingToken.approve(address(dexRouter), amount), "approve failed.");
 
         address[] memory path = new address[](2);
 
@@ -165,7 +165,7 @@ contract AaveYNFTVault is Ownable, ReentrancyGuard {
         path[0] = _tokenIn;
         path[1] = address(underlyingToken);
 
-        require(IERC20(_tokenIn).approve(address(dexRouter), amountInToBuy), 'approve failed.');
+        require(IERC20(_tokenIn).approve(address(dexRouter), amountInToBuy), "approve failed.");
 
         uint[] memory amounts = dexRouter.swapExactTokensForTokens(amountInToBuy, _amountOutMin, path, address(this), _deadline);
 

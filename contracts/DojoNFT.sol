@@ -21,9 +21,9 @@ contract ProxyRegistry {
 contract DojoNFT is ContextMixin, ERC721Enumerable, NativeMetaTransaction, Ownable {
     using SafeMath for uint256;
 
-    address proxyRegistryAddress;
+    address private proxyRegistryAddress;
     uint256 private _currentTokenId = 0;
-    string baseURI;
+    string private baseURI;
 
     struct Characteristics {
         uint8 faceMask;
@@ -98,7 +98,7 @@ contract DojoNFT is ContextMixin, ERC721Enumerable, NativeMetaTransaction, Ownab
         return uint(keccak256(abi.encodePacked(_tokenId, _prefix, _blockTimestamp, _blockDifficulty, msg.sender))) % 100;
     }
 
-    function _getOption(uint _rarity, uint8[] memory _distribution) pure internal returns (RarityOption memory rarityOption) {
+    function _getOption(uint _rarity, uint8[] memory _distribution) internal pure returns (RarityOption memory rarityOption) {
         uint256 arrayLength = _distribution.length;
         for (uint8 i=0; i<arrayLength; i++) {
             if(_distribution[i] > _rarity) {
