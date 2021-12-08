@@ -1,13 +1,10 @@
 import { ethers } from "hardhat";
-import { waitForReceipt } from "../utils/deployment";
-import { AaveYNFTVault } from "../typechain";
-import * as consts from "../consts";
-
-import configEnv from "../config";
+import { waitForReceipt } from "../../utils/deployment";
+import * as consts from "../../consts";
+import { AaveYNFTVault } from "../../typechain";
+import configEnv from "../../config";
 
 const { VAULT_ADDRESS } = configEnv;
-
-const NFT_TOKEN_ID = 0;
 
 async function main() {
   const [owner] = await ethers.getSigners();
@@ -17,16 +14,18 @@ async function main() {
     "AaveYNFTVault",
     VAULT_ADDRESS
   );
-  const deadline = Math.round(Date.now() / 1000) + consts.SECONDS_IN_ONE_DAY;
 
   // frontend should calculate and pass it to the function, using "0" for convenience
   const amountOutMin = 0;
 
-  await yNFTVault
-    .withdrawToEther(NFT_TOKEN_ID, amountOutMin, deadline)
-    .then(waitForReceipt);
+  const deadline = Math.round(Date.now() / 1000) + consts.SECONDS_IN_ONE_DAY;
 
-  console.log("withdrawn");
+  await yNFTVault
+    .createYNFTForEther(amountOutMin, deadline, {
+      value: ethers.utils.parseEther("0.1"),
+    })
+    .then(waitForReceipt);
+  console.log("created");
 }
 
 main()

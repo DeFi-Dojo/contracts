@@ -17,8 +17,7 @@ describe("DojoNFT", () => {
     dojoNFT = await deployContract<ExposedDojoNFT>(
       "ExposedDojoNFT",
       [NFT_BASE_URI, PROXY_REGISTRY_ADDRESS_RINKEBY],
-      undefined,
-      false
+      undefined
     );
   });
 

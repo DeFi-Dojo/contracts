@@ -20,22 +20,19 @@ describe("DojoNFT", () => {
     dojoNFT = await deployContract<DojoNFT>(
       "DojoNFT",
       [NFT_BASE_URI, PROXY_REGISTRY_ADDRESS_RINKEBY],
-      undefined,
-      false
+      undefined
     );
 
     mockProxyRegistry = await deployContract<MockProxyRegistry>(
       "MockProxyRegistry",
       [],
-      undefined,
-      false
+      undefined
     );
 
     openSeaFactory = await deployContract<OpenSeaFactory>(
       "OpenSeaFactory",
       [mockProxyRegistry.address, dojoNFT.address, NFT_MAX_SUPPLY],
-      undefined,
-      false
+      undefined
     );
   });
 

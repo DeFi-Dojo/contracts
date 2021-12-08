@@ -1,19 +1,19 @@
 import { ethers } from "hardhat";
-import { DexYNFTVault, IERC20 } from "../typechain";
-import { deployContract, waitForReceipt } from "../utils/deployment";
-import configEnv from "../config";
-import * as consts from "../consts";
+import { DexYNFTVault, IERC20 } from "../../typechain";
+import { waitForReceipt } from "../../utils/deployment";
+import configEnv from "../../config";
+import * as consts from "../../consts";
 
-const { ADDRESSES } = configEnv;
+const { VAULT_ADDRESS, ADDRESSES } = configEnv;
 
 async function main() {
   const [owner] = await ethers.getSigners();
   console.log(`Deploying contracts using address: ${owner.address}`);
 
-  const yNFTVault = await deployContract<DexYNFTVault>("DexYNFTVault", [
-    ADDRESSES.ROUTER_02_SUSHISWAP,
-    ADDRESSES.PAIR_USDC_USDT_SUSHISWAP,
-  ]);
+  const yNFTVault = await ethers.getContractAt<DexYNFTVault>(
+    "DexYNFTVault",
+    VAULT_ADDRESS
+  );
 
   const tokenAmountIn = BigInt(1 * 10 ** consts.DECIMALS.USDT);
 
@@ -44,22 +44,6 @@ async function main() {
     .then(waitForReceipt);
 
   console.log("created");
-
-  const nftTokenId = 0;
-
-  const amountOutEth = 0;
-
-  await yNFTVault
-    .withdrawToEther(
-      nftTokenId,
-      amountOutMinFirstToken,
-      amountOutMinSecondToken,
-      amountOutEth,
-      deadline
-    )
-    .then(waitForReceipt);
-
-  console.log("withdrawn");
 }
 
 main()
