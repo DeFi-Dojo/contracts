@@ -1,8 +1,8 @@
 import { ethers } from "hardhat";
-import { waitForReceipt } from "../utils/deployment";
-import { AaveYNFTVault } from "../typechain";
-import configEnv from "../config";
-import * as consts from "../consts";
+import { waitForReceipt } from "../../utils/deployment";
+import { AaveYNFTVault } from "../../typechain";
+import configEnv from "../../config";
+import * as consts from "../../consts";
 
 const { VAULT_ADDRESS } = configEnv;
 

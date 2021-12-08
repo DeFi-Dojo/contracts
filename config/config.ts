@@ -11,7 +11,6 @@ const {
   NFT_BASE_URI,
   NFT_FACTORY_BASE_URI,
   KOVAN_API_URL,
-  USE_ETHERNAL,
   POLYGON_MAINNET_API_URL,
   VAULT_ADDRESS,
 } = process.env;
@@ -23,7 +22,6 @@ if (
   WALLET_MNEMONIC === undefined ||
   NFT_BASE_URI === undefined ||
   NFT_FACTORY_BASE_URI === undefined ||
-  USE_ETHERNAL === undefined ||
   KOVAN_API_URL === undefined ||
   POLYGON_MAINNET_API_URL === undefined ||
   VAULT_ADDRESS === undefined
@@ -39,7 +37,6 @@ export default {
   NFT_BASE_URI,
   NFT_FACTORY_BASE_URI,
   KOVAN_API_URL,
-  USE_ETHERNAL: JSON.parse(USE_ETHERNAL),
   POLYGON_MAINNET_API_URL,
   ADDRESSES: consts.NETWORK_ADDRESSES[DEFAULT_NETWORK.toUpperCase()],
   VAULT_ADDRESS,
