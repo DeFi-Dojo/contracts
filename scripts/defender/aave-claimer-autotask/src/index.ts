@@ -4,10 +4,16 @@ import {
   DefenderRelayProvider,
 } from "defender-relay-client/lib/ethers";
 import { AutotaskEvent } from "defender-autotask-utils";
-// import {} from "@chainlink/contracts";
+import { ethers } from "ethers";
+import { ChainlinkFeedRegistryInterface } from "./abi";
 import { TestERC20__factory } from "./typechain";
 
 const VAULT_ADDRESS = "0x57c27D6E71d53D02D70219Dbf73dF0ff7116ab56";
+// const ORACLE_ETH_USD = "0x9326BFA02ADD2366b30bacB125260Af641031331";
+const ORACLE = "0xAa7F6f7f507457a1EE157fE97F6c7DB2BEec5cD0";
+
+const LINK = "0xa36085F69e2889c224210F603D836748e7dC0088";
+const USD = "0x0000000000000000000000000000000000000348";
 
 export async function handler(event: AutotaskEvent) {
   if (event.credentials === undefined || event.relayerARN === undefined) {
@@ -31,12 +37,17 @@ export async function handler(event: AutotaskEvent) {
   // Create contract instance from the signer and use it to send a tx
   const contract = TestERC20__factory.connect(VAULT_ADDRESS, signer);
 
-  const res = await contract.mint();
+  console.log(contract);
 
-  res.wait();
+  const oracle = new ethers.Contract(
+    ORACLE,
+    ChainlinkFeedRegistryInterface,
+    signer
+  );
 
-  const name = await contract.name();
+  //   const name = await contract.name();
+  const res = await oracle.latestRoundData(LINK, USD);
 
-  console.log(`Called execute in ${name}`);
-  return { name };
+  //   console.log(`Called execute in ${name}`);
+  return { res };
 }
