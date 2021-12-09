@@ -1,6 +1,6 @@
 npx hardhat compile
 echo "compiled successfully"
-cp -R ./typechain ./scripts/defender/aave-claimer-autotask/src/typechain
+cp -R ./typechain ./scripts/defender/aave-claimer-autotask/src
 echo "copied typechain to autotask src folder"
 rm -R ./dist
 echo "cleared dist folder"

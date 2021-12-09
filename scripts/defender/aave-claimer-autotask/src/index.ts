@@ -4,9 +4,10 @@ import {
   DefenderRelayProvider,
 } from "defender-relay-client/lib/ethers";
 import { AutotaskEvent } from "defender-autotask-utils";
-import { ethers } from "ethers";
-import { ChainlinkFeedRegistryInterface } from "./abi";
-import { TestERC20__factory } from "./typechain";
+import {
+  TestERC20__factory,
+  FeedRegistryInterface__factory,
+} from "./typechain";
 
 const VAULT_ADDRESS = "0x57c27D6E71d53D02D70219Dbf73dF0ff7116ab56";
 // const ORACLE_ETH_USD = "0x9326BFA02ADD2366b30bacB125260Af641031331";
@@ -39,14 +40,9 @@ export async function handler(event: AutotaskEvent) {
 
   console.log(contract);
 
-  const oracle = new ethers.Contract(
-    ORACLE,
-    ChainlinkFeedRegistryInterface,
-    signer
-  );
+  const oracle = FeedRegistryInterface__factory.connect(ORACLE, signer);
 
-  //   const name = await contract.name();
-  const res = await oracle.latestRoundData(LINK, USD);
+  const res = await oracle.latestRound(LINK, USD);
 
   //   console.log(`Called execute in ${name}`);
   return { res };
