@@ -5,8 +5,9 @@ import {
 } from "defender-relay-client/lib/ethers";
 // import { ethers } from "ethers";
 import { AutotaskEvent } from "defender-autotask-utils";
+import { TestERC20__factory } from "./typechain/factories/TestERC20__factory";
 
-// const ADDRESS = "0.0.0.0";
+const VAULT_ADDRESS = "0xD1669d59CA26223e26BbDaFf118f38A9EFDfa70D";
 
 export async function handler(event: AutotaskEvent) {
   if (event.credentials === undefined || event.relayerARN === undefined) {
@@ -27,13 +28,12 @@ export async function handler(event: AutotaskEvent) {
     { speed: "fast" }
   );
 
-  console.log("bla", signer);
-
   // Create contract instance from the signer and use it to send a tx
-  //   const contract = new ethers.Contract(ADDRESS, ABI, signer);
+  const contract = TestERC20__factory.connect(VAULT_ADDRESS, signer);
+
   //   if (await contract.canExecute()) {
-  //     const tx = await contract.execute();
-  //     console.log(`Called execute in ${tx.hash}`);
-  //     // return { tx: tx.hash };
+  const name = await contract.name();
+  console.log(`Called execute in ${name}`);
+  return { name };
   //   }
 }

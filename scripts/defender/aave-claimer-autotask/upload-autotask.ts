@@ -7,6 +7,9 @@ const {
   DEFENDER_AUTOTASK_ID,
 } = configEnv;
 
+const PATH_TO_COMPILED_SRC_CODE =
+  "./dist/scripts/defender/aave-claimer-autotask/src";
+
 async function main() {
   const client = new AutotaskClient({
     apiKey: DEFENDER_TEAM_API_KEY,
@@ -15,7 +18,7 @@ async function main() {
 
   await client.updateCodeFromFolder(
     DEFENDER_AUTOTASK_ID,
-    "./dist/scripts/defender/aave-claimer-autotask/src"
+    PATH_TO_COMPILED_SRC_CODE
   );
 }
 
