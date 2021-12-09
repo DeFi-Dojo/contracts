@@ -13,6 +13,9 @@ const {
   KOVAN_API_URL,
   POLYGON_MAINNET_API_URL,
   VAULT_ADDRESS,
+  DEFENDER_TEAM_API_KEY,
+  DEFENDER_TEAM_API_SECRET,
+  DEFENDER_AUTOTASK_ID,
 } = process.env;
 
 if (
@@ -24,7 +27,10 @@ if (
   NFT_FACTORY_BASE_URI === undefined ||
   KOVAN_API_URL === undefined ||
   POLYGON_MAINNET_API_URL === undefined ||
-  VAULT_ADDRESS === undefined
+  VAULT_ADDRESS === undefined ||
+  DEFENDER_TEAM_API_KEY === undefined ||
+  DEFENDER_TEAM_API_SECRET === undefined ||
+  DEFENDER_AUTOTASK_ID === undefined
 ) {
   throw new Error("ENV not valid");
 }
@@ -40,4 +46,7 @@ export default {
   POLYGON_MAINNET_API_URL,
   ADDRESSES: consts.NETWORK_ADDRESSES[DEFAULT_NETWORK.toUpperCase()],
   VAULT_ADDRESS,
+  DEFENDER_TEAM_API_KEY,
+  DEFENDER_TEAM_API_SECRET,
+  DEFENDER_AUTOTASK_ID,
 };

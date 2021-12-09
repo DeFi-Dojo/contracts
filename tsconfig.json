@@ -15,7 +15,8 @@
     "./typechain",
     "./utils",
     "./consts",
-    "./config"
+    "./config",
+    "scripts/defender"
   ],
   "files": ["./hardhat.config.ts", "./test.config.ts"],
   "exclude": ["node_modules"]
