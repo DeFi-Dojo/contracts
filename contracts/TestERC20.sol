@@ -8,8 +8,9 @@ contract TestERC20 is ERC20 {
 
     constructor() ERC20("Test", "TEST") {}
 
-    function claim() public pure returns (bool)
+     function mint() public returns (bool)
     {
+        _mint(msg.sender, 10 * 10**18);
         return true;
     }
 }

@@ -3,15 +3,15 @@ import {
   DefenderRelaySigner,
   DefenderRelayProvider,
 } from "defender-relay-client/lib/ethers";
-// import { ethers } from "ethers";
 import { AutotaskEvent } from "defender-autotask-utils";
-import { TestERC20__factory } from "./typechain/factories/TestERC20__factory";
+// import {} from "@chainlink/contracts";
+import { TestERC20__factory } from "./typechain";
 
-const VAULT_ADDRESS = "0xD1669d59CA26223e26BbDaFf118f38A9EFDfa70D";
+const VAULT_ADDRESS = "0x57c27D6E71d53D02D70219Dbf73dF0ff7116ab56";
 
 export async function handler(event: AutotaskEvent) {
   if (event.credentials === undefined || event.relayerARN === undefined) {
-    throw new Error("");
+    throw new Error("Relayer not provided");
   }
 
   const provider = new DefenderRelayProvider({
@@ -31,9 +31,12 @@ export async function handler(event: AutotaskEvent) {
   // Create contract instance from the signer and use it to send a tx
   const contract = TestERC20__factory.connect(VAULT_ADDRESS, signer);
 
-  //   if (await contract.canExecute()) {
+  const res = await contract.mint();
+
+  res.wait();
+
   const name = await contract.name();
+
   console.log(`Called execute in ${name}`);
   return { name };
-  //   }
 }
