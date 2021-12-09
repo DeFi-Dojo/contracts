@@ -3,10 +3,10 @@ import {
   DefenderRelaySigner,
   DefenderRelayProvider,
 } from "defender-relay-client/lib/ethers";
-import { ethers } from "ethers";
+// import { ethers } from "ethers";
 import { AutotaskEvent } from "defender-autotask-utils";
 
-const ADDRESS = "0.0.0.0";
+// const ADDRESS = "0.0.0.0";
 
 export async function handler(event: AutotaskEvent) {
   if (event.credentials === undefined || event.relayerARN === undefined) {
@@ -27,7 +27,7 @@ export async function handler(event: AutotaskEvent) {
     { speed: "fast" }
   );
 
-  console.log(signer);
+  console.log("bla", signer);
 
   // Create contract instance from the signer and use it to send a tx
   //   const contract = new ethers.Contract(ADDRESS, ABI, signer);
