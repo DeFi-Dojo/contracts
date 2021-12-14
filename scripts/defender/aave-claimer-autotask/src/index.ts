@@ -70,14 +70,6 @@ export async function handler(event: AutotaskEvent) {
     { speed: "fast" }
   );
 
-  const oracle = AggregatorV3Interface__factory.connect(
-    addresses.NATIVE_TOKEN_USD,
-    signer
-  );
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [roundID, price] = await oracle.latestRoundData();
-
   const vault = AaveYNFTVault__factory.connect(VAULT_ADDRESS, signer);
 
   const amountToClaim = await vault.getAmountToClaim();
@@ -85,6 +77,14 @@ export async function handler(event: AutotaskEvent) {
   if (amountToClaim.eq(0)) {
     throw new Error("Nothing to claim");
   }
+
+  const oracle = AggregatorV3Interface__factory.connect(
+    addresses.NATIVE_TOKEN_USD,
+    signer
+  );
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [roundID, price] = await oracle.latestRoundData();
 
   const deadline = Math.round(Date.now() / 1000) + DEADLINE_SECONDS;
 
