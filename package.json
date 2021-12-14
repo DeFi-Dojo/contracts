@@ -8,8 +8,7 @@
     "deploy:nft:and:opensea:factory": "hardhat run scripts/deploy-nft-and-nft-factory-to-opensea.ts",
     "pretest": "hardhat compile",
     "test": "hardhat test --config test.config.ts",
-    "build": "tsc --project tsconfig.json",
-    "copy:typechain:to:aave:autotask:claimer": "cp -R ./typechain ./scripts/defender/aave-claimer-autotask/src"
+    "build": "tsc --project tsconfig.json"
   },
   "author": "",
   "license": "ISC",
@@ -32,7 +31,6 @@
     "typescript": "^4.3.5"
   },
   "dependencies": {
-    "@chainlink/contracts": "^0.2.2",
     "@nomiclabs/hardhat-ethers": "npm:hardhat-deploy-ethers",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@nomiclabs/hardhat-web3": "^2.0.0",
