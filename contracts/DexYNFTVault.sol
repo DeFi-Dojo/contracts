@@ -102,7 +102,7 @@ contract DexYNFTVault is Ownable, ReentrancyGuard {
         return amounts[1];
     }
 
-    function withdrawToEther(uint256 _nftTokenId,  uint _amountOutMinFirstToken, uint _amountOutMinSecondToken, uint _amountOutETH, uint _deadline) external nonReentrant onlyNftOwner(_nftTokenId) returns (bool) {
+    function withdrawToEther(uint256 _nftTokenId,  uint _amountOutMinFirstToken, uint _amountOutMinSecondToken, uint _amountOutETH, uint _deadline) external nonReentrant onlyNftOwner(_nftTokenId) {
 
         uint balance = balanceOf[_nftTokenId];
 
@@ -142,8 +142,6 @@ contract DexYNFTVault is Ownable, ReentrancyGuard {
         _swapTokenToETH(msg.sender, amountSecondToken, _amountOutETH / 2, address(secondToken), _deadline);
 
         yNFT.burn(_nftTokenId);
-
-        return true;
     }
 
     function withdrawToUnderlyingTokens(uint256 _nftTokenId,  uint _amountOutMinFirstToken, uint _amountOutMinSecondToken, uint _deadline) external onlyNftOwner(_nftTokenId) returns (bool) {

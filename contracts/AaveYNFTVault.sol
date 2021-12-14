@@ -80,7 +80,7 @@ contract AaveYNFTVault is ReentrancyGuard, AccessControl {
     }
 
     // front run, sandwich attack
-    function claimRewards(uint _amountOutMin, uint _deadline) external onlyRole(CLAIMER_ROLE) returns (bool) {
+    function claimRewards(uint _amountOutMin, uint _deadline) external onlyRole(CLAIMER_ROLE) {
         address[] memory claimAssets = new address[](1);
         claimAssets[0] = address(aToken);
 
@@ -99,7 +99,6 @@ contract AaveYNFTVault is ReentrancyGuard, AccessControl {
 
         pool.deposit(address(underlyingToken), amounts[1], address(this), 0);
 
-        return true;
     }
 
     function _withdraw(uint256 _nftTokenId, address _receiver) private returns (uint) {
@@ -115,7 +114,9 @@ contract AaveYNFTVault is ReentrancyGuard, AccessControl {
         return pool.withdraw(address(underlyingToken), amountToWithdraw, _receiver);
     }
 
-    function _deposit(uint256 _nftTokenId, uint _tokenAmount) private returns (bool) {
+    function _deposit(uint _tokenAmount) private {
+        uint256 tokenId = yNFT.mint(msg.sender);
+
        require(underlyingToken.approve(address(pool), _tokenAmount), 'approve failed.');
 
         uint currentAmountOfAToken = aToken.balanceOf(address(this));
@@ -123,29 +124,25 @@ contract AaveYNFTVault is ReentrancyGuard, AccessControl {
         pool.deposit(address(underlyingToken), _tokenAmount, address(this), 0);
 
         if (totalSupply == 0) {
-            balanceOf[_nftTokenId] = _tokenAmount;
+            balanceOf[tokenId] = _tokenAmount;
             totalSupply = _tokenAmount;
         } else {
             uint balance = _tokenAmount * totalSupply / currentAmountOfAToken;
 
-            balanceOf[_nftTokenId] = balance;
+            balanceOf[tokenId] = balance;
 
             totalSupply = totalSupply + balance;
         }
-
-        return true;
     }
 
-    function withdrawToUnderlyingToken(uint256 _nftTokenId) external onlyNftOwner(_nftTokenId) returns (bool) {
+    function withdrawToUnderlyingToken(uint256 _nftTokenId) external onlyNftOwner(_nftTokenId) {
 
         _withdraw(_nftTokenId, msg.sender);
 
         yNFT.burn(_nftTokenId);
-
-        return true;
     }
 
-    function withdrawToEther(uint256 _nftTokenId, uint _amountOutMin, uint _deadline) external onlyNftOwner(_nftTokenId) returns (bool) {
+    function withdrawToEther(uint256 _nftTokenId, uint _amountOutMin, uint _deadline) external onlyNftOwner(_nftTokenId) {
         uint amount = _withdraw(_nftTokenId, address(this));
 
         require(underlyingToken.approve(address(dexRouter), amount), 'approve failed.');
@@ -158,36 +155,32 @@ contract AaveYNFTVault is ReentrancyGuard, AccessControl {
         dexRouter.swapExactTokensForETH(amount, _amountOutMin, path, msg.sender, _deadline);
 
         yNFT.burn(_nftTokenId);
-
-        return true;
     }
 
     function createYNFT(address _tokenIn, uint _amountIn, uint _amountOutMin, uint _deadline) external {
-
-        // check if _tokenIn === underlyingToken
-        uint256 tokenId = yNFT.mint(msg.sender);
 
         uint fee = _calcFee(_amountIn);
         IERC20(_tokenIn).safeTransferFrom(msg.sender, beneficiary, fee);
 
         uint amountInToBuy = _amountIn - fee;
 
-        IERC20(_tokenIn).safeTransferFrom(msg.sender, address(this), amountInToBuy);
+        if(_tokenIn == address(underlyingToken)) {
+            _deposit(amountInToBuy);
+        } else {
+            IERC20(_tokenIn).safeTransferFrom(msg.sender, address(this), amountInToBuy);
+            address[] memory path = new address[](2);
+            path[0] = _tokenIn;
+            path[1] = address(underlyingToken);
 
-        address[] memory path = new address[](2);
-        path[0] = _tokenIn;
-        path[1] = address(underlyingToken);
+            require(IERC20(_tokenIn).approve(address(dexRouter), amountInToBuy), 'approve failed.');
 
-        require(IERC20(_tokenIn).approve(address(dexRouter), amountInToBuy), 'approve failed.');
+            uint[] memory amounts = dexRouter.swapExactTokensForTokens(amountInToBuy, _amountOutMin, path, address(this), _deadline);
 
-        uint[] memory amounts = dexRouter.swapExactTokensForTokens(amountInToBuy, _amountOutMin, path, address(this), _deadline);
-
-        _deposit(tokenId, amounts[1]);
+            _deposit(amounts[1]);
+        }
     }
 
     function createYNFTForEther(uint _amountOutMin, uint _deadline) external nonReentrant payable {
-        uint256 tokenId = yNFT.mint(msg.sender);
-
         uint fee = _calcFee(msg.value);
 
         (bool success, ) = beneficiary.call{value: fee}("");
@@ -199,6 +192,6 @@ contract AaveYNFTVault is ReentrancyGuard, AccessControl {
 
         uint[] memory amounts = dexRouter.swapExactETHForTokens{ value: msg.value - fee }(_amountOutMin, path, address(this), _deadline);
 
-        _deposit(tokenId, amounts[1]);
+        _deposit(amounts[1]);
     }
 }
