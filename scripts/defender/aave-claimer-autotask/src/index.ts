@@ -30,7 +30,7 @@ const ADDRESSES: NetworksAddresses = {
 };
 
 // TODO: how to handle vault address for diffrent vaults
-const VAULT_ADDRESS = "0x8fDEE6E1CaA7827f033aB4671f7536cCB899556F";
+const VAULT_ADDRESS = "0x0bf97F8f2dF1cEEC3EF21827E00F11011aE2d118";
 
 const PRICE_FEED_DECIMALS = 8;
 

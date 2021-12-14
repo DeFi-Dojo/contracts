@@ -3,10 +3,10 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./interfaces/uniswapv2/IUniswapV2Router02.sol";
 import "./interfaces/aave/ILendingPool.sol";
 import "./interfaces/aave/IAToken.sol";
@@ -14,7 +14,7 @@ import "./interfaces/aave/IAaveIncentivesController.sol";
 import "./YNFT.sol";
 
 
-contract AaveYNFTVault is Ownable, ReentrancyGuard {
+contract AaveYNFTVault is ReentrancyGuard, AccessControl {
     using SafeERC20 for IAToken;
     using SafeERC20 for IERC20;
 
@@ -29,7 +29,9 @@ contract AaveYNFTVault is Ownable, ReentrancyGuard {
     IERC20 public immutable underlyingToken;
     uint public totalSupply;
     uint public feePercentage = 1;
+    address public beneficiary;
 
+    bytes32 public constant CLAIMER_ROLE = keccak256("CLAIMER_ROLE");
 
     modifier onlyNftOwner(uint nftTokenId) {
         address owner = yNFT.ownerOf(nftTokenId);
@@ -40,7 +42,8 @@ contract AaveYNFTVault is Ownable, ReentrancyGuard {
     constructor(
         IUniswapV2Router02 _dexRouter,
         IAToken _aToken,
-        IAaveIncentivesController _incentivesController
+        IAaveIncentivesController _incentivesController,
+        address _claimer
     ) {
         incentivesController = _incentivesController;
         rewardToken = IERC20(incentivesController.REWARD_TOKEN());
@@ -49,9 +52,16 @@ contract AaveYNFTVault is Ownable, ReentrancyGuard {
         yNFT = new YNFT();
         dexRouter = _dexRouter;
         underlyingToken = IERC20(aToken.UNDERLYING_ASSET_ADDRESS());
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _setupRole(CLAIMER_ROLE, _claimer);
+        beneficiary = msg.sender;
     }
 
-    function setFee(uint _feePercentage) external onlyOwner returns (uint) {
+    function setBeneficiary(address _beneficiary) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        beneficiary = _beneficiary;
+    }
+
+    function setFee(uint _feePercentage) external onlyRole(DEFAULT_ADMIN_ROLE) returns (uint) {
         feePercentage = _feePercentage;
         return feePercentage;
     }
@@ -70,8 +80,7 @@ contract AaveYNFTVault is Ownable, ReentrancyGuard {
     }
 
     // front run, sandwich attack
-    // TODO: add ACL, restrict for autoclaimer only
-    function claimRewards(uint _amountOutMin, uint _deadline) external returns (bool) {
+    function claimRewards(uint _amountOutMin, uint _deadline) external onlyRole(CLAIMER_ROLE) returns (bool) {
         address[] memory claimAssets = new address[](1);
         claimAssets[0] = address(aToken);
 
@@ -159,7 +168,7 @@ contract AaveYNFTVault is Ownable, ReentrancyGuard {
         uint256 tokenId = yNFT.mint(msg.sender);
 
         uint fee = _calcFee(_amountIn);
-        IERC20(_tokenIn).safeTransferFrom(msg.sender, owner(), fee);
+        IERC20(_tokenIn).safeTransferFrom(msg.sender, beneficiary, fee);
 
         uint amountInToBuy = _amountIn - fee;
 
@@ -181,7 +190,7 @@ contract AaveYNFTVault is Ownable, ReentrancyGuard {
 
         uint fee = _calcFee(msg.value);
 
-        (bool success, ) = owner().call{value: fee}("");
+        (bool success, ) = beneficiary.call{value: fee}("");
         require(success, "Transfer failed.");
 
         address[] memory path = new address[](2);

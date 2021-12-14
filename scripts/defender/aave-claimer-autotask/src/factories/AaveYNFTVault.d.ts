@@ -22,33 +22,52 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface AaveYNFTVaultInterface extends ethers.utils.Interface {
   functions: {
+    "CLAIMER_ROLE()": FunctionFragment;
+    "DEFAULT_ADMIN_ROLE()": FunctionFragment;
     "aToken()": FunctionFragment;
     "balanceOf(uint256)": FunctionFragment;
+    "beneficiary()": FunctionFragment;
     "claimRewards(uint256,uint256)": FunctionFragment;
     "createYNFT(address,uint256,uint256,uint256)": FunctionFragment;
     "createYNFTForEther(uint256,uint256)": FunctionFragment;
     "dexRouter()": FunctionFragment;
     "feePercentage()": FunctionFragment;
     "getAmountToClaim()": FunctionFragment;
+    "getRoleAdmin(bytes32)": FunctionFragment;
+    "grantRole(bytes32,address)": FunctionFragment;
+    "hasRole(bytes32,address)": FunctionFragment;
     "incentivesController()": FunctionFragment;
     "nftToken()": FunctionFragment;
-    "owner()": FunctionFragment;
     "pool()": FunctionFragment;
-    "renounceOwnership()": FunctionFragment;
+    "renounceRole(bytes32,address)": FunctionFragment;
+    "revokeRole(bytes32,address)": FunctionFragment;
     "rewardToken()": FunctionFragment;
+    "setBeneficiary(address)": FunctionFragment;
     "setFee(uint256)": FunctionFragment;
+    "supportsInterface(bytes4)": FunctionFragment;
     "totalSupply()": FunctionFragment;
-    "transferOwnership(address)": FunctionFragment;
     "underlyingToken()": FunctionFragment;
     "withdrawToEther(uint256,uint256,uint256)": FunctionFragment;
     "withdrawToUnderlyingToken(uint256)": FunctionFragment;
     "yNFT()": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "CLAIMER_ROLE",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "DEFAULT_ADMIN_ROLE",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "aToken", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "balanceOf",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "beneficiary",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "claimRewards",
@@ -72,31 +91,50 @@ interface AaveYNFTVaultInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "getRoleAdmin",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "grantRole",
+    values: [BytesLike, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "hasRole",
+    values: [BytesLike, string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "incentivesController",
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "nftToken", values?: undefined): string;
-  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(functionFragment: "pool", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "renounceOwnership",
-    values?: undefined
+    functionFragment: "renounceRole",
+    values: [BytesLike, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "revokeRole",
+    values: [BytesLike, string]
   ): string;
   encodeFunctionData(
     functionFragment: "rewardToken",
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "setBeneficiary",
+    values: [string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "setFee",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "totalSupply",
-    values?: undefined
+    functionFragment: "supportsInterface",
+    values: [BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "transferOwnership",
-    values: [string]
+    functionFragment: "totalSupply",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "underlyingToken",
@@ -112,8 +150,20 @@ interface AaveYNFTVaultInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "yNFT", values?: undefined): string;
 
+  decodeFunctionResult(
+    functionFragment: "CLAIMER_ROLE",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "DEFAULT_ADMIN_ROLE",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "aToken", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "beneficiary",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "claimRewards",
     data: BytesLike
@@ -133,27 +183,37 @@ interface AaveYNFTVaultInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "getRoleAdmin",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "grantRole", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "hasRole", data: BytesLike): Result;
+  decodeFunctionResult(
     functionFragment: "incentivesController",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "nftToken", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pool", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "renounceOwnership",
+    functionFragment: "renounceRole",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "rewardToken",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "setBeneficiary",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "setFee", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "totalSupply",
+    functionFragment: "supportsInterface",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "transferOwnership",
+    functionFragment: "totalSupply",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -171,14 +231,30 @@ interface AaveYNFTVaultInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "yNFT", data: BytesLike): Result;
 
   events: {
-    "OwnershipTransferred(address,address)": EventFragment;
+    "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
+    "RoleGranted(bytes32,address,address)": EventFragment;
+    "RoleRevoked(bytes32,address,address)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RoleAdminChanged"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RoleRevoked"): EventFragment;
 }
 
-export type OwnershipTransferredEvent = TypedEvent<
-  [string, string] & { previousOwner: string; newOwner: string }
+export type RoleAdminChangedEvent = TypedEvent<
+  [string, string, string] & {
+    role: string;
+    previousAdminRole: string;
+    newAdminRole: string;
+  }
+>;
+
+export type RoleGrantedEvent = TypedEvent<
+  [string, string, string] & { role: string; account: string; sender: string }
+>;
+
+export type RoleRevokedEvent = TypedEvent<
+  [string, string, string] & { role: string; account: string; sender: string }
 >;
 
 export class AaveYNFTVault extends BaseContract {
@@ -225,12 +301,18 @@ export class AaveYNFTVault extends BaseContract {
   interface: AaveYNFTVaultInterface;
 
   functions: {
+    CLAIMER_ROLE(overrides?: CallOverrides): Promise<[string]>;
+
+    DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
+
     aToken(overrides?: CallOverrides): Promise<[string]>;
 
     balanceOf(
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
+
+    beneficiary(overrides?: CallOverrides): Promise<[string]>;
 
     claimRewards(
       _amountOutMin: BigNumberish,
@@ -258,31 +340,56 @@ export class AaveYNFTVault extends BaseContract {
 
     getAmountToClaim(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<[string]>;
+
+    grantRole(
+      role: BytesLike,
+      account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    hasRole(
+      role: BytesLike,
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
     incentivesController(overrides?: CallOverrides): Promise<[string]>;
 
     nftToken(overrides?: CallOverrides): Promise<[string]>;
 
-    owner(overrides?: CallOverrides): Promise<[string]>;
-
     pool(overrides?: CallOverrides): Promise<[string]>;
 
-    renounceOwnership(
+    renounceRole(
+      role: BytesLike,
+      account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    revokeRole(
+      role: BytesLike,
+      account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     rewardToken(overrides?: CallOverrides): Promise<[string]>;
+
+    setBeneficiary(
+      _beneficiary: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     setFee(
       _feePercentage: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
+    supportsInterface(
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
 
-    transferOwnership(
-      newOwner: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     underlyingToken(overrides?: CallOverrides): Promise<[string]>;
 
@@ -301,9 +408,15 @@ export class AaveYNFTVault extends BaseContract {
     yNFT(overrides?: CallOverrides): Promise<[string]>;
   };
 
+  CLAIMER_ROLE(overrides?: CallOverrides): Promise<string>;
+
+  DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
+
   aToken(overrides?: CallOverrides): Promise<string>;
 
   balanceOf(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
+
+  beneficiary(overrides?: CallOverrides): Promise<string>;
 
   claimRewards(
     _amountOutMin: BigNumberish,
@@ -331,31 +444,56 @@ export class AaveYNFTVault extends BaseContract {
 
   getAmountToClaim(overrides?: CallOverrides): Promise<BigNumber>;
 
+  getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<string>;
+
+  grantRole(
+    role: BytesLike,
+    account: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  hasRole(
+    role: BytesLike,
+    account: string,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
   incentivesController(overrides?: CallOverrides): Promise<string>;
 
   nftToken(overrides?: CallOverrides): Promise<string>;
 
-  owner(overrides?: CallOverrides): Promise<string>;
-
   pool(overrides?: CallOverrides): Promise<string>;
 
-  renounceOwnership(
+  renounceRole(
+    role: BytesLike,
+    account: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  revokeRole(
+    role: BytesLike,
+    account: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   rewardToken(overrides?: CallOverrides): Promise<string>;
+
+  setBeneficiary(
+    _beneficiary: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   setFee(
     _feePercentage: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
+  supportsInterface(
+    interfaceId: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
 
-  transferOwnership(
-    newOwner: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
   underlyingToken(overrides?: CallOverrides): Promise<string>;
 
@@ -374,12 +512,18 @@ export class AaveYNFTVault extends BaseContract {
   yNFT(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
+    CLAIMER_ROLE(overrides?: CallOverrides): Promise<string>;
+
+    DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
+
     aToken(overrides?: CallOverrides): Promise<string>;
 
     balanceOf(
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    beneficiary(overrides?: CallOverrides): Promise<string>;
 
     claimRewards(
       _amountOutMin: BigNumberish,
@@ -407,29 +551,56 @@ export class AaveYNFTVault extends BaseContract {
 
     getAmountToClaim(overrides?: CallOverrides): Promise<BigNumber>;
 
+    getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<string>;
+
+    grantRole(
+      role: BytesLike,
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    hasRole(
+      role: BytesLike,
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
     incentivesController(overrides?: CallOverrides): Promise<string>;
 
     nftToken(overrides?: CallOverrides): Promise<string>;
 
-    owner(overrides?: CallOverrides): Promise<string>;
-
     pool(overrides?: CallOverrides): Promise<string>;
 
-    renounceOwnership(overrides?: CallOverrides): Promise<void>;
+    renounceRole(
+      role: BytesLike,
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    revokeRole(
+      role: BytesLike,
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     rewardToken(overrides?: CallOverrides): Promise<string>;
+
+    setBeneficiary(
+      _beneficiary: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     setFee(
       _feePercentage: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
-
-    transferOwnership(
-      newOwner: string,
+    supportsInterface(
+      interfaceId: BytesLike,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<boolean>;
+
+    totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
     underlyingToken(overrides?: CallOverrides): Promise<string>;
 
@@ -449,30 +620,74 @@ export class AaveYNFTVault extends BaseContract {
   };
 
   filters: {
-    "OwnershipTransferred(address,address)"(
-      previousOwner?: string | null,
-      newOwner?: string | null
+    "RoleAdminChanged(bytes32,bytes32,bytes32)"(
+      role?: BytesLike | null,
+      previousAdminRole?: BytesLike | null,
+      newAdminRole?: BytesLike | null
     ): TypedEventFilter<
-      [string, string],
-      { previousOwner: string; newOwner: string }
+      [string, string, string],
+      { role: string; previousAdminRole: string; newAdminRole: string }
     >;
 
-    OwnershipTransferred(
-      previousOwner?: string | null,
-      newOwner?: string | null
+    RoleAdminChanged(
+      role?: BytesLike | null,
+      previousAdminRole?: BytesLike | null,
+      newAdminRole?: BytesLike | null
     ): TypedEventFilter<
-      [string, string],
-      { previousOwner: string; newOwner: string }
+      [string, string, string],
+      { role: string; previousAdminRole: string; newAdminRole: string }
+    >;
+
+    "RoleGranted(bytes32,address,address)"(
+      role?: BytesLike | null,
+      account?: string | null,
+      sender?: string | null
+    ): TypedEventFilter<
+      [string, string, string],
+      { role: string; account: string; sender: string }
+    >;
+
+    RoleGranted(
+      role?: BytesLike | null,
+      account?: string | null,
+      sender?: string | null
+    ): TypedEventFilter<
+      [string, string, string],
+      { role: string; account: string; sender: string }
+    >;
+
+    "RoleRevoked(bytes32,address,address)"(
+      role?: BytesLike | null,
+      account?: string | null,
+      sender?: string | null
+    ): TypedEventFilter<
+      [string, string, string],
+      { role: string; account: string; sender: string }
+    >;
+
+    RoleRevoked(
+      role?: BytesLike | null,
+      account?: string | null,
+      sender?: string | null
+    ): TypedEventFilter<
+      [string, string, string],
+      { role: string; account: string; sender: string }
     >;
   };
 
   estimateGas: {
+    CLAIMER_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
+
+    DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
+
     aToken(overrides?: CallOverrides): Promise<BigNumber>;
 
     balanceOf(
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    beneficiary(overrides?: CallOverrides): Promise<BigNumber>;
 
     claimRewards(
       _amountOutMin: BigNumberish,
@@ -500,31 +715,59 @@ export class AaveYNFTVault extends BaseContract {
 
     getAmountToClaim(overrides?: CallOverrides): Promise<BigNumber>;
 
+    getRoleAdmin(
+      role: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    grantRole(
+      role: BytesLike,
+      account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    hasRole(
+      role: BytesLike,
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     incentivesController(overrides?: CallOverrides): Promise<BigNumber>;
 
     nftToken(overrides?: CallOverrides): Promise<BigNumber>;
 
-    owner(overrides?: CallOverrides): Promise<BigNumber>;
-
     pool(overrides?: CallOverrides): Promise<BigNumber>;
 
-    renounceOwnership(
+    renounceRole(
+      role: BytesLike,
+      account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    revokeRole(
+      role: BytesLike,
+      account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     rewardToken(overrides?: CallOverrides): Promise<BigNumber>;
+
+    setBeneficiary(
+      _beneficiary: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
     setFee(
       _feePercentage: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
-
-    transferOwnership(
-      newOwner: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+    supportsInterface(
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
     underlyingToken(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -544,12 +787,20 @@ export class AaveYNFTVault extends BaseContract {
   };
 
   populateTransaction: {
+    CLAIMER_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    DEFAULT_ADMIN_ROLE(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     aToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     balanceOf(
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    beneficiary(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     claimRewards(
       _amountOutMin: BigNumberish,
@@ -577,33 +828,61 @@ export class AaveYNFTVault extends BaseContract {
 
     getAmountToClaim(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    getRoleAdmin(
+      role: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    grantRole(
+      role: BytesLike,
+      account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    hasRole(
+      role: BytesLike,
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     incentivesController(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     nftToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     pool(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    renounceOwnership(
+    renounceRole(
+      role: BytesLike,
+      account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    revokeRole(
+      role: BytesLike,
+      account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     rewardToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    setBeneficiary(
+      _beneficiary: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
 
     setFee(
       _feePercentage: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    transferOwnership(
-      newOwner: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+    supportsInterface(
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     underlyingToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
