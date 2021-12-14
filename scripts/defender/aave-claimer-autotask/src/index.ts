@@ -82,6 +82,10 @@ export async function handler(event: AutotaskEvent) {
 
   const amountToClaim = await vault.getAmountToClaim();
 
+  if (amountToClaim.eq(0)) {
+    throw new Error("Nothing to claim");
+  }
+
   const deadline = Math.round(Date.now() / 1000) + DEADLINE_SECONDS;
 
   const amountOutMin = price
