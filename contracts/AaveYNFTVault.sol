@@ -70,7 +70,8 @@ contract AaveYNFTVault is Ownable, ReentrancyGuard {
     }
 
     // front run, sandwich attack
-    function claimRewards(uint _amountOutMin, uint _deadline) external onlyOwner returns (bool) {
+    // TODO: add ACL, restrict for autoclaimer
+    function claimRewards(uint _amountOutMin, uint _deadline) external returns (bool) {
         address[] memory claimAssets = new address[](1);
         claimAssets[0] = address(aToken);
 

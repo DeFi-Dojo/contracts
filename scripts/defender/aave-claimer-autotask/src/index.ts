@@ -5,11 +5,9 @@ import {
 } from "defender-relay-client/lib/ethers";
 import { AutotaskEvent } from "defender-autotask-utils";
 import {
-  //   TestERC20__factory,
+  AaveYNFTVault__factory,
   AggregatorV3Interface__factory,
 } from "./factories";
-
-// const VAULT_ADDRESS = "0x57c27D6E71d53D02D70219Dbf73dF0ff7116ab56";
 
 enum ChainIds {
   KOVAN = 42,
@@ -31,8 +29,18 @@ const ADDRESSES: NetworksAddresses = {
   },
 };
 
+// TODO: how to handle vault address for diffrent vaults
+const VAULT_ADDRESS = "0x8fDEE6E1CaA7827f033aB4671f7536cCB899556F";
+
+const PRICE_FEED_DECIMALS = 8;
+
+const SLIPPAGE_PERCANTAGE = 3;
+
+const ALL_PERCANTAGE = 100;
+
+const DEADLINE_SECONDS = 60;
+
 export async function handler(event: AutotaskEvent) {
-  console.log(event);
   if (event.credentials === undefined || event.relayerARN === undefined) {
     throw new Error("Relayer not provided");
   }
@@ -62,15 +70,27 @@ export async function handler(event: AutotaskEvent) {
     { speed: "fast" }
   );
 
-  // Create contract instance from the signer and use it to send a tx
-  //   const contract = TestERC20__factory.connect(VAULT_ADDRESS, signer);
-
   const oracle = AggregatorV3Interface__factory.connect(
     addresses.NATIVE_TOKEN_USD,
     signer
   );
 
-  const res = await oracle.latestRoundData();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [roundID, price] = await oracle.latestRoundData();
 
-  return { res };
+  const vault = AaveYNFTVault__factory.connect(VAULT_ADDRESS, signer);
+
+  const amountToClaim = await vault.getAmountToClaim();
+
+  const deadline = Math.round(Date.now() / 1000) + DEADLINE_SECONDS;
+
+  const amountOutMin = price
+    .mul(amountToClaim)
+    .div(10 ** PRICE_FEED_DECIMALS)
+    .mul(ALL_PERCANTAGE - SLIPPAGE_PERCANTAGE)
+    .div(ALL_PERCANTAGE);
+
+  const tx = await vault.claimRewards(amountOutMin, deadline);
+
+  return { tx: tx.hash };
 }
