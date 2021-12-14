@@ -1,2 +1,2 @@
 // eslint-disable-next-line import/prefer-default-export
-export { FeedRegistryInterface__factory } from "./FeedRegistryInterface__factory";
+export { AggregatorV3Interface__factory } from "./AggregatorV3Interface__factory";
