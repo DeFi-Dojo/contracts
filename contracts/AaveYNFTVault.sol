@@ -62,6 +62,7 @@ contract AaveYNFTVault is ReentrancyGuard, AccessControl {
     }
 
     function setFee(uint _feePercentage) external onlyRole(DEFAULT_ADMIN_ROLE) returns (uint) {
+        require(_feePercentage <= 10, "Fee cannot be that much");
         feePercentage = _feePercentage;
         return feePercentage;
     }

@@ -42,6 +42,7 @@ contract DexYNFTVault is Ownable, ReentrancyGuard {
     }
 
     function setFee(uint _feePercentage) external onlyOwner returns (uint) {
+        require(_feePercentage <= 10, "Fee cannot be that much");
         feePercentage = _feePercentage;
         return feePercentage;
     }
