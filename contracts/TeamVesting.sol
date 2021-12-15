@@ -23,8 +23,8 @@ contract TeamVesting is Vesting, Ownable{
     {
         require(timestamp > MIN_TIMESTAMP);
         uint256 endWeek = timestamp / 1 weeks;
-        if(vestingStoppedTimestamp < endWeek)
-            endWeek = vestingStoppedTimestamp;
+        if(vestingStoppedTimestamp < timestamp)
+            endWeek = vestingStoppedTimestamp / 1 weeks;
         return vestedAmountUntilWeek(endWeek, token);
     }
 }
