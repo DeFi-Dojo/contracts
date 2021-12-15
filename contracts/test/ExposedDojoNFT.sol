@@ -6,13 +6,15 @@ import "../DojoNFT.sol";
 
 contract ExposedDojoNFT is DojoNFT {
 
+    /* solhint-disable no-empty-blocks */
     constructor(
         string memory _baseURI,
         address _proxyRegistryAddress
     ) DojoNFT(_baseURI, _proxyRegistryAddress) {
     }
+    /* solhint-enable no-empty-blocks */
 
-    function public_getNextTokenId() view public returns (uint) {
+    function public_getNextTokenId() public view returns (uint) {
         return _getNextTokenId();
     }
 
@@ -24,7 +26,7 @@ contract ExposedDojoNFT is DojoNFT {
         return _randPercentage(tokenId, prefix, _blockTimestamp, _blockDifficulty);
     }
 
-    function public_getOption(uint rarity, uint8[] memory distribution) pure public returns (RarityOption memory rarityOption) {
+    function public_getOption(uint rarity, uint8[] memory distribution) public pure returns (RarityOption memory rarityOption) {
         return _getOption(rarity, distribution);
     }
 

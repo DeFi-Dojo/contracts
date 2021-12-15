@@ -23,18 +23,18 @@ contract OpenSeaFactory is FactoryERC721, Ownable {
     /*
      * Enforce the existence of only 1000 OpenSea creatures.
      */
-    uint256 CREATURE_SUPPLY;
+    uint256 private creatureSupply;
 
     /*
      * One option for minting.
      */
-    uint256 NUM_OPTIONS = 1;
-    uint256 SINGLE_CREATURE_OPTION = 0;
+    uint256 private numOptions_ = 1;
+    uint256 private singleCreatureOption = 0;
 
     constructor(address _proxyRegistryAddress, address _nftAddress, uint256 _creatureSupply, string memory _baseURI) {
         proxyRegistryAddress = _proxyRegistryAddress;
         nftAddress = _nftAddress;
-        CREATURE_SUPPLY = _creatureSupply;
+        creatureSupply = _creatureSupply;
         baseURI = _baseURI;
 
         fireTransferEvents(address(0), owner());
@@ -53,7 +53,7 @@ contract OpenSeaFactory is FactoryERC721, Ownable {
     }
 
     function numOptions() override public view returns (uint256) {
-        return NUM_OPTIONS;
+        return numOptions_;
     }
 
     function transferOwnership(address _newOwner) override public onlyOwner {
@@ -63,7 +63,7 @@ contract OpenSeaFactory is FactoryERC721, Ownable {
     }
 
     function fireTransferEvents(address _from, address _to) private {
-        for (uint256 i = 0; i < NUM_OPTIONS; i++) {
+        for (uint256 i = 0; i < numOptions_; i++) {
             emit Transfer(_from, _to, i);
         }
     }
@@ -78,24 +78,24 @@ contract OpenSeaFactory is FactoryERC721, Ownable {
         require(canMint(_optionId));
 
         DojoNFT mask = DojoNFT(nftAddress);
-        if (_optionId == SINGLE_CREATURE_OPTION) {
+        if (_optionId == singleCreatureOption) {
             mask.mintTo(_toAddress);
         }
     }
 
     function canMint(uint256 _optionId) override public view returns (bool) {
-        if (_optionId >= NUM_OPTIONS) {
+        if (_optionId >= numOptions_) {
             return false;
         }
 
         DojoNFT mask = DojoNFT(nftAddress);
-        uint256 creatureSupply = mask.totalSupply();
+        uint256 creatureSupply_ = mask.totalSupply();
 
         uint256 numItemsAllocated = 0;
-        if (_optionId == SINGLE_CREATURE_OPTION) {
+        if (_optionId == singleCreatureOption) {
             numItemsAllocated = 1;
         }
-        return creatureSupply <= (CREATURE_SUPPLY - numItemsAllocated);
+        return creatureSupply_ <= (creatureSupply - numItemsAllocated);
     }
 
     function tokenURI(uint256 _optionId) override external view returns (string memory) {
@@ -106,11 +106,14 @@ contract OpenSeaFactory is FactoryERC721, Ownable {
      * Hack to get things to work automatically on OpenSea.
      * Use transferFrom so the frontend doesn't have to worry about different method names.
      */
+    /* solhint-disable no-unused-vars */
     function transferFrom(
         address _from,
         address _to,
         uint256 _tokenId
-    ) public {
+    ) public
+    /* solhint-enable no-unused-vars */
+    {
         mint(_tokenId, _to);
     }
 
@@ -142,6 +145,7 @@ contract OpenSeaFactory is FactoryERC721, Ownable {
      * Hack to get things to work automatically on OpenSea.
      * Use isApprovedForAll so the frontend doesn't have to worry about different method names.
      */
+    // solhint-disable-next-line no-unused-vars
     function ownerOf(uint256 _tokenId) public view returns (address _owner) {
         return owner();
     }

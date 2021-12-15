@@ -26,7 +26,7 @@ contract DexYNFTVault is Ownable, ReentrancyGuard {
 
     modifier onlyNftOwner(uint _nftTokenId) {
         address owner = yNFT.ownerOf(_nftTokenId);
-        require(owner == msg.sender, 'Sender is not owner of the NFT');
+        require(owner == msg.sender, "Sender is not owner of the NFT");
         _;
     }
 
@@ -73,7 +73,7 @@ contract DexYNFTVault is Ownable, ReentrancyGuard {
         path[0] =  _tokenIn;
         path[1] =  dexRouter.WETH();
 
-        require(IERC20(_tokenIn).approve(address(dexRouter), _amountInToken), 'approve failed.');
+        require(IERC20(_tokenIn).approve(address(dexRouter), _amountInToken), "approve failed.");
 
         uint[] memory amounts = dexRouter.swapExactTokensForETH(_amountInToken, _amountOutETH, path, _receiver, _deadline);
 
@@ -95,7 +95,7 @@ contract DexYNFTVault is Ownable, ReentrancyGuard {
         path[0] = _tokenIn;
         path[1] = _tokenOut;
 
-        require(IERC20(_tokenIn).approve(address(dexRouter), _amountIn), 'approve failed.');
+        require(IERC20(_tokenIn).approve(address(dexRouter), _amountIn), "approve failed.");
 
         uint[] memory amounts = dexRouter.swapExactTokensForTokens(_amountIn, _amountOut, path, _receiver, _deadline);
 
@@ -108,7 +108,7 @@ contract DexYNFTVault is Ownable, ReentrancyGuard {
 
         balanceOf[_nftTokenId] = 0;
 
-        require(pair.approve(address(dexRouter), balance), 'approve failed.');
+        require(pair.approve(address(dexRouter), balance), "approve failed.");
 
 
         uint amountFirstToken;
@@ -152,7 +152,7 @@ contract DexYNFTVault is Ownable, ReentrancyGuard {
 
         balanceOf[_nftTokenId] = 0;
 
-        require(pair.approve(address(dexRouter), balance), 'approve failed.');
+        require(pair.approve(address(dexRouter), balance), "approve failed.");
 
         if (address(firstToken) == dexRouter.WETH()) {
             dexRouter.removeLiquidityETH(
@@ -202,7 +202,7 @@ contract DexYNFTVault is Ownable, ReentrancyGuard {
         } else {
             amountFirstToken = _swapTokenToToken(address(this), amountToBuyOneAsstet, _amountOutMinFirstToken, _tokenIn, address(firstToken), _deadline);
         }
-        require(firstToken.approve(address(dexRouter), amountFirstToken), 'approve failed.');
+        require(firstToken.approve(address(dexRouter), amountFirstToken), "approve failed.");
 
 
         uint amountSecondToken;
@@ -211,7 +211,7 @@ contract DexYNFTVault is Ownable, ReentrancyGuard {
         } else {
             amountSecondToken = _swapTokenToToken(address(this), amountToBuyOneAsstet, _amountOutMinSecondToken, _tokenIn, address(secondToken), _deadline);
         }
-        require(secondToken.approve(address(dexRouter), amountSecondToken), 'approve failed.');
+        require(secondToken.approve(address(dexRouter), amountSecondToken), "approve failed.");
 
         (,, uint liquidity) = dexRouter.addLiquidity(
                 address(firstToken),
@@ -240,7 +240,7 @@ contract DexYNFTVault is Ownable, ReentrancyGuard {
 
         uint amountSecondToken = _swapETHToToken(address(this), amountToBuyOneAsstet, _amountOutMinSecondToken, address(secondToken), _deadline);
 
-        require(secondToken.approve(address(dexRouter), amountSecondToken), 'approve failed.');
+        require(secondToken.approve(address(dexRouter), amountSecondToken), "approve failed.");
 
         uint liquidity;
         if (address(firstToken) == dexRouter.WETH()) {
@@ -254,7 +254,7 @@ contract DexYNFTVault is Ownable, ReentrancyGuard {
             );
         } else {
             uint amountFirstToken = _swapETHToToken(address(this), amountToBuyOneAsstet, _amountOutMinFirstToken, address(firstToken), _deadline);
-            require(firstToken.approve(address(dexRouter), amountFirstToken), 'approve failed.');
+            require(firstToken.approve(address(dexRouter), amountFirstToken), "approve failed.");
             (,, liquidity) = dexRouter.addLiquidity(
                     address(firstToken),
                     address(secondToken),

@@ -7,7 +7,8 @@
     "run:node": "hardhat node",
     "deploy:nft:and:opensea:factory": "hardhat run scripts/deploy-nft-and-nft-factory-to-opensea.ts",
     "pretest": "hardhat compile",
-    "test": "hardhat test --config test.config.ts"
+    "test": "hardhat test --config test.config.ts",
+    "solhint": "npx solhint 'contracts/**/*.sol'"
   },
   "author": "",
   "license": "ISC",
@@ -25,6 +26,8 @@
     "eslint-config-airbnb-typescript": "^14.0.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.24.2",
+    "hardhat-gas-reporter": "^1.0.4",
+    "solhint": "^3.3.6",
     "ts-node": "^10.1.0",
     "typechain": "^5.1.2",
     "typescript": "^4.3.5"
@@ -43,7 +46,6 @@
     "ethereum-waffle": "^3.4.0",
     "ethers": "^5.4.5",
     "hardhat": "^2.6.8",
-    "hardhat-gas-reporter": "^1.0.4",
     "opensea-js": "^1.2.0",
     "web3": "^1.5.2",
     "web3-core": "^1.5.2",
