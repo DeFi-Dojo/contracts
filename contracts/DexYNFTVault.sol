@@ -271,7 +271,6 @@ contract DexYNFTVault is Ownable, ReentrancyGuard {
 
     }
 
-    // solhint-disable-next-line
      receive() external payable {
      }
 }
