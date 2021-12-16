@@ -7,12 +7,13 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 import "./interfaces/uniswapv2/IUniswapV2Router02.sol";
 import "./interfaces/uniswapv2/IUniswapV2Pair.sol";
 import "./YNFT.sol";
 
 
-contract DexYNFTVault is Ownable, ReentrancyGuard {
+contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
     using SafeERC20 for IERC20;
 
     mapping (uint256 => uint) public balanceOf;
@@ -41,7 +42,16 @@ contract DexYNFTVault is Ownable, ReentrancyGuard {
         secondToken = IERC20(pair.token1());
     }
 
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    function unpause() external onlyOwner {
+        _unpause();
+    }
+
     function setFee(uint _feePercentage) external onlyOwner returns (uint) {
+        require(_feePercentage <= 10, "Fee cannot be that much");
         feePercentage = _feePercentage;
         return feePercentage;
     }
@@ -102,7 +112,7 @@ contract DexYNFTVault is Ownable, ReentrancyGuard {
         return amounts[1];
     }
 
-    function withdrawToEther(uint256 _nftTokenId,  uint _amountOutMinFirstToken, uint _amountOutMinSecondToken, uint _amountOutETH, uint _deadline) external nonReentrant onlyNftOwner(_nftTokenId) {
+    function withdrawToEther(uint256 _nftTokenId,  uint _amountOutMinFirstToken, uint _amountOutMinSecondToken, uint _amountOutETH, uint _deadline) external whenNotPaused nonReentrant onlyNftOwner(_nftTokenId) {
 
         uint balance = balanceOf[_nftTokenId];
 
@@ -144,7 +154,7 @@ contract DexYNFTVault is Ownable, ReentrancyGuard {
         yNFT.burn(_nftTokenId);
     }
 
-    function withdrawToUnderlyingTokens(uint256 _nftTokenId,  uint _amountOutMinFirstToken, uint _amountOutMinSecondToken, uint _deadline) external onlyNftOwner(_nftTokenId) returns (bool) {
+    function withdrawToUnderlyingTokens(uint256 _nftTokenId,  uint _amountOutMinFirstToken, uint _amountOutMinSecondToken, uint _deadline) external whenNotPaused onlyNftOwner(_nftTokenId) returns (bool) {
 
         uint balance = balanceOf[_nftTokenId];
 
@@ -186,7 +196,7 @@ contract DexYNFTVault is Ownable, ReentrancyGuard {
         uint _amountMinLiqudityFirstToken,
         uint _amountMinLiquditySecondToken,
         uint _deadline
-      ) external {
+      ) external whenNotPaused {
 
         uint amountInToBuy = _amountIn - _collectFeeToken(_tokenIn, _amountIn);
 
@@ -233,7 +243,7 @@ contract DexYNFTVault is Ownable, ReentrancyGuard {
      uint _amountMinLiqudityFirstToken,
      uint _amountMinLiquditySecondToken,
      uint _deadline
-      ) external payable {
+      ) whenNotPaused external payable {
         uint amountToBuyOneAsstet = (msg.value - _collectFeeEther()) / 2;
 
         uint amountSecondToken = _swapETHToToken(address(this), amountToBuyOneAsstet, _amountOutMinSecondToken, address(secondToken), _deadline);
