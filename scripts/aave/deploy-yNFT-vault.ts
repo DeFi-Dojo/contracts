@@ -3,7 +3,7 @@ import { AaveYNFTVault } from "../../typechain";
 import { deployContract } from "../../utils/deployment";
 import configEnv from "../../config";
 
-const { ADDRESSES } = configEnv;
+const { ADDRESSES, CLAIMER_ADDRESS } = configEnv;
 
 async function main() {
   const [owner] = await ethers.getSigners();
@@ -13,6 +13,7 @@ async function main() {
     ADDRESSES.ROUTER_02_SUSHISWAP,
     ADDRESSES.A_DAI,
     ADDRESSES.INCENTIVES_CONTROLLER,
+    CLAIMER_ADDRESS,
   ]);
 }
 
