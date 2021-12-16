@@ -4,8 +4,11 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/finance/VestingWallet.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract Vesting is VestingWallet{
+    using SafeERC20 for IERC20;
+
     struct Vest {
         IERC20 token;
         uint256 startWeek;
@@ -14,18 +17,17 @@ contract Vesting is VestingWallet{
     }
     Vest[] public vests;
 
-    uint256 MIN_TIMESTAMP = 1639246638;
+    uint256 MIN_TIMESTAMP = 1639246638; // Saturday, December 11, 2021 6:17:18 PM
 
     constructor(address beneficiaryAddress)
     VestingWallet(beneficiaryAddress, 0, 0)
     {
     }
 
-    function addVest(IERC20 token, uint256 amount, uint256 startTimestamp, uint256 durationWeeks) public virtual
+    function addVest(IERC20 token, uint256 amount, uint256 startTimestamp, uint256 durationWeeks) external virtual
     {
-        require(startTimestamp > MIN_TIMESTAMP);
-        bool success = IERC20(token).transferFrom(_msgSender(), address(this), amount);
-        require(success);
+        require(startTimestamp > MIN_TIMESTAMP, "Vesting starts before minimal date");
+        IERC20(token).safeTransferFrom(_msgSender(), address(this), amount);
         uint256 startingWeek = (startTimestamp / 1 weeks) + 1;
         vests.push(Vest({
             token: token,

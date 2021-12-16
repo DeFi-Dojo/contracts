@@ -4,7 +4,6 @@ pragma solidity ^0.8.0;
 
 import "./Vesting.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 contract TeamVesting is Vesting, Ownable{
     uint256 constant MAX_UINT = 2**256 - 1;
