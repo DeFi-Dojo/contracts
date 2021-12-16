@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 import "./interfaces/uniswapv2/IUniswapV2Router02.sol";
 import "./interfaces/aave/ILendingPool.sol";
 import "./interfaces/aave/IAToken.sol";
@@ -14,7 +15,7 @@ import "./interfaces/aave/IAaveIncentivesController.sol";
 import "./YNFT.sol";
 
 
-contract AaveYNFTVault is ReentrancyGuard, AccessControl {
+contract AaveYNFTVault is ReentrancyGuard, AccessControl, Pausable {
     using SafeERC20 for IAToken;
     using SafeERC20 for IERC20;
 
@@ -57,6 +58,14 @@ contract AaveYNFTVault is ReentrancyGuard, AccessControl {
         beneficiary = msg.sender;
     }
 
+    function pause() external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _pause();
+    }
+
+    function unpause() external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _unpause();
+    }
+
     function setBeneficiary(address _beneficiary) external onlyRole(DEFAULT_ADMIN_ROLE) {
         beneficiary = _beneficiary;
     }
@@ -81,7 +90,7 @@ contract AaveYNFTVault is ReentrancyGuard, AccessControl {
     }
 
     // front run, sandwich attack
-    function claimRewards(uint _amountOutMin, uint _deadline) external onlyRole(CLAIMER_ROLE) {
+    function claimRewards(uint _amountOutMin, uint _deadline) external whenNotPaused onlyRole(CLAIMER_ROLE) {
         address[] memory claimAssets = new address[](1);
         claimAssets[0] = address(aToken);
 
@@ -136,14 +145,14 @@ contract AaveYNFTVault is ReentrancyGuard, AccessControl {
         }
     }
 
-    function withdrawToUnderlyingToken(uint256 _nftTokenId) external onlyNftOwner(_nftTokenId) {
+    function withdrawToUnderlyingToken(uint256 _nftTokenId) external whenNotPaused onlyNftOwner(_nftTokenId) {
 
         _withdraw(_nftTokenId, msg.sender);
 
         yNFT.burn(_nftTokenId);
     }
 
-    function withdrawToEther(uint256 _nftTokenId, uint _amountOutMin, uint _deadline) external onlyNftOwner(_nftTokenId) {
+    function withdrawToEther(uint256 _nftTokenId, uint _amountOutMin, uint _deadline) external whenNotPaused onlyNftOwner(_nftTokenId) {
         uint amount = _withdraw(_nftTokenId, address(this));
 
         require(underlyingToken.approve(address(dexRouter), amount), 'approve failed.');
@@ -158,7 +167,7 @@ contract AaveYNFTVault is ReentrancyGuard, AccessControl {
         yNFT.burn(_nftTokenId);
     }
 
-    function createYNFT(address _tokenIn, uint _amountIn, uint _amountOutMin, uint _deadline) external {
+    function createYNFT(address _tokenIn, uint _amountIn, uint _amountOutMin, uint _deadline) whenNotPaused external {
 
         uint fee = _calcFee(_amountIn);
         IERC20(_tokenIn).safeTransferFrom(msg.sender, beneficiary, fee);
@@ -181,7 +190,7 @@ contract AaveYNFTVault is ReentrancyGuard, AccessControl {
         }
     }
 
-    function createYNFTForEther(uint _amountOutMin, uint _deadline) external nonReentrant payable {
+    function createYNFTForEther(uint _amountOutMin, uint _deadline) external whenNotPaused nonReentrant payable {
         uint fee = _calcFee(msg.value);
 
         (bool success, ) = beneficiary.call{value: fee}("");
