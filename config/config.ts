@@ -16,6 +16,7 @@ const {
   DEFENDER_TEAM_API_KEY,
   DEFENDER_TEAM_API_SECRET,
   DEFENDER_AUTOTASK_ID,
+  CLAIMER_ADDRESS,
 } = process.env;
 
 if (
@@ -30,7 +31,8 @@ if (
   VAULT_ADDRESS === undefined ||
   DEFENDER_TEAM_API_KEY === undefined ||
   DEFENDER_TEAM_API_SECRET === undefined ||
-  DEFENDER_AUTOTASK_ID === undefined
+  DEFENDER_AUTOTASK_ID === undefined ||
+  CLAIMER_ADDRESS === undefined
 ) {
   throw new Error("ENV not valid");
 }
@@ -49,4 +51,5 @@ export default {
   DEFENDER_TEAM_API_KEY,
   DEFENDER_TEAM_API_SECRET,
   DEFENDER_AUTOTASK_ID,
+  CLAIMER_ADDRESS,
 };
