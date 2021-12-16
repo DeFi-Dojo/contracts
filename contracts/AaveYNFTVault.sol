@@ -36,7 +36,7 @@ contract AaveYNFTVault is ReentrancyGuard, AccessControl, Pausable {
 
     modifier onlyNftOwner(uint nftTokenId) {
         address owner = yNFT.ownerOf(nftTokenId);
-        require(owner == msg.sender, 'Sender is not owner of the NFT');
+        require(owner == msg.sender, "Sender is not owner of the NFT");
         _;
     }
 
@@ -97,7 +97,7 @@ contract AaveYNFTVault is ReentrancyGuard, AccessControl, Pausable {
         uint256 amountToClaim = incentivesController.getRewardsBalance(claimAssets, address(this));
         uint256 amountClaimed = incentivesController.claimRewards(claimAssets, amountToClaim, address(this));
 
-        require(rewardToken.approve(address(dexRouter), amountClaimed), 'approve failed.');
+        require(rewardToken.approve(address(dexRouter), amountClaimed), "approve failed.");
 
         address[] memory path = new address[](2);
         path[0] = address(rewardToken);
@@ -105,7 +105,7 @@ contract AaveYNFTVault is ReentrancyGuard, AccessControl, Pausable {
 
         uint[] memory amounts = dexRouter.swapExactTokensForTokens(amountClaimed, _amountOutMin, path, address(this), _deadline);
 
-        require(underlyingToken.approve(address(pool), amounts[1]), 'approve failed.');
+        require(underlyingToken.approve(address(pool), amounts[1]), "approve failed.");
 
         pool.deposit(address(underlyingToken), amounts[1], address(this), 0);
 
@@ -127,7 +127,7 @@ contract AaveYNFTVault is ReentrancyGuard, AccessControl, Pausable {
     function _deposit(uint _tokenAmount) private {
         uint256 tokenId = yNFT.mint(msg.sender);
 
-       require(underlyingToken.approve(address(pool), _tokenAmount), 'approve failed.');
+       require(underlyingToken.approve(address(pool), _tokenAmount), "approve failed.");
 
         uint currentAmountOfAToken = aToken.balanceOf(address(this));
 
@@ -155,7 +155,7 @@ contract AaveYNFTVault is ReentrancyGuard, AccessControl, Pausable {
     function withdrawToEther(uint256 _nftTokenId, uint _amountOutMin, uint _deadline) external whenNotPaused onlyNftOwner(_nftTokenId) {
         uint amount = _withdraw(_nftTokenId, address(this));
 
-        require(underlyingToken.approve(address(dexRouter), amount), 'approve failed.');
+        require(underlyingToken.approve(address(dexRouter), amount), "approve failed.");
 
         address[] memory path = new address[](2);
 
@@ -167,7 +167,7 @@ contract AaveYNFTVault is ReentrancyGuard, AccessControl, Pausable {
         yNFT.burn(_nftTokenId);
     }
 
-    function createYNFT(address _tokenIn, uint _amountIn, uint _amountOutMin, uint _deadline) whenNotPaused external {
+    function createYNFT(address _tokenIn, uint _amountIn, uint _amountOutMin, uint _deadline) external whenNotPaused {
 
         uint fee = _calcFee(_amountIn);
         IERC20(_tokenIn).safeTransferFrom(msg.sender, beneficiary, fee);
@@ -182,7 +182,7 @@ contract AaveYNFTVault is ReentrancyGuard, AccessControl, Pausable {
             path[0] = _tokenIn;
             path[1] = address(underlyingToken);
 
-            require(IERC20(_tokenIn).approve(address(dexRouter), amountInToBuy), 'approve failed.');
+        require(IERC20(_tokenIn).approve(address(dexRouter), amountInToBuy), "approve failed.");
 
             uint[] memory amounts = dexRouter.swapExactTokensForTokens(amountInToBuy, _amountOutMin, path, address(this), _deadline);
 
@@ -193,6 +193,7 @@ contract AaveYNFTVault is ReentrancyGuard, AccessControl, Pausable {
     function createYNFTForEther(uint _amountOutMin, uint _deadline) external whenNotPaused nonReentrant payable {
         uint fee = _calcFee(msg.value);
 
+        //solhint-disable-next-line avoid-low-level-calls
         (bool success, ) = beneficiary.call{value: fee}("");
         require(success, "Transfer failed.");
 
