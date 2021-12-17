@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "run:node": "hardhat node",
-    "deploy:nft:and:opensea:factory": "hardhat run scripts/deploy-nft-and-nft-factory-to-opensea.ts",
+    "deploy:nft:and:opensea:factory": "hardhat run scripts/nft/deploy-nft-and-nft-factory-to-opensea.ts",
     "pretest": "hardhat compile",
     "test": "hardhat test --config test.config.ts",
     "build": "tsc --project tsconfig.json",
@@ -15,6 +15,7 @@
   "license": "ISC",
   "devDependencies": {
     "@ethersproject/solidity": "^5.4.0",
+    "@openzeppelin/test-helpers": "^0.5.15",
     "@typechain/ethers-v5": "^7.1.0",
     "@types/chai": "^4.2.21",
     "@types/mocha": "^9.0.0",
@@ -37,7 +38,7 @@
     "@nomiclabs/hardhat-ethers": "npm:hardhat-deploy-ethers",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@nomiclabs/hardhat-web3": "^2.0.0",
-    "@openzeppelin/contracts": "^4.3.1",
+    "@openzeppelin/contracts": "^4.4.0",
     "@openzeppelin/contracts-v2": "npm:@openzeppelin/contracts@^2.5.1",
     "@openzeppelin/contracts-v3": "npm:@openzeppelin/contracts@^3.1.0",
     "@truffle/hdwallet-provider": "^1.5.0",
@@ -51,7 +52,7 @@
     "ethers": "^5.4.5",
     "hardhat": "^2.6.8",
     "opensea-js": "^1.2.0",
-    "web3": "^1.5.2",
+    "web3": "^1.6.1",
     "web3-core": "^1.5.2",
     "web3-provider-engine": "^16.0.3"
   }
