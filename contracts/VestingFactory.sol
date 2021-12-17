@@ -10,24 +10,24 @@ contract VestingFactory {
     constructor()
     {}
 
-    event CreatedVestingForUser(address userAddr, address contractAddr);
-    event CreatedVestingForTeamMember(address teamMemberAddr, address contractAddr);
+    event CreatedVestingForUser(address _userAddr, address _contractAddr);
+    event CreatedVestingForTeamMember(address _teamMemberAddr, address _contractAddr);
 
-    function createVestingForUser(address user) external returns(address)
+    function createVestingForUser(address _user) external returns(address)
     {
-        require(vestingForUser[user] == address(0), "Vesting contract already exists");
-        Vesting v = new Vesting(user);
-        vestingForUser[user] = address(v);
-        emit CreatedVestingForUser(user, address(v));
+        require(vestingForUser[_user] == address(0), "Vesting contract already exists");
+        Vesting v = new Vesting(_user);
+        vestingForUser[_user] = address(v);
+        emit CreatedVestingForUser(_user, address(v));
         return address(v);
     }
 
-    function createVestingForTeamMember(address teamMember) external returns(address)
+    function createVestingForTeamMember(address _teamMember) external returns(address)
     {
-        require(vestingForTeamMember[teamMember] == address(0), "Vesting contract already exists");
-        TeamVesting v = new TeamVesting(teamMember);
-        vestingForTeamMember[teamMember] = address(v);
-        emit CreatedVestingForUser(teamMember, address(v));
+        require(vestingForTeamMember[_teamMember] == address(0), "Vesting contract already exists");
+        TeamVesting v = new TeamVesting(_teamMember);
+        vestingForTeamMember[_teamMember] = address(v);
+        emit CreatedVestingForTeamMember(_teamMember, address(v));
         return address(v);
     }
 }

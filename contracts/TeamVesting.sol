@@ -9,7 +9,7 @@ contract TeamVesting is Vesting, Ownable{
     uint256 constant MAX_UINT = 2**256 - 1;
     uint256 vestingStoppedTimestamp = MAX_UINT;
 
-    constructor(address beneficiaryAddress) Vesting(beneficiaryAddress)
+    constructor(address _beneficiaryAddress) Vesting(_beneficiaryAddress)
     {}
 
     function stopVesting() external onlyOwner
@@ -18,12 +18,12 @@ contract TeamVesting is Vesting, Ownable{
             vestingStoppedTimestamp = block.timestamp;
     }
 
-    function vestedAmount(address token, uint64 timestamp) public view override returns (uint256)
+    function vestedAmount(address _token, uint64 _timestamp) public view override returns (uint256)
     {
-        require(timestamp > MIN_TIMESTAMP);
-        uint256 endWeek = timestamp / 1 weeks;
-        if(vestingStoppedTimestamp < timestamp)
+        require(_timestamp > MIN_TIMESTAMP, "Vesting start before minimal date");
+        uint256 endWeek = _timestamp / 1 weeks;
+        if(vestingStoppedTimestamp < _timestamp)
             endWeek = vestingStoppedTimestamp / 1 weeks;
-        return vestedAmountUntilWeek(endWeek, token);
+        return vestedAmountUntilWeek(endWeek, _token);
     }
 }
