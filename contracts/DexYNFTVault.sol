@@ -10,6 +10,7 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "./interfaces/uniswapv2/IUniswapV2Router02.sol";
 import "./interfaces/uniswapv2/IUniswapV2Pair.sol";
+import "./interfaces/sushiswap/IMiniChefV2.sol";
 import "./YNFT.sol";
 
 
@@ -21,9 +22,12 @@ contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
     YNFT public immutable yNFT;
     IUniswapV2Router02 immutable public dexRouter;
     uint public feePercentage = 1;
-    IERC20 public firstToken;
-    IERC20 public secondToken;
-    IUniswapV2Pair public pair;
+    IERC20 immutable public firstToken;
+    IERC20 immutable public secondToken;
+    IUniswapV2Pair immutable public pair;
+    IMiniChefV2 immutable public masterChef;
+    uint immutable public chefPoolPid;
+    IERC20 public sushiToken;
 
     modifier onlyNftOwner(uint _nftTokenId) {
         address owner = yNFT.ownerOf(_nftTokenId);
@@ -33,13 +37,18 @@ contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
 
     constructor(
         IUniswapV2Router02 _dexRouter,
-        IUniswapV2Pair _pair
+        IUniswapV2Pair _pair,
+        IMiniChefV2 _masterChef,
+        uint32 _chefPoolPid
     ) {
         yNFT = new YNFT();
         dexRouter = _dexRouter;
         pair = _pair;
-        firstToken = IERC20(pair.token0());
-        secondToken = IERC20(pair.token1());
+        masterChef = _masterChef;
+        chefPoolPid = _chefPoolPid;
+        sushiToken = IERC20(_masterChef.SUSHI());
+        firstToken = IERC20(_pair.token0());
+        secondToken = IERC20(_pair.token1());
     }
 
     function pause() external onlyOwner {
@@ -56,9 +65,85 @@ contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
         return feePercentage;
     }
 
+    function _depositHarvestedSushiTokens(
+        uint _amountOutMinFirstToken,
+        uint _amountOutMinSecondToken,
+        uint _amountMinLiqudityFirstToken,
+        uint _amountMinLiquditySecondToken,
+        uint _deadline
+    ) private {
+        uint balanceSushi = sushiToken.balanceOf(address(this));
+
+        uint amountToBuyOneAsstet = balanceSushi / 2;
+
+        uint amountFirstToken = _swapTokenToToken(address(this), amountToBuyOneAsstet, _amountOutMinFirstToken, address(sushiToken), address(firstToken), _deadline);
+
+        uint amountSecondToken = _swapTokenToToken(address(this), amountToBuyOneAsstet, _amountOutMinSecondToken, address(sushiToken), address(secondToken), _deadline);
+
+        require(firstToken.approve(address(dexRouter), amountFirstToken), "approve failed.");
+        require(secondToken.approve(address(dexRouter), amountSecondToken), "approve failed.");
+
+        dexRouter.addLiquidity(
+            address(firstToken),
+            address(secondToken),
+            amountFirstToken,
+            amountSecondToken,
+            _amountMinLiqudityFirstToken,
+            _amountMinLiquditySecondToken,
+            address(this),
+            _deadline
+        );
+    }
+
+    function _depositHarvestedETH(
+        uint _amountOutMinFirstToken,
+        uint _amountOutMinSecondToken,
+        uint _amountMinLiqudityFirstToken,
+        uint _amountMinLiquditySecondToken,
+        uint _deadline
+    ) private {
+        uint balance = address(this).balance;
+
+        uint amountToBuyOneAsstet = balance / 2;
+
+        uint amountFirstToken = _swapETHToToken(address(this), amountToBuyOneAsstet, _amountOutMinFirstToken, address(firstToken), _deadline);
+
+        uint amountSecondToken = _swapETHToToken(address(this), amountToBuyOneAsstet, _amountOutMinSecondToken, address(secondToken), _deadline);
+
+        require(firstToken.approve(address(dexRouter), amountFirstToken), "approve failed.");
+        require(secondToken.approve(address(dexRouter), amountSecondToken), "approve failed.");
+
+        (,, uint liquidity) = dexRouter.addLiquidity(
+            address(firstToken),
+            address(secondToken),
+            amountFirstToken,
+            amountSecondToken,
+            _amountMinLiqudityFirstToken,
+            _amountMinLiquditySecondToken,
+            address(this),
+            _deadline
+        );
+
+        _farmLiquidity(liquidity);
+    }
+
+    function harvest() external onlyOwner {
+        masterChef.harvest(chefPoolPid, address(this));
+    }
+
+    function _farmLiquidity(uint _liquidity) private {
+        require(pair.approve(address(masterChef), _liquidity), "approve failed.");
+        masterChef.deposit(chefPoolPid, _liquidity, address(this));
+    }
+
     function _mintYNFTForLiquidity(uint _liquidity) private {
         uint256 tokenId = yNFT.mint(msg.sender);
         balanceOf[tokenId] = _liquidity;
+    }
+
+    function _mintYNFTAndFarmLiquidity(uint _liquidity) private {
+        _mintYNFTForLiquidity(_liquidity);
+        _farmLiquidity(_liquidity);
     }
 
     function _calcFee(uint _price) private view returns (uint) {
@@ -67,6 +152,7 @@ contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
 
     function _collectFeeEther() private nonReentrant returns (uint){
         uint fee = _calcFee(msg.value);
+        //solhint-disable-next-line avoid-low-level-calls
         (bool success, ) = owner().call{value: fee}("");
         require(success, "Transfer failed.");
         return fee;
@@ -134,6 +220,7 @@ contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
                 _deadline
             );
 
+            //solhint-disable-next-line avoid-low-level-calls
             (bool success, ) = msg.sender.call{value: amountFirstToken}("");
             require(success, "Transfer failed.");
         } else {
@@ -232,8 +319,7 @@ contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
                 _deadline
             );
 
-        _mintYNFTForLiquidity(liquidity);
-
+        _mintYNFTAndFarmLiquidity(liquidity);
     }
 
 
@@ -243,7 +329,7 @@ contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
      uint _amountMinLiqudityFirstToken,
      uint _amountMinLiquditySecondToken,
      uint _deadline
-      ) whenNotPaused external payable {
+      ) external payable whenNotPaused {
         uint amountToBuyOneAsstet = (msg.value - _collectFeeEther()) / 2;
 
         uint amountSecondToken = _swapETHToToken(address(this), amountToBuyOneAsstet, _amountOutMinSecondToken, address(secondToken), _deadline);
@@ -275,7 +361,7 @@ contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
                 );
 
         }
-        _mintYNFTForLiquidity(liquidity);
+        _mintYNFTAndFarmLiquidity(liquidity);
 
     }
 
