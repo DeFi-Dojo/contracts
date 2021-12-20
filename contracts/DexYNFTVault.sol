@@ -27,7 +27,6 @@ contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
     IUniswapV2Pair immutable public pair;
     IMiniChefV2 immutable public masterChef;
     uint immutable public chefPoolPid;
-    IERC20 public sushiToken;
 
     modifier onlyNftOwner(uint _nftTokenId) {
         address owner = yNFT.ownerOf(_nftTokenId);
@@ -46,7 +45,6 @@ contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
         pair = _pair;
         masterChef = _masterChef;
         chefPoolPid = _chefPoolPid;
-        sushiToken = IERC20(_masterChef.SUSHI());
         firstToken = IERC20(_pair.token0());
         secondToken = IERC20(_pair.token1());
     }
@@ -65,34 +63,31 @@ contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
         return feePercentage;
     }
 
-    function depositHarvestedSushiTokens(
+    function depositHarvestedTokens(
+        address _tokenIn,
         uint _amountOutMinFirstToken,
         uint _amountOutMinSecondToken,
         uint _amountMinLiqudityFirstToken,
         uint _amountMinLiquditySecondToken,
         uint _deadline
-    ) external onlyOwner {
-        uint balanceSushi = sushiToken.balanceOf(address(this));
+    ) external onlyOwner whenNotPaused {
+        require(_tokenIn != address(pair), "Cannot deposit LP tokens");
 
-        uint amountToBuyOneAsstet = balanceSushi / 2;
+        uint balance = IERC20(_tokenIn).balanceOf(address(_tokenIn));
 
-        uint amountFirstToken = _swapTokenToToken(address(this), amountToBuyOneAsstet, _amountOutMinFirstToken, address(sushiToken), address(firstToken), _deadline);
+        uint amountToBuyOneAsstet = balance / 2;
 
-        uint amountSecondToken = _swapTokenToToken(address(this), amountToBuyOneAsstet, _amountOutMinSecondToken, address(sushiToken), address(secondToken), _deadline);
-
-        require(firstToken.approve(address(dexRouter), amountFirstToken), "approve failed.");
-        require(secondToken.approve(address(dexRouter), amountSecondToken), "approve failed.");
-
-        dexRouter.addLiquidity(
-            address(firstToken),
-            address(secondToken),
-            amountFirstToken,
-            amountSecondToken,
+        uint liquidity = _depositLiquidityForToken(
+            _tokenIn,
+            amountToBuyOneAsstet,
+            _amountOutMinFirstToken,
+            _amountOutMinSecondToken,
             _amountMinLiqudityFirstToken,
             _amountMinLiquditySecondToken,
-            address(this),
             _deadline
         );
+
+        _farmLiquidity(liquidity);
     }
 
     function depositHarvestedETH(
@@ -101,17 +96,17 @@ contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
         uint _amountMinLiqudityFirstToken,
         uint _amountMinLiquditySecondToken,
         uint _deadline
-    ) external onlyOwner {
+    ) external onlyOwner whenNotPaused {
         uint balance = address(this).balance;
 
         uint amountToBuyOneAsstet = balance / 2;
 
-        uint liquidity = _depositLiquidityForEther(_amountOutMinFirstToken, _amountOutMinSecondToken, _amountMinLiqudityFirstToken, _amountMinLiquditySecondToken, amountToBuyOneAsstet, _deadline);
+        uint liquidity = _depositLiquidityForEther(amountToBuyOneAsstet, _amountOutMinFirstToken, _amountOutMinSecondToken, _amountMinLiqudityFirstToken, _amountMinLiquditySecondToken, _deadline);
 
         _farmLiquidity(liquidity);
     }
 
-    function harvest() external onlyOwner {
+    function harvest() external onlyOwner whenNotPaused {
         masterChef.harvest(chefPoolPid, address(this));
     }
 
@@ -178,12 +173,12 @@ contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
     }
 
     function _depositLiquidityForEther(
-     uint _amountOutMinFirstToken,
-     uint _amountOutMinSecondToken,
-     uint _amountMinLiqudityFirstToken,
-     uint _amountMinLiquditySecondToken,
-     uint _amountToBuyOneAsstet,
-     uint _deadline
+        uint _amountToBuyOneAsstet,
+        uint _amountOutMinFirstToken,
+        uint _amountOutMinSecondToken,
+        uint _amountMinLiqudityFirstToken,
+        uint _amountMinLiquditySecondToken,
+        uint _deadline
       ) private returns (uint){
         uint amountSecondToken = _swapETHToToken(address(this), _amountToBuyOneAsstet, _amountOutMinSecondToken, address(secondToken), _deadline);
 
@@ -216,6 +211,47 @@ contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
         }
         return liquidity;
 
+    }
+
+    function _depositLiquidityForToken(
+        address _tokenIn,
+        uint _amountToBuyOneAsstet,
+        uint _amountOutMinFirstToken,
+        uint _amountOutMinSecondToken,
+        uint _amountMinLiqudityFirstToken,
+        uint _amountMinLiquditySecondToken,
+        uint _deadline
+      ) private returns (uint){
+
+        uint amountFirstToken;
+        if (_tokenIn == address(firstToken)) {
+            amountFirstToken = _amountToBuyOneAsstet;
+        } else {
+            amountFirstToken = _swapTokenToToken(address(this), _amountToBuyOneAsstet, _amountOutMinFirstToken, _tokenIn, address(firstToken), _deadline);
+        }
+        require(firstToken.approve(address(dexRouter), amountFirstToken), "approve failed.");
+
+
+        uint amountSecondToken;
+        if (_tokenIn == address(secondToken)) {
+            amountSecondToken = _amountToBuyOneAsstet;
+        } else {
+            amountSecondToken = _swapTokenToToken(address(this), _amountToBuyOneAsstet, _amountOutMinSecondToken, _tokenIn, address(secondToken), _deadline);
+        }
+        require(secondToken.approve(address(dexRouter), amountSecondToken), "approve failed.");
+
+        (,, uint liquidity) = dexRouter.addLiquidity(
+                address(firstToken),
+                address(secondToken),
+                amountFirstToken,
+                amountSecondToken,
+                _amountMinLiqudityFirstToken,
+                _amountMinLiquditySecondToken,
+                address(this),
+                _deadline
+            );
+
+        return liquidity;
     }
 
     function withdrawToEther(uint256 _nftTokenId,  uint _amountOutMinFirstToken, uint _amountOutMinSecondToken, uint _amountOutETH, uint _deadline) external whenNotPaused nonReentrant onlyNftOwner(_nftTokenId) {
@@ -311,33 +347,7 @@ contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
 
         uint amountToBuyOneAsstet = amountInToBuy / 2;
 
-        uint amountFirstToken;
-        if (_tokenIn == address(firstToken)) {
-            amountFirstToken = amountToBuyOneAsstet;
-        } else {
-            amountFirstToken = _swapTokenToToken(address(this), amountToBuyOneAsstet, _amountOutMinFirstToken, _tokenIn, address(firstToken), _deadline);
-        }
-        require(firstToken.approve(address(dexRouter), amountFirstToken), "approve failed.");
-
-
-        uint amountSecondToken;
-        if (_tokenIn == address(secondToken)) {
-            amountSecondToken = amountToBuyOneAsstet;
-        } else {
-            amountSecondToken = _swapTokenToToken(address(this), amountToBuyOneAsstet, _amountOutMinSecondToken, _tokenIn, address(secondToken), _deadline);
-        }
-        require(secondToken.approve(address(dexRouter), amountSecondToken), "approve failed.");
-
-        (,, uint liquidity) = dexRouter.addLiquidity(
-                address(firstToken),
-                address(secondToken),
-                amountFirstToken,
-                amountSecondToken,
-                _amountMinLiqudityFirstToken,
-                _amountMinLiquditySecondToken,
-                address(this),
-                _deadline
-            );
+        uint liquidity = _depositLiquidityForToken(_tokenIn, amountToBuyOneAsstet, _amountOutMinFirstToken, _amountOutMinSecondToken, _amountMinLiqudityFirstToken, _amountMinLiquditySecondToken, _deadline);
 
         _mintYNFTForLiquidity(liquidity);
         _farmLiquidity(liquidity);
@@ -353,7 +363,7 @@ contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
       ) external payable whenNotPaused {
         uint amountToBuyOneAsstet = (msg.value - _collectFeeEther()) / 2;
 
-        uint liquidity = _depositLiquidityForEther(_amountOutMinFirstToken, _amountOutMinSecondToken, _amountMinLiqudityFirstToken, _amountMinLiquditySecondToken, amountToBuyOneAsstet, _deadline);
+        uint liquidity = _depositLiquidityForEther(amountToBuyOneAsstet, _amountOutMinFirstToken, _amountOutMinSecondToken, _amountMinLiqudityFirstToken, _amountMinLiquditySecondToken, _deadline);
 
         _mintYNFTForLiquidity(liquidity);
         _farmLiquidity(liquidity);
