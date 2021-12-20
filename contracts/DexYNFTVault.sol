@@ -2,19 +2,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./interfaces/uniswapv2/IUniswapV2Router02.sol";
 import "./interfaces/uniswapv2/IUniswapV2Pair.sol";
 import "./interfaces/sushiswap/IMiniChefV2.sol";
 import "./YNFT.sol";
 
 
-contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
+contract DexYNFTVault is AccessControl, ReentrancyGuard, Pausable {
     using SafeERC20 for IERC20;
 
     mapping (uint256 => uint) public balanceOf;
@@ -27,6 +27,9 @@ contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
     IUniswapV2Pair immutable public pair;
     IMiniChefV2 immutable public masterChef;
     uint immutable public chefPoolPid;
+    address public beneficiary;
+
+    bytes32 public constant CLAIMER_ROLE = keccak256("CLAIMER_ROLE");
 
     modifier onlyNftOwner(uint _nftTokenId) {
         address owner = yNFT.ownerOf(_nftTokenId);
@@ -38,7 +41,8 @@ contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
         IUniswapV2Router02 _dexRouter,
         IUniswapV2Pair _pair,
         IMiniChefV2 _masterChef,
-        uint32 _chefPoolPid
+        uint32 _chefPoolPid,
+        address _claimer
     ) {
         yNFT = new YNFT();
         dexRouter = _dexRouter;
@@ -47,17 +51,20 @@ contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
         chefPoolPid = _chefPoolPid;
         firstToken = IERC20(_pair.token0());
         secondToken = IERC20(_pair.token1());
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _setupRole(CLAIMER_ROLE, _claimer);
+        beneficiary = msg.sender;
     }
 
-    function pause() external onlyOwner {
+    function pause() external onlyRole(DEFAULT_ADMIN_ROLE) {
         _pause();
     }
 
-    function unpause() external onlyOwner {
+    function unpause() external onlyRole(DEFAULT_ADMIN_ROLE) {
         _unpause();
     }
 
-    function setFee(uint _feePercentage) external onlyOwner returns (uint) {
+    function setFee(uint _feePercentage) external onlyRole(DEFAULT_ADMIN_ROLE) returns (uint) {
         require(_feePercentage <= 10, "Fee cannot be that much");
         feePercentage = _feePercentage;
         return feePercentage;
@@ -70,7 +77,7 @@ contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
         uint _amountMinLiqudityFirstToken,
         uint _amountMinLiquditySecondToken,
         uint _deadline
-    ) external onlyOwner whenNotPaused {
+    ) external onlyRole(CLAIMER_ROLE) whenNotPaused {
         require(_tokenIn != address(pair), "Cannot deposit LP tokens");
 
         uint balance = IERC20(_tokenIn).balanceOf(address(_tokenIn));
@@ -96,7 +103,7 @@ contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
         uint _amountMinLiqudityFirstToken,
         uint _amountMinLiquditySecondToken,
         uint _deadline
-    ) external onlyOwner whenNotPaused {
+    ) external onlyRole(CLAIMER_ROLE) whenNotPaused {
         uint balance = address(this).balance;
 
         uint amountToBuyOneAsstet = balance / 2;
@@ -106,8 +113,16 @@ contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
         _farmLiquidity(liquidity);
     }
 
-    function harvest() external onlyOwner whenNotPaused {
+    function setBeneficiary(address _beneficiary) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        beneficiary = _beneficiary;
+    }
+
+    function harvest() external onlyRole(DEFAULT_ADMIN_ROLE) whenNotPaused {
         masterChef.harvest(chefPoolPid, address(this));
+    }
+
+    function _withrdrawFromFarm(uint _balance) private {
+        masterChef.withdraw(chefPoolPid, _balance, address(this));
     }
 
     function _farmLiquidity(uint _liquidity) private {
@@ -127,14 +142,14 @@ contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
     function _collectFeeEther() private nonReentrant returns (uint){
         uint fee = _calcFee(msg.value);
         //solhint-disable-next-line avoid-low-level-calls
-        (bool success, ) = owner().call{value: fee}("");
+        (bool success, ) = beneficiary.call{value: fee}("");
         require(success, "Transfer failed.");
         return fee;
     }
 
     function _collectFeeToken(address _tokenIn, uint _tokenAmount) private returns (uint){
         uint fee = _calcFee(_tokenAmount);
-        IERC20(_tokenIn).safeTransferFrom(msg.sender, owner(), fee);
+        IERC20(_tokenIn).safeTransferFrom(msg.sender, beneficiary, fee);
         return fee;
     }
 
@@ -260,6 +275,8 @@ contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
 
         balanceOf[_nftTokenId] = 0;
 
+        _withrdrawFromFarm(balance);
+
         require(pair.approve(address(dexRouter), balance), "approve failed.");
 
 
@@ -300,6 +317,8 @@ contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
     function withdrawToUnderlyingTokens(uint256 _nftTokenId,  uint _amountOutMinFirstToken, uint _amountOutMinSecondToken, uint _deadline) external whenNotPaused onlyNftOwner(_nftTokenId) returns (bool) {
 
         uint balance = balanceOf[_nftTokenId];
+
+        _withrdrawFromFarm(balance);
 
         balanceOf[_nftTokenId] = 0;
 

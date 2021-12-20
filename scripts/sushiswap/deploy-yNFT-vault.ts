@@ -3,7 +3,7 @@ import { DexYNFTVault } from "../../typechain";
 import { deployContract } from "../../utils/deployment";
 import configEnv from "../../config";
 
-const { ADDRESSES } = configEnv;
+const { ADDRESSES, CLAIMER_ADDRESS } = configEnv;
 
 async function main() {
   const [owner] = await ethers.getSigners();
@@ -15,6 +15,7 @@ async function main() {
     ADDRESSES.PAIR_WETH_USDT_SUSHISWAP,
     ADDRESSES.MASTER_CHEF_V2_SUSHISWAP,
     poolPid,
+    CLAIMER_ADDRESS,
   ]);
 }
 
