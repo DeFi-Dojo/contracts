@@ -1,5 +1,5 @@
 import { ethers } from "hardhat";
-import { DexYNFTVault } from "../../typechain";
+import { SushiswapYNFTVault } from "../../typechain";
 import { deployContract } from "../../utils/deployment";
 import configEnv from "../../config";
 
@@ -10,7 +10,7 @@ async function main() {
   console.log(`Deploying contracts using address: ${owner.address}`);
 
   const poolPid = 0;
-  await deployContract<DexYNFTVault>("DexYNFTVault", [
+  await deployContract<SushiswapYNFTVault>("SushiswapYNFTVault", [
     ADDRESSES.ROUTER_02_SUSHISWAP,
     ADDRESSES.PAIR_WETH_USDT_SUSHISWAP,
     ADDRESSES.MASTER_CHEF_V2_SUSHISWAP,

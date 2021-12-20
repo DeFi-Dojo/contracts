@@ -14,7 +14,7 @@ import "./interfaces/sushiswap/IMiniChefV2.sol";
 import "./YNFT.sol";
 
 
-contract DexYNFTVault is AccessControl, ReentrancyGuard, Pausable {
+contract SushiswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
     using SafeERC20 for IERC20;
 
     mapping (uint256 => uint) public balanceOf;
