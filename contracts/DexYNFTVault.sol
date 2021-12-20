@@ -65,13 +65,13 @@ contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
         return feePercentage;
     }
 
-    function _depositHarvestedSushiTokens(
+    function depositHarvestedSushiTokens(
         uint _amountOutMinFirstToken,
         uint _amountOutMinSecondToken,
         uint _amountMinLiqudityFirstToken,
         uint _amountMinLiquditySecondToken,
         uint _deadline
-    ) private {
+    ) external onlyOwner {
         uint balanceSushi = sushiToken.balanceOf(address(this));
 
         uint amountToBuyOneAsstet = balanceSushi / 2;
@@ -95,34 +95,18 @@ contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
         );
     }
 
-    function _depositHarvestedETH(
+    function depositHarvestedETH(
         uint _amountOutMinFirstToken,
         uint _amountOutMinSecondToken,
         uint _amountMinLiqudityFirstToken,
         uint _amountMinLiquditySecondToken,
         uint _deadline
-    ) private {
+    ) external onlyOwner {
         uint balance = address(this).balance;
 
         uint amountToBuyOneAsstet = balance / 2;
 
-        uint amountFirstToken = _swapETHToToken(address(this), amountToBuyOneAsstet, _amountOutMinFirstToken, address(firstToken), _deadline);
-
-        uint amountSecondToken = _swapETHToToken(address(this), amountToBuyOneAsstet, _amountOutMinSecondToken, address(secondToken), _deadline);
-
-        require(firstToken.approve(address(dexRouter), amountFirstToken), "approve failed.");
-        require(secondToken.approve(address(dexRouter), amountSecondToken), "approve failed.");
-
-        (,, uint liquidity) = dexRouter.addLiquidity(
-            address(firstToken),
-            address(secondToken),
-            amountFirstToken,
-            amountSecondToken,
-            _amountMinLiqudityFirstToken,
-            _amountMinLiquditySecondToken,
-            address(this),
-            _deadline
-        );
+        uint liquidity = _depositLiquidityForEther(_amountOutMinFirstToken, _amountOutMinSecondToken, _amountMinLiqudityFirstToken, _amountMinLiquditySecondToken, amountToBuyOneAsstet, _deadline);
 
         _farmLiquidity(liquidity);
     }
@@ -139,11 +123,6 @@ contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
     function _mintYNFTForLiquidity(uint _liquidity) private {
         uint256 tokenId = yNFT.mint(msg.sender);
         balanceOf[tokenId] = _liquidity;
-    }
-
-    function _mintYNFTAndFarmLiquidity(uint _liquidity) private {
-        _mintYNFTForLiquidity(_liquidity);
-        _farmLiquidity(_liquidity);
     }
 
     function _calcFee(uint _price) private view returns (uint) {
@@ -196,6 +175,47 @@ contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
         uint[] memory amounts = dexRouter.swapExactTokensForTokens(_amountIn, _amountOut, path, _receiver, _deadline);
 
         return amounts[1];
+    }
+
+    function _depositLiquidityForEther(
+     uint _amountOutMinFirstToken,
+     uint _amountOutMinSecondToken,
+     uint _amountMinLiqudityFirstToken,
+     uint _amountMinLiquditySecondToken,
+     uint _amountToBuyOneAsstet,
+     uint _deadline
+      ) private returns (uint){
+        uint amountSecondToken = _swapETHToToken(address(this), _amountToBuyOneAsstet, _amountOutMinSecondToken, address(secondToken), _deadline);
+
+        require(secondToken.approve(address(dexRouter), amountSecondToken), "approve failed.");
+
+        uint liquidity;
+        if (address(firstToken) == dexRouter.WETH()) {
+            (,, liquidity) = dexRouter.addLiquidityETH{ value: _amountToBuyOneAsstet }(
+                address(secondToken),
+                amountSecondToken,
+                _amountMinLiquditySecondToken,
+                _amountMinLiqudityFirstToken,
+                address(this),
+                _deadline
+            );
+        } else {
+            uint amountFirstToken = _swapETHToToken(address(this), _amountToBuyOneAsstet, _amountOutMinFirstToken, address(firstToken), _deadline);
+            require(firstToken.approve(address(dexRouter), amountFirstToken), "approve failed.");
+            (,, liquidity) = dexRouter.addLiquidity(
+                    address(firstToken),
+                    address(secondToken),
+                    amountFirstToken,
+                    amountSecondToken,
+                    _amountMinLiqudityFirstToken,
+                    _amountMinLiquditySecondToken,
+                    address(this),
+                    _deadline
+                );
+
+        }
+        return liquidity;
+
     }
 
     function withdrawToEther(uint256 _nftTokenId,  uint _amountOutMinFirstToken, uint _amountOutMinSecondToken, uint _amountOutETH, uint _deadline) external whenNotPaused nonReentrant onlyNftOwner(_nftTokenId) {
@@ -319,7 +339,8 @@ contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
                 _deadline
             );
 
-        _mintYNFTAndFarmLiquidity(liquidity);
+        _mintYNFTForLiquidity(liquidity);
+        _farmLiquidity(liquidity);
     }
 
 
@@ -332,37 +353,10 @@ contract DexYNFTVault is Ownable, ReentrancyGuard, Pausable {
       ) external payable whenNotPaused {
         uint amountToBuyOneAsstet = (msg.value - _collectFeeEther()) / 2;
 
-        uint amountSecondToken = _swapETHToToken(address(this), amountToBuyOneAsstet, _amountOutMinSecondToken, address(secondToken), _deadline);
+        uint liquidity = _depositLiquidityForEther(_amountOutMinFirstToken, _amountOutMinSecondToken, _amountMinLiqudityFirstToken, _amountMinLiquditySecondToken, amountToBuyOneAsstet, _deadline);
 
-        require(secondToken.approve(address(dexRouter), amountSecondToken), "approve failed.");
-
-        uint liquidity;
-        if (address(firstToken) == dexRouter.WETH()) {
-            (,, liquidity) = dexRouter.addLiquidityETH{ value: amountToBuyOneAsstet }(
-                address(secondToken),
-                amountSecondToken,
-                _amountMinLiquditySecondToken,
-                _amountMinLiqudityFirstToken,
-                address(this),
-                _deadline
-            );
-        } else {
-            uint amountFirstToken = _swapETHToToken(address(this), amountToBuyOneAsstet, _amountOutMinFirstToken, address(firstToken), _deadline);
-            require(firstToken.approve(address(dexRouter), amountFirstToken), "approve failed.");
-            (,, liquidity) = dexRouter.addLiquidity(
-                    address(firstToken),
-                    address(secondToken),
-                    amountFirstToken,
-                    amountSecondToken,
-                    _amountMinLiqudityFirstToken,
-                    _amountMinLiquditySecondToken,
-                    address(this),
-                    _deadline
-                );
-
-        }
-        _mintYNFTAndFarmLiquidity(liquidity);
-
+        _mintYNFTForLiquidity(liquidity);
+        _farmLiquidity(liquidity);
     }
 
      receive() external payable {
