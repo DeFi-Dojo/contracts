@@ -1,5 +1,5 @@
 import { ethers } from "hardhat";
-import { SushiswapYNFTVault } from "../../typechain";
+import { QuickswapYNFTVault } from "../../typechain";
 import { waitForReceipt } from "../../utils/deployment";
 import configEnv from "../../config";
 import * as consts from "../../consts";
@@ -12,8 +12,8 @@ async function main() {
   const [owner] = await ethers.getSigners();
   console.log(`Deploying contracts using address: ${owner.address}`);
 
-  const yNFTVault = await ethers.getContractAt<SushiswapYNFTVault>(
-    "SushiswapYNFTVault",
+  const yNFTVault = await ethers.getContractAt<QuickswapYNFTVault>(
+    "QuickswapYNFTVault",
     VAULT_ADDRESS
   );
 

@@ -10,11 +10,11 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./interfaces/uniswapv2/IUniswapV2Router02.sol";
 import "./interfaces/uniswapv2/IUniswapV2Pair.sol";
-import "./interfaces/sushiswap/IMiniChefV2.sol";
+import "./interfaces/quickswap/IStakingDualRewards.sol";
 import "./YNFT.sol";
 
 
-contract SushiswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
+contract QuickswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
     using SafeERC20 for IERC20;
 
     mapping (uint256 => uint) public balanceOf;
@@ -25,7 +25,7 @@ contract SushiswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
     IERC20 immutable public firstToken;
     IERC20 immutable public secondToken;
     IUniswapV2Pair immutable public pair;
-    IMiniChefV2 immutable public masterChef;
+    IStakingDualRewards immutable public stakingDualRewards;
     uint immutable public chefPoolPid;
     address public beneficiary;
 
@@ -40,14 +40,14 @@ contract SushiswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
     constructor(
         IUniswapV2Router02 _dexRouter,
         IUniswapV2Pair _pair,
-        IMiniChefV2 _masterChef,
+        IStakingDualRewards _stakingDualRewards,
         uint32 _chefPoolPid,
         address _claimer
     ) {
         yNFT = new YNFT();
         dexRouter = _dexRouter;
         pair = _pair;
-        masterChef = _masterChef;
+        stakingDualRewards = _stakingDualRewards;
         chefPoolPid = _chefPoolPid;
         firstToken = IERC20(_pair.token0());
         secondToken = IERC20(_pair.token1());
@@ -117,17 +117,17 @@ contract SushiswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
         beneficiary = _beneficiary;
     }
 
-    function harvest() external onlyRole(DEFAULT_ADMIN_ROLE) whenNotPaused {
-        masterChef.harvest(chefPoolPid, address(this));
+    function getReward() external onlyRole(CLAIMER_ROLE) whenNotPaused {
+        stakingDualRewards.getReward();
     }
 
     function _withrdrawFromFarm(uint _balance) private {
-        masterChef.withdraw(chefPoolPid, _balance, address(this));
+        stakingDualRewards.withdraw(_balance);
     }
 
     function _farmLiquidity(uint _liquidity) private {
-        require(pair.approve(address(masterChef), _liquidity), "approve failed.");
-        masterChef.deposit(chefPoolPid, _liquidity, address(this));
+        require(pair.approve(address(stakingDualRewards), _liquidity), "approve failed.");
+        stakingDualRewards.stake(_liquidity);
     }
 
     function _mintYNFTForLiquidity(uint _liquidity) private {

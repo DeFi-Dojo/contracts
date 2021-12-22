@@ -1,49 +1,39 @@
 import { ethers } from "hardhat";
-import { SushiswapYNFTVault, IERC20 } from "../../typechain";
+import { QuickswapYNFTVault } from "../../typechain";
 import { waitForReceipt } from "../../utils/deployment";
 import configEnv from "../../config";
 import * as consts from "../../consts";
 
-const { VAULT_ADDRESS, ADDRESSES } = configEnv;
+const { VAULT_ADDRESS } = configEnv;
+
+const NFT_TOKEN_ID = 0;
 
 async function main() {
   const [owner] = await ethers.getSigners();
   console.log(`Deploying contracts using address: ${owner.address}`);
 
-  const yNFTVault = await ethers.getContractAt<SushiswapYNFTVault>(
-    "SushiswapYNFTVault",
+  const yNFTVault = await ethers.getContractAt<QuickswapYNFTVault>(
+    "QuickswapYNFTVault",
     VAULT_ADDRESS
   );
-
-  const tokenAmountIn = BigInt(1 * 10 ** consts.DECIMALS.USDT);
-
-  const usdt = await ethers.getContractAt<IERC20>("IERC20", ADDRESSES.USDT);
-
-  await usdt.approve(yNFTVault.address, tokenAmountIn).then(waitForReceipt);
-
-  console.log("approved");
 
   // frontend should calculate and pass it to the function, using "0" for convenience
   const amountOutMinFirstToken = 0;
   const amountOutMinSecondToken = 0;
-  const amountMinLiqudityFirstToken = 0;
-  const amountMinLiquditySecondToken = 0;
-
+  const amountOutEth = 0;
   const deadline = Math.round(Date.now() / 1000) + consts.SECONDS_IN_ONE_DAY;
 
   await yNFTVault
-    .createYNFT(
-      ADDRESSES.USDT,
-      tokenAmountIn,
+    .withdrawToEther(
+      NFT_TOKEN_ID,
       amountOutMinFirstToken,
       amountOutMinSecondToken,
-      amountMinLiqudityFirstToken,
-      amountMinLiquditySecondToken,
+      amountOutEth,
       deadline
     )
     .then(waitForReceipt);
 
-  console.log("created");
+  console.log("withdrawn");
 }
 
 main()
