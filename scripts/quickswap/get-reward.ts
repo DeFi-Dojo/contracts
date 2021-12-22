@@ -1,20 +1,21 @@
 import { ethers } from "hardhat";
 import { QuickswapYNFTVault } from "../../typechain";
-import { deployContract } from "../../utils/deployment";
+import { waitForReceipt } from "../../utils/deployment";
 import configEnv from "../../config";
 
-const { ADDRESSES } = configEnv;
+const { VAULT_ADDRESS } = configEnv;
 
 async function main() {
   const [owner] = await ethers.getSigners();
   console.log(`Deploying contracts using address: ${owner.address}`);
 
-  await deployContract<QuickswapYNFTVault>("QuickswapYNFTVault", [
-    ADDRESSES.ROUTER_02_QUICKSWAP,
-    ADDRESSES.PAIR_WMATIC_USDT_QUICKSWAP,
-    ADDRESSES.STAKING_DUAL_REWARDS_QUICKSWAP,
-    owner.address,
-  ]);
+  const yNFTVault = await ethers.getContractAt<QuickswapYNFTVault>(
+    "QuickswapYNFTVault",
+    VAULT_ADDRESS
+  );
+
+  await yNFTVault.getReward().then(waitForReceipt);
+  console.log("got reward");
 }
 
 main()

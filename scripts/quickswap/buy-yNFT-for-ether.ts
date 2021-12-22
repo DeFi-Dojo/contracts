@@ -31,7 +31,7 @@ async function main() {
       amountMinLiquditySecondToken,
       deadline,
       {
-        value: ethers.utils.parseEther("0.01"),
+        value: ethers.utils.parseEther("0.1"),
       }
     )
     .then(waitForReceipt);

@@ -26,7 +26,6 @@ contract QuickswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
     IERC20 immutable public secondToken;
     IUniswapV2Pair immutable public pair;
     IStakingDualRewards immutable public stakingDualRewards;
-    uint immutable public chefPoolPid;
     address public beneficiary;
 
     bytes32 public constant CLAIMER_ROLE = keccak256("CLAIMER_ROLE");
@@ -41,14 +40,12 @@ contract QuickswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
         IUniswapV2Router02 _dexRouter,
         IUniswapV2Pair _pair,
         IStakingDualRewards _stakingDualRewards,
-        uint32 _chefPoolPid,
         address _claimer
     ) {
         yNFT = new YNFT();
         dexRouter = _dexRouter;
         pair = _pair;
         stakingDualRewards = _stakingDualRewards;
-        chefPoolPid = _chefPoolPid;
         firstToken = IERC20(_pair.token0());
         secondToken = IERC20(_pair.token1());
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
