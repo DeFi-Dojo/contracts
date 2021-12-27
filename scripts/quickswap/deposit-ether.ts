@@ -24,18 +24,15 @@ async function main() {
   const deadline = Math.round(Date.now() / 1000) + consts.SECONDS_IN_ONE_DAY;
 
   await yNFTVault
-    .createYNFTForEther(
+    .depositETH(
       amountOutMinFirstToken,
       amountOutMinSecondToken,
       amountMinLiqudityFirstToken,
       amountMinLiquditySecondToken,
-      deadline,
-      {
-        value: ethers.utils.parseEther("0.01"),
-      }
+      deadline
     )
     .then(waitForReceipt);
-  console.log("created");
+  console.log("ether deposited");
 }
 
 main()

@@ -1,6 +1,5 @@
 import { ethers } from "hardhat";
-import { AaveYNFTVault } from "../../typechain";
-import { deployContract } from "../../utils/deployment";
+import { AaveYNFTVault__factory } from "../../typechain";
 import configEnv from "../../config";
 
 const { ADDRESSES, CLAIMER_ADDRESS } = configEnv;
@@ -9,12 +8,21 @@ async function main() {
   const [owner] = await ethers.getSigners();
   console.log(`Deploying contracts using address: ${owner.address}`);
 
-  await deployContract<AaveYNFTVault>("AaveYNFTVault", [
+  const contractName = "AaveYNFTVault";
+
+  const contractFactory =
+    await ethers.getContractFactory<AaveYNFTVault__factory>(contractName);
+
+  const contract = await contractFactory.deploy(
     ADDRESSES.ROUTER_02_SUSHISWAP,
     ADDRESSES.A_DAI,
     ADDRESSES.INCENTIVES_CONTROLLER,
-    CLAIMER_ADDRESS,
-  ]);
+    CLAIMER_ADDRESS
+  );
+
+  await contract.deployed();
+
+  console.log(`${contractName} deployed to: `, contract.address);
 }
 
 main()

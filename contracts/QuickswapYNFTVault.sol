@@ -28,6 +28,10 @@ contract QuickswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
     IStakingDualRewards immutable public stakingDualRewards;
     address public beneficiary;
 
+    uint public amountFirstToken;
+
+    uint public amountSecondToken;
+
     bytes32 public constant CLAIMER_ROLE = keccak256("CLAIMER_ROLE");
 
     modifier onlyNftOwner(uint _nftTokenId) {
@@ -67,7 +71,7 @@ contract QuickswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
         return feePercentage;
     }
 
-    function depositHarvestedTokens(
+    function depositTokens(
         address _tokenIn,
         uint _amountOutMinFirstToken,
         uint _amountOutMinSecondToken,
@@ -77,7 +81,7 @@ contract QuickswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
     ) external onlyRole(CLAIMER_ROLE) whenNotPaused {
         require(_tokenIn != address(pair), "Cannot deposit LP tokens");
 
-        uint balance = IERC20(_tokenIn).balanceOf(address(_tokenIn));
+        uint balance = IERC20(_tokenIn).balanceOf(address(this));
 
         uint amountToBuyOneAsstet = balance / 2;
 
@@ -94,7 +98,7 @@ contract QuickswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
         _farmLiquidity(liquidity);
     }
 
-    function depositHarvestedETH(
+    function depositETH(
         uint _amountOutMinFirstToken,
         uint _amountOutMinSecondToken,
         uint _amountMinLiqudityFirstToken,
@@ -235,20 +239,34 @@ contract QuickswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
         uint _deadline
       ) private returns (uint){
 
-        uint amountFirstToken;
+        // uint amountFirstToken;
         if (_tokenIn == address(firstToken)) {
             amountFirstToken = _amountToBuyOneAsstet;
         } else {
-            amountFirstToken = _swapTokenToToken(address(this), _amountToBuyOneAsstet, _amountOutMinFirstToken, _tokenIn, address(firstToken), _deadline);
+            amountFirstToken = _swapTokenToToken(
+                address(this),
+                _amountToBuyOneAsstet,
+                _amountOutMinFirstToken,
+                _tokenIn,
+                address(firstToken),
+                _deadline
+            );
         }
         require(firstToken.approve(address(dexRouter), amountFirstToken), "approve failed.");
 
 
-        uint amountSecondToken;
+        // uint amountSecondToken;
         if (_tokenIn == address(secondToken)) {
             amountSecondToken = _amountToBuyOneAsstet;
         } else {
-            amountSecondToken = _swapTokenToToken(address(this), _amountToBuyOneAsstet, _amountOutMinSecondToken, _tokenIn, address(secondToken), _deadline);
+            amountSecondToken = _swapTokenToToken(
+                address(this),
+                _amountToBuyOneAsstet,
+                _amountOutMinSecondToken,
+                _tokenIn,
+                address(secondToken),
+                _deadline
+            );
         }
         require(secondToken.approve(address(dexRouter), amountSecondToken), "approve failed.");
 
@@ -311,13 +329,13 @@ contract QuickswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
         yNFT.burn(_nftTokenId);
     }
 
-    function withdrawToUnderlyingTokens(uint256 _nftTokenId,  uint _amountOutMinFirstToken, uint _amountOutMinSecondToken, uint _deadline) external whenNotPaused onlyNftOwner(_nftTokenId) returns (bool) {
+    function withdrawToUnderlyingTokens(uint256 _nftTokenId,  uint _amountOutMinFirstToken, uint _amountOutMinSecondToken, uint _deadline) external whenNotPaused onlyNftOwner(_nftTokenId) {
 
         uint balance = balanceOf[_nftTokenId];
 
-        _withrdrawFromFarm(balance);
-
         balanceOf[_nftTokenId] = 0;
+
+        _withrdrawFromFarm(balance);
 
         require(pair.approve(address(dexRouter), balance), "approve failed.");
 
@@ -343,8 +361,6 @@ contract QuickswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
         }
 
         yNFT.burn(_nftTokenId);
-
-        return true;
     }
 
     function createYNFT(
