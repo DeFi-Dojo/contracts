@@ -1,17 +1,17 @@
 import { ethers } from "hardhat";
-import { DexYNFTVault } from "../../typechain";
+import { QuickswapYNFTVault } from "../../typechain";
 import { waitForReceipt } from "../../utils/deployment";
 import configEnv from "../../config";
 import * as consts from "../../consts";
 
-const { VAULT_ADDRESS } = configEnv;
+const { VAULT_ADDRESS, ADDRESSES } = configEnv;
 
 async function main() {
   const [owner] = await ethers.getSigners();
   console.log(`Deploying contracts using address: ${owner.address}`);
 
-  const yNFTVault = await ethers.getContractAt<DexYNFTVault>(
-    "DexYNFTVault",
+  const yNFTVault = await ethers.getContractAt<QuickswapYNFTVault>(
+    "QuickswapYNFTVault",
     VAULT_ADDRESS
   );
 
@@ -24,18 +24,16 @@ async function main() {
   const deadline = Math.round(Date.now() / 1000) + consts.SECONDS_IN_ONE_DAY;
 
   await yNFTVault
-    .createYNFTForEther(
+    .depositTokens(
+      ADDRESSES.USDT,
       amountOutMinFirstToken,
       amountOutMinSecondToken,
       amountMinLiqudityFirstToken,
       amountMinLiquditySecondToken,
-      deadline,
-      {
-        value: ethers.utils.parseEther("0.01"),
-      }
+      deadline
     )
     .then(waitForReceipt);
-  console.log("created");
+  console.log("tokens deposited");
 }
 
 main()

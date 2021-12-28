@@ -1,5 +1,5 @@
 import { ethers } from "hardhat";
-import { AaveYNFTVault__factory } from "../../typechain";
+import { QuickswapYNFTVault__factory } from "../../typechain";
 import configEnv from "../../config";
 
 const { ADDRESSES, HARVESTER_ADDRESS } = configEnv;
@@ -8,15 +8,15 @@ async function main() {
   const [owner] = await ethers.getSigners();
   console.log(`Deploying contracts using address: ${owner.address}`);
 
-  const contractName = "AaveYNFTVault";
+  const contractName = "QuickswapYNFTVault";
 
   const contractFactory =
-    await ethers.getContractFactory<AaveYNFTVault__factory>(contractName);
+    await ethers.getContractFactory<QuickswapYNFTVault__factory>(contractName);
 
   const contract = await contractFactory.deploy(
-    ADDRESSES.ROUTER_02_SUSHISWAP,
-    ADDRESSES.A_DAI,
-    ADDRESSES.INCENTIVES_CONTROLLER,
+    ADDRESSES.ROUTER_02_QUICKSWAP,
+    ADDRESSES.PAIR_WMATIC_USDT_QUICKSWAP,
+    ADDRESSES.STAKING_DUAL_REWARDS_QUICKSWAP,
     HARVESTER_ADDRESS
   );
 

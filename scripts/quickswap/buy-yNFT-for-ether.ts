@@ -1,27 +1,19 @@
 import { ethers } from "hardhat";
-import { DexYNFTVault, IERC20 } from "../../typechain";
+import { QuickswapYNFTVault } from "../../typechain";
 import { waitForReceipt } from "../../utils/deployment";
 import configEnv from "../../config";
 import * as consts from "../../consts";
 
-const { VAULT_ADDRESS, ADDRESSES } = configEnv;
+const { VAULT_ADDRESS } = configEnv;
 
 async function main() {
   const [owner] = await ethers.getSigners();
   console.log(`Deploying contracts using address: ${owner.address}`);
 
-  const yNFTVault = await ethers.getContractAt<DexYNFTVault>(
-    "DexYNFTVault",
+  const yNFTVault = await ethers.getContractAt<QuickswapYNFTVault>(
+    "QuickswapYNFTVault",
     VAULT_ADDRESS
   );
-
-  const tokenAmountIn = BigInt(1 * 10 ** consts.DECIMALS.USDT);
-
-  const usdt = await ethers.getContractAt<IERC20>("IERC20", ADDRESSES.USDT);
-
-  await usdt.approve(yNFTVault.address, tokenAmountIn).then(waitForReceipt);
-
-  console.log("approved");
 
   // frontend should calculate and pass it to the function, using "0" for convenience
   const amountOutMinFirstToken = 0;
@@ -32,17 +24,17 @@ async function main() {
   const deadline = Math.round(Date.now() / 1000) + consts.SECONDS_IN_ONE_DAY;
 
   await yNFTVault
-    .createYNFT(
-      ADDRESSES.USDT,
-      tokenAmountIn,
+    .createYNFTForEther(
       amountOutMinFirstToken,
       amountOutMinSecondToken,
       amountMinLiqudityFirstToken,
       amountMinLiquditySecondToken,
-      deadline
+      deadline,
+      {
+        value: ethers.utils.parseEther("0.01"),
+      }
     )
     .then(waitForReceipt);
-
   console.log("created");
 }
 
