@@ -2,7 +2,7 @@ import { ethers } from "hardhat";
 import { QuickswapYNFTVault__factory } from "../../typechain";
 import configEnv from "../../config";
 
-const { ADDRESSES } = configEnv;
+const { ADDRESSES, HARVESTER_ADDRESS } = configEnv;
 
 async function main() {
   const [owner] = await ethers.getSigners();
@@ -17,7 +17,7 @@ async function main() {
     ADDRESSES.ROUTER_02_QUICKSWAP,
     ADDRESSES.PAIR_WMATIC_USDT_QUICKSWAP,
     ADDRESSES.STAKING_DUAL_REWARDS_QUICKSWAP,
-    owner.address
+    HARVESTER_ADDRESS
   );
 
   await contract.deployed();
