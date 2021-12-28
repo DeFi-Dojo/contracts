@@ -9,8 +9,8 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
-import "./utils/meta-transactions/ContentMixin.sol";
-import "./utils/meta-transactions/NativeMetaTransaction.sol";
+import "../utils/meta-transactions/ContentMixin.sol";
+import "../utils/meta-transactions/NativeMetaTransaction.sol";
 
 contract OwnableDelegateProxy {}
 

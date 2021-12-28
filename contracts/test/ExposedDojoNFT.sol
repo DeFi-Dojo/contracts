@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "../DojoNFT.sol";
+import "../nft/DojoNFT.sol";
 
 contract ExposedDojoNFT is DojoNFT {
 

@@ -17,7 +17,7 @@ async function main() {
     VAULT_ADDRESS
   );
 
-  await yNFTVault.withdrawToUnderlyingToken(NFT_TOKEN_ID).then(waitForReceipt);
+  await yNFTVault.withdrawToUnderlyingTokens(NFT_TOKEN_ID).then(waitForReceipt);
 
   console.log("withdrawn");
 }

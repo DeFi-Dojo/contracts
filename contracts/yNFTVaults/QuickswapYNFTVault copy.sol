@@ -8,36 +8,23 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import "./interfaces/uniswapv2/IUniswapV2Router02.sol";
-import "./interfaces/uniswapv2/IUniswapV2Pair.sol";
-import "./interfaces/quickswap/IStakingDualRewards.sol";
-import "./interfaces/quickswap/IStakingRewards.sol";
+import "../interfaces/uniswapv2/IUniswapV2Router02.sol";
+import "../interfaces/uniswapv2/IUniswapV2Pair.sol";
+import "../interfaces/quickswap/IStakingDualRewards.sol";
+import "../interfaces/quickswap/IStakingRewards.sol";
+import "./YNFTVault.sol";
 import "./YNFT.sol";
 
 
-contract QuickswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
+contract QuickswapYNFTVault is YNFTVault {
     using SafeERC20 for IERC20;
 
-    mapping (uint256 => uint) public balanceOf;
-    IERC721 public nftToken;
-    YNFT public immutable yNFT;
-    IUniswapV2Router02 immutable public dexRouter;
-    uint public feePercentage = 1;
     IERC20 immutable public firstToken;
     IERC20 immutable public secondToken;
     IUniswapV2Pair immutable public pair;
     IStakingDualRewards immutable public stakingDualRewards;
     IStakingRewards immutable public dragonSyrup;
     IERC20 immutable public dQuick;
-    address public beneficiary;
-
-    bytes32 public constant HARVESTER_ROLE = keccak256("HARVESTER_ROLE");
-
-    modifier onlyNftOwner(uint _nftTokenId) {
-        address owner = yNFT.ownerOf(_nftTokenId);
-        require(owner == msg.sender, "Sender is not owner of the NFT");
-        _;
-    }
 
     constructor(
         IUniswapV2Router02 _dexRouter,
@@ -46,32 +33,13 @@ contract QuickswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
         IStakingRewards _dragonSyrup,
         IERC20 _dQuick,
         address _harvester
-    ) {
-        yNFT = new YNFT();
-        dexRouter = _dexRouter;
+    ) YNFTVault(_dexRouter, _harvester) {
         pair = _pair;
         stakingDualRewards = _stakingDualRewards;
         dragonSyrup = _dragonSyrup;
         dQuick = _dQuick;
         firstToken = IERC20(_pair.token0());
         secondToken = IERC20(_pair.token1());
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _setupRole(HARVESTER_ROLE, _harvester);
-        beneficiary = msg.sender;
-    }
-
-    function pause() external onlyRole(DEFAULT_ADMIN_ROLE) {
-        _pause();
-    }
-
-    function unpause() external onlyRole(DEFAULT_ADMIN_ROLE) {
-        _unpause();
-    }
-
-    function setFee(uint _feePercentage) external onlyRole(DEFAULT_ADMIN_ROLE) returns (uint) {
-        require(_feePercentage <= 10, "Fee cannot be that much");
-        feePercentage = _feePercentage;
-        return feePercentage;
     }
 
     function depositTokens(
@@ -117,10 +85,6 @@ contract QuickswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
         _farmLiquidity(liquidity);
     }
 
-    function setBeneficiary(address _beneficiary) external onlyRole(DEFAULT_ADMIN_ROLE) {
-        beneficiary = _beneficiary;
-    }
-
     function getRewardLPMining() external onlyRole(HARVESTER_ROLE) whenNotPaused {
         stakingDualRewards.getReward();
     }
@@ -155,58 +119,6 @@ contract QuickswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
     function _mintYNFTForLiquidity(uint _liquidity) private {
         uint256 tokenId = yNFT.mint(msg.sender);
         balanceOf[tokenId] = _liquidity;
-    }
-
-    function _calcFee(uint _price) private view returns (uint) {
-        return (_price * feePercentage) / 100;
-    }
-
-    function _collectFeeEther() private nonReentrant returns (uint){
-        uint fee = _calcFee(msg.value);
-        //solhint-disable-next-line avoid-low-level-calls
-        (bool success, ) = beneficiary.call{value: fee}("");
-        require(success, "Transfer failed.");
-        return fee;
-    }
-
-    function _collectFeeToken(address _tokenIn, uint _tokenAmount) private returns (uint){
-        uint fee = _calcFee(_tokenAmount);
-        IERC20(_tokenIn).safeTransferFrom(msg.sender, beneficiary, fee);
-        return fee;
-    }
-
-    function _swapTokenToETH(address _receiver, uint _amountInToken, uint _amountOutETH, address _tokenIn, uint _deadline) private returns (uint){
-        address[] memory path = new address[](2);
-        path[0] =  _tokenIn;
-        path[1] =  dexRouter.WETH();
-
-        require(IERC20(_tokenIn).approve(address(dexRouter), _amountInToken), "approve failed.");
-
-        uint[] memory amounts = dexRouter.swapExactTokensForETH(_amountInToken, _amountOutETH, path, _receiver, _deadline);
-
-        return amounts[1];
-    }
-
-    function _swapETHToToken(address _receiver, uint _amountInEth, uint _amountOutToken, address _token, uint _deadline) private returns (uint){
-        address[] memory path = new address[](2);
-        path[0] = dexRouter.WETH();
-        path[1] = _token;
-
-        uint[] memory amounts = dexRouter.swapExactETHForTokens{ value: _amountInEth }(_amountOutToken, path, _receiver, _deadline);
-
-        return amounts[1];
-    }
-
-    function _swapTokenToToken(address _receiver, uint _amountIn, uint _amountOut, address _tokenIn, address _tokenOut, uint _deadline) private returns (uint){
-        address[] memory path = new address[](2);
-        path[0] = _tokenIn;
-        path[1] = _tokenOut;
-
-        require(IERC20(_tokenIn).approve(address(dexRouter), _amountIn), "approve failed.");
-
-        uint[] memory amounts = dexRouter.swapExactTokensForTokens(_amountIn, _amountOut, path, _receiver, _deadline);
-
-        return amounts[1];
     }
 
     // TODO BUG: Cannot buy yNFT for WMATIC in WMATIC/USDT pool on quickswap https://jira.minebest.com/browse/DEX-322
@@ -422,7 +334,4 @@ contract QuickswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
         _mintYNFTForLiquidity(liquidity);
         _farmLiquidity(liquidity);
     }
-
-     receive() external payable {
-     }
 }
