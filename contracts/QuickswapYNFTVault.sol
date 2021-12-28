@@ -28,7 +28,7 @@ contract QuickswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
     IStakingDualRewards immutable public stakingDualRewards;
     address public beneficiary;
 
-    bytes32 public constant CLAIMER_ROLE = keccak256("CLAIMER_ROLE");
+    bytes32 public constant HARVESTER_ROLE = keccak256("HARVESTER_ROLE");
 
     modifier onlyNftOwner(uint _nftTokenId) {
         address owner = yNFT.ownerOf(_nftTokenId);
@@ -49,7 +49,7 @@ contract QuickswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
         firstToken = IERC20(_pair.token0());
         secondToken = IERC20(_pair.token1());
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _setupRole(CLAIMER_ROLE, _claimer);
+        _setupRole(HARVESTER_ROLE, _claimer);
         beneficiary = msg.sender;
     }
 
@@ -74,7 +74,7 @@ contract QuickswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
         uint _amountMinLiqudityFirstToken,
         uint _amountMinLiquditySecondToken,
         uint _deadline
-    ) external onlyRole(CLAIMER_ROLE) whenNotPaused {
+    ) external onlyRole(HARVESTER_ROLE) whenNotPaused {
         require(_tokenIn != address(pair), "Cannot deposit LP tokens");
 
         uint balance = IERC20(_tokenIn).balanceOf(address(this));
@@ -100,7 +100,7 @@ contract QuickswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
         uint _amountMinLiqudityFirstToken,
         uint _amountMinLiquditySecondToken,
         uint _deadline
-    ) external onlyRole(CLAIMER_ROLE) whenNotPaused {
+    ) external onlyRole(HARVESTER_ROLE) whenNotPaused {
         uint balance = address(this).balance;
 
         uint amountToBuyOneAsstet = balance / 2;
@@ -114,7 +114,7 @@ contract QuickswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
         beneficiary = _beneficiary;
     }
 
-    function getReward() external onlyRole(CLAIMER_ROLE) whenNotPaused {
+    function getReward() external onlyRole(HARVESTER_ROLE) whenNotPaused {
         stakingDualRewards.getReward();
     }
 
@@ -184,6 +184,7 @@ contract QuickswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
         return amounts[1];
     }
 
+    // TODO BUG: Cannot buy yNFT for WMATIC in WMATIC/USDT pool on quickswap https://jira.minebest.com/browse/DEX-322
     function _depositLiquidityForEther(
         uint _amountToBuyOneAsstet,
         uint _amountOutMinFirstToken,
