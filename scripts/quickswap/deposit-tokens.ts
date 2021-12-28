@@ -15,28 +15,25 @@ async function main() {
     VAULT_ADDRESS
   );
 
-  console.log(await yNFTVault.firstToken());
-  console.log(await yNFTVault.secondToken());
+  // frontend should calculate and pass it to the function, using "0" for convenience
+  const amountOutMinFirstToken = 0;
+  const amountOutMinSecondToken = 0;
+  const amountMinLiqudityFirstToken = 0;
+  const amountMinLiquditySecondToken = 0;
 
-  // // frontend should calculate and pass it to the function, using "0" for convenience
-  // const amountOutMinFirstToken = 0;
-  // const amountOutMinSecondToken = 0;
-  // const amountMinLiqudityFirstToken = 0;
-  // const amountMinLiquditySecondToken = 0;
+  const deadline = Math.round(Date.now() / 1000) + consts.SECONDS_IN_ONE_DAY;
 
-  // const deadline = Math.round(Date.now() / 1000) + consts.SECONDS_IN_ONE_DAY;
-
-  // await yNFTVault
-  //   .depositTokens(
-  //     ADDRESSES.USDT,
-  //     amountOutMinFirstToken,
-  //     amountOutMinSecondToken,
-  //     amountMinLiqudityFirstToken,
-  //     amountMinLiquditySecondToken,
-  //     deadline
-  //   )
-  //   .then(waitForReceipt);
-  // console.log("tokens deposited");
+  await yNFTVault
+    .depositTokens(
+      ADDRESSES.USDT,
+      amountOutMinFirstToken,
+      amountOutMinSecondToken,
+      amountMinLiqudityFirstToken,
+      amountMinLiquditySecondToken,
+      deadline
+    )
+    .then(waitForReceipt);
+  console.log("tokens deposited");
 }
 
 main()

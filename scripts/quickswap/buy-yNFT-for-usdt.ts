@@ -1,9 +1,5 @@
 import { ethers } from "hardhat";
-import {
-  QuickswapYNFTVault,
-  IERC20,
-  IUniswapV2Router02,
-} from "../../typechain";
+import { QuickswapYNFTVault, IERC20 } from "../../typechain";
 import { waitForReceipt } from "../../utils/deployment";
 import configEnv from "../../config";
 import * as consts from "../../consts";
@@ -19,9 +15,9 @@ async function main() {
     VAULT_ADDRESS
   );
 
-  const tokenAmountIn = BigInt(0.01 * 10 ** 18);
+  const tokenAmountIn = BigInt(0.01 * 10 ** consts.DECIMALS.USDT);
 
-  const matic = await ethers.getContractAt<IERC20>("IERC20", ADDRESSES.WMATIC);
+  const matic = await ethers.getContractAt<IERC20>("IERC20", ADDRESSES.USDT);
 
   await matic.approve(yNFTVault.address, tokenAmountIn).then(waitForReceipt);
 
@@ -37,7 +33,7 @@ async function main() {
 
   await yNFTVault
     .createYNFT(
-      ADDRESSES.WMATIC,
+      ADDRESSES.USDT,
       tokenAmountIn,
       amountOutMinFirstToken,
       amountOutMinSecondToken,
@@ -48,45 +44,6 @@ async function main() {
     .then(waitForReceipt);
 
   console.log("created");
-
-  const maticAmount = await yNFTVault.amountFirstToken();
-
-  const usdtAmount = await yNFTVault.amountSecondToken();
-
-  console.log("matic", maticAmount.toString());
-  console.log("usdt", usdtAmount.toString());
-
-  await matic
-    .approve(ADDRESSES.ROUTER_02_QUICKSWAP, maticAmount)
-    .then(waitForReceipt);
-
-  const usdt = await ethers.getContractAt<IERC20>("IERC20", ADDRESSES.USDT);
-
-  await usdt
-    .approve(ADDRESSES.ROUTER_02_QUICKSWAP, usdtAmount)
-    .then(waitForReceipt);
-
-  console.log("approved");
-
-  const router = await ethers.getContractAt<IUniswapV2Router02>(
-    "IUniswapV2Router02",
-    ADDRESSES.ROUTER_02_QUICKSWAP
-  );
-
-  await router
-    .addLiquidity(
-      ADDRESSES.WMATIC,
-      ADDRESSES.USDT,
-      maticAmount,
-      usdtAmount,
-      amountMinLiqudityFirstToken,
-      amountMinLiquditySecondToken,
-      owner.address,
-      deadline
-    )
-    .then(waitForReceipt);
-
-  console.log("added");
 }
 
 main()

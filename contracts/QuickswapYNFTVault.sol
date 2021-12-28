@@ -28,10 +28,6 @@ contract QuickswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
     IStakingDualRewards immutable public stakingDualRewards;
     address public beneficiary;
 
-    uint public amountFirstToken;
-
-    uint public amountSecondToken;
-
     bytes32 public constant CLAIMER_ROLE = keccak256("CLAIMER_ROLE");
 
     modifier onlyNftOwner(uint _nftTokenId) {
@@ -239,7 +235,7 @@ contract QuickswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
         uint _deadline
       ) private returns (uint){
 
-        // uint amountFirstToken;
+        uint amountFirstToken;
         if (_tokenIn == address(firstToken)) {
             amountFirstToken = _amountToBuyOneAsstet;
         } else {
@@ -255,7 +251,7 @@ contract QuickswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
         require(firstToken.approve(address(dexRouter), amountFirstToken), "approve failed.");
 
 
-        // uint amountSecondToken;
+        uint amountSecondToken;
         if (_tokenIn == address(secondToken)) {
             amountSecondToken = _amountToBuyOneAsstet;
         } else {
