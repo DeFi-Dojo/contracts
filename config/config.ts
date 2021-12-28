@@ -17,6 +17,7 @@ const {
   DEFENDER_TEAM_API_SECRET,
   DEFENDER_AUTOTASK_ID,
   HARVESTER_ADDRESS,
+  HARDHAT_FORKING_URL,
 } = process.env;
 
 if (
@@ -32,7 +33,8 @@ if (
   DEFENDER_TEAM_API_KEY === undefined ||
   DEFENDER_TEAM_API_SECRET === undefined ||
   DEFENDER_AUTOTASK_ID === undefined ||
-  HARVESTER_ADDRESS === undefined
+  HARVESTER_ADDRESS === undefined ||
+  HARDHAT_FORKING_URL === undefined
 ) {
   throw new Error("ENV not valid");
 }
@@ -52,4 +54,5 @@ export default {
   DEFENDER_TEAM_API_SECRET,
   DEFENDER_AUTOTASK_ID,
   HARVESTER_ADDRESS,
+  HARDHAT_FORKING_URL,
 };

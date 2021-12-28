@@ -11,6 +11,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./interfaces/uniswapv2/IUniswapV2Router02.sol";
 import "./interfaces/uniswapv2/IUniswapV2Pair.sol";
 import "./interfaces/quickswap/IStakingDualRewards.sol";
+import "./interfaces/quickswap/IStakingRewards.sol";
 import "./YNFT.sol";
 
 
@@ -26,6 +27,8 @@ contract QuickswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
     IERC20 immutable public secondToken;
     IUniswapV2Pair immutable public pair;
     IStakingDualRewards immutable public stakingDualRewards;
+    IStakingRewards immutable public dragonSyrup;
+    IERC20 immutable public dQuick;
     address public beneficiary;
 
     bytes32 public constant HARVESTER_ROLE = keccak256("HARVESTER_ROLE");
@@ -40,16 +43,20 @@ contract QuickswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
         IUniswapV2Router02 _dexRouter,
         IUniswapV2Pair _pair,
         IStakingDualRewards _stakingDualRewards,
-        address _claimer
+        IStakingRewards _dragonSyrup,
+        IERC20 _dQuick,
+        address _harvester
     ) {
         yNFT = new YNFT();
         dexRouter = _dexRouter;
         pair = _pair;
         stakingDualRewards = _stakingDualRewards;
+        dragonSyrup = _dragonSyrup;
+        dQuick = _dQuick;
         firstToken = IERC20(_pair.token0());
         secondToken = IERC20(_pair.token1());
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _setupRole(HARVESTER_ROLE, _claimer);
+        _setupRole(HARVESTER_ROLE, _harvester);
         beneficiary = msg.sender;
     }
 
@@ -114,17 +121,35 @@ contract QuickswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
         beneficiary = _beneficiary;
     }
 
-    function getReward() external onlyRole(HARVESTER_ROLE) whenNotPaused {
+    function getRewardLPMining() external onlyRole(HARVESTER_ROLE) whenNotPaused {
         stakingDualRewards.getReward();
     }
 
-    function _withrdrawFromFarm(uint _balance) private {
+    function _withrdrawFromLPMining(uint _balance) private {
         stakingDualRewards.withdraw(_balance);
     }
 
     function _farmLiquidity(uint _liquidity) private {
         require(pair.approve(address(stakingDualRewards), _liquidity), "approve failed.");
         stakingDualRewards.stake(_liquidity);
+    }
+
+    function getRewardFromDragonSyrup() external onlyRole(HARVESTER_ROLE) whenNotPaused {
+        dragonSyrup.getReward();
+    }
+
+    function farmDQuick() external onlyRole(HARVESTER_ROLE) whenNotPaused {
+        uint balance = dQuick.balanceOf(address(this));
+        require(dQuick.approve(address(dragonSyrup), balance), "approve failed.");
+        dragonSyrup.stake(balance);
+    }
+
+    function withdrawDQuick(uint256 _amount) external onlyRole(HARVESTER_ROLE) whenNotPaused {
+        dragonSyrup.withdraw(_amount);
+    }
+
+    function exitDQuick() external onlyRole(HARVESTER_ROLE) whenNotPaused {
+        dragonSyrup.exit();
     }
 
     function _mintYNFTForLiquidity(uint _liquidity) private {
@@ -287,7 +312,7 @@ contract QuickswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
 
         balanceOf[_nftTokenId] = 0;
 
-        _withrdrawFromFarm(balance);
+        _withrdrawFromLPMining(balance);
 
         require(pair.approve(address(dexRouter), balance), "approve failed.");
 
@@ -332,7 +357,7 @@ contract QuickswapYNFTVault is AccessControl, ReentrancyGuard, Pausable {
 
         balanceOf[_nftTokenId] = 0;
 
-        _withrdrawFromFarm(balance);
+        _withrdrawFromLPMining(balance);
 
         require(pair.approve(address(dexRouter), balance), "approve failed.");
 

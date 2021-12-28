@@ -14,8 +14,9 @@ async function main() {
     VAULT_ADDRESS
   );
 
-  await yNFTVault.getReward().then(waitForReceipt);
-  console.log("got reward");
+  await yNFTVault.getRewardFromDragonSyrup().then(waitForReceipt);
+
+  console.log("got reward from dragon syrup");
 }
 
 main()
