@@ -14,6 +14,7 @@ const {
   WALLET_MNEMONIC,
   KOVAN_API_URL,
   POLYGON_MAINNET_API_URL,
+  HARDHAT_FORKING_URL,
 } = configEnv;
 
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
@@ -33,6 +34,9 @@ const config: HardhatUserConfig = {
       chainId: 1337,
       // minting on the DojoNFT takes about 325354 gas
       gas: 400000,
+      forking: {
+        url: HARDHAT_FORKING_URL,
+      },
       mining: {
         auto: false,
         interval: 5000,
