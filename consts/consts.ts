@@ -1,4 +1,4 @@
-export const MAX_SUPPLY_OF_NFT = 3;
+export const MAX_SUPPLY_OF_NFT = 2500;
 
 export const NATIVE_TOKEN_PRICE_FEED_DECIMALS = 8;
 
