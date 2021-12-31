@@ -74,17 +74,8 @@ describe("DojoNFT", () => {
 
     expect(balance._hex).to.equal("0x01");
 
-    const {
-      faceMask,
-      eyes,
-      symbol,
-      horn,
-      weapon,
-      helmetMaterial,
-      faceMaskColor,
-      faceMaskPattern,
-      samuraiSex,
-    } = await dojoNFT.characteristics(0);
+    const { faceMask, eyes, symbol, horn, weapon, helmet, bust } =
+      await dojoNFT.characteristics(0);
 
     expect({
       faceMask,
@@ -92,25 +83,21 @@ describe("DojoNFT", () => {
       symbol,
       horn,
       weapon,
-      helmetMaterial,
-      faceMaskColor,
-      faceMaskPattern,
-      samuraiSex,
+      helmet,
+      bust,
     }).to.deep.equal({
       eyes: 0,
       faceMask: 3,
-      faceMaskColor: 2,
-      faceMaskPattern: 0,
-      helmetMaterial: 0,
+      helmet: 0,
       horn: 0,
-      samuraiSex: 0,
+      bust: 2,
       symbol: 2,
       weapon: 1,
     });
 
     const rarityIndex = await dojoNFT.rarityIndex(0);
 
-    expect(rarityIndex).to.equal(320);
+    expect(rarityIndex).to.equal(170);
   });
 
   it("_randPercentage", async () => {
