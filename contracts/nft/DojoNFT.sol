@@ -22,7 +22,7 @@ contract DojoNFT is ContextMixin, ERC721Enumerable, NativeMetaTransaction, Ownab
     using SafeMath for uint256;
 
     address private proxyRegistryAddress;
-    uint256 private _currentTokenId = 0;
+    uint256 private _currentTokenId = 1;
     string private baseURI;
 
     struct Characteristics {
@@ -31,10 +31,8 @@ contract DojoNFT is ContextMixin, ERC721Enumerable, NativeMetaTransaction, Ownab
         uint8 symbol;
         uint8 horn;
         uint8 weapon;
-        uint8 helmetMaterial;
-        uint8 faceMaskColor;
-        uint8 faceMaskPattern;
-        uint8 samuraiSex;
+        uint8 helmet;
+        uint8 bust;
     }
 
     mapping(uint256 => Characteristics) public characteristics;
@@ -42,18 +40,16 @@ contract DojoNFT is ContextMixin, ERC721Enumerable, NativeMetaTransaction, Ownab
     mapping(uint256 => uint256) public rarityIndex;
 
     uint8[][] public equipmentDistributionMatrix = [
-        [50, 60, 85, 95, 100], // faceMask
+        [40, 65, 85, 95, 100], // faceMask
         [10, 40, 55, 60, 100], // eyes
         [40, 60, 80, 85, 100], // symbol
         [30, 35, 40, 55, 100], // horn
         [50, 70, 85, 90, 100] // weapon
     ];
 
-    uint8[][] public rarityDistributionMatrix = [
-        [75, 95, 100], // helmetMaterial
-        [75, 95, 100], // faceMaskColor
-        [75, 95, 100], // faceMaskPattern
-        [75, 95, 100]  // samuraiSex
+    uint8[][] public armorDistributionMatrix = [
+        [75, 95, 100], // helmet
+        [75, 95, 100] // bust
     ];
 
     struct RarityOption {
@@ -67,19 +63,17 @@ contract DojoNFT is ContextMixin, ERC721Enumerable, NativeMetaTransaction, Ownab
         RarityOption symbol;
         RarityOption horn;
         RarityOption weapon;
-        RarityOption helmetMaterial;
-        RarityOption faceMaskColor;
-        RarityOption faceMaskPattern;
-        RarityOption samuraiSex;
+        RarityOption helmet;
+        RarityOption bust;
     }
 
     constructor(
         string memory _baseURI,
         address _proxyRegistryAddress
-    ) ERC721("DojoMask", "DOJO") {
+    ) ERC721("DeFi DOJO Warriors", "DOJO") {
         baseURI = _baseURI;
         proxyRegistryAddress = _proxyRegistryAddress;
-        _initializeEIP712("DojoMask");
+        _initializeEIP712("DeFi DOJO Warriors");
     }
 
     function setBaseTokenURI(string memory _baseURI) public onlyOwner {
@@ -127,10 +121,8 @@ contract DojoNFT is ContextMixin, ERC721Enumerable, NativeMetaTransaction, Ownab
             symbol: _getOption(_randPercentage(newTokenId, "symbol", _blockTimestamp, _blockDifficulty), equipmentDistributionMatrix[2]),
             horn: _getOption(_randPercentage(newTokenId, "horn", _blockTimestamp, _blockDifficulty), equipmentDistributionMatrix[3]),
             weapon:  _getOption(_randPercentage(newTokenId, "weapon", _blockTimestamp, _blockDifficulty), equipmentDistributionMatrix[4]),
-            helmetMaterial: _getOption(_randPercentage(newTokenId, "helmetMaterial", _blockTimestamp, _blockDifficulty), rarityDistributionMatrix[0]),
-            faceMaskColor: _getOption(_randPercentage(newTokenId, "faceMaskColor", _blockTimestamp, _blockDifficulty), rarityDistributionMatrix[1]),
-            faceMaskPattern: _getOption(_randPercentage(newTokenId, "faceMaskPattern", _blockTimestamp, _blockDifficulty), rarityDistributionMatrix[2]),
-            samuraiSex: _getOption(_randPercentage(newTokenId, "samuraiSex", _blockTimestamp, _blockDifficulty), rarityDistributionMatrix[3])
+            helmet: _getOption(_randPercentage(newTokenId, "helmetMaterial", _blockTimestamp, _blockDifficulty), armorDistributionMatrix[0]),
+            bust: _getOption(_randPercentage(newTokenId, "faceMaskColor", _blockTimestamp, _blockDifficulty), armorDistributionMatrix[1])
         });
 
         characteristics[newTokenId] = Characteristics({
@@ -139,13 +131,11 @@ contract DojoNFT is ContextMixin, ERC721Enumerable, NativeMetaTransaction, Ownab
             symbol: rarityInfo.symbol.optionId,
             horn: rarityInfo.horn.optionId,
             weapon: rarityInfo.weapon.optionId,
-            helmetMaterial: rarityInfo.helmetMaterial.optionId,
-            faceMaskColor: rarityInfo.faceMaskColor.optionId,
-            faceMaskPattern: rarityInfo.faceMaskPattern.optionId,
-            samuraiSex: rarityInfo.samuraiSex.optionId
+            helmet: rarityInfo.helmet.optionId,
+            bust: rarityInfo.bust.optionId
         });
 
-        rarityIndex[newTokenId] = rarityInfo.faceMask.rarity + rarityInfo.eyes.rarity + rarityInfo.symbol.rarity + rarityInfo.horn.rarity + rarityInfo.weapon.rarity + rarityInfo.helmetMaterial.rarity + rarityInfo.faceMaskColor.rarity + rarityInfo.faceMaskPattern.rarity + rarityInfo.samuraiSex.rarity;
+        rarityIndex[newTokenId] = rarityInfo.faceMask.rarity + rarityInfo.eyes.rarity + rarityInfo.symbol.rarity + rarityInfo.horn.rarity + rarityInfo.weapon.rarity + rarityInfo.helmet.rarity + rarityInfo.bust.rarity;
 
         _safeMint(_to, newTokenId);
         _incrementTokenId();

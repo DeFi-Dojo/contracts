@@ -41,7 +41,7 @@ contract OpenSeaFactory is FactoryERC721, Ownable {
     }
 
     function name() override external pure returns (string memory) {
-        return "Dojo NFT Item Sale";
+        return "DeFi DOJO Warriors";
     }
 
     function symbol() override external pure returns (string memory) {
@@ -68,6 +68,16 @@ contract OpenSeaFactory is FactoryERC721, Ownable {
         }
     }
 
+    function setBaseTokenURI(string calldata _baseURI) external onlyOwner {
+        baseURI = _baseURI;
+    }
+
+    function setNFTBaseTokenURI(string calldata _baseURI) external onlyOwner {
+
+        DojoNFT mask = DojoNFT(nftAddress);
+        mask.setBaseTokenURI(_baseURI);
+    }
+
     function mint(uint256 _optionId, address _toAddress) override public {
         // Must be sent from the owner proxy or owner.
         ProxyRegistry proxyRegistry = ProxyRegistry(proxyRegistryAddress);
@@ -75,7 +85,7 @@ contract OpenSeaFactory is FactoryERC721, Ownable {
             address(proxyRegistry.proxies(owner())) == _msgSender() ||
                 owner() == _msgSender()
         );
-        require(canMint(_optionId));
+        require(canMint(_optionId), "Cannot mint");
 
         DojoNFT mask = DojoNFT(nftAddress);
         if (_optionId == singleCreatureOption) {
