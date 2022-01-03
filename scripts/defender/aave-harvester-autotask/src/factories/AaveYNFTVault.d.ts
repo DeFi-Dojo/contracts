@@ -18,12 +18,12 @@ import {
 import { BytesLike } from "@ethersproject/bytes";
 import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+import type { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface AaveYNFTVaultInterface extends ethers.utils.Interface {
   functions: {
-    "CLAIMER_ROLE()": FunctionFragment;
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
+    "HARVESTER_ROLE()": FunctionFragment;
     "aToken()": FunctionFragment;
     "balanceOf(uint256)": FunctionFragment;
     "beneficiary()": FunctionFragment;
@@ -31,13 +31,15 @@ interface AaveYNFTVaultInterface extends ethers.utils.Interface {
     "createYNFT(address,uint256,uint256,uint256)": FunctionFragment;
     "createYNFTForEther(uint256,uint256)": FunctionFragment;
     "dexRouter()": FunctionFragment;
-    "feePercentage()": FunctionFragment;
+    "feePerMile()": FunctionFragment;
     "getAmountToClaim()": FunctionFragment;
     "getRoleAdmin(bytes32)": FunctionFragment;
     "grantRole(bytes32,address)": FunctionFragment;
     "hasRole(bytes32,address)": FunctionFragment;
     "incentivesController()": FunctionFragment;
     "nftToken()": FunctionFragment;
+    "pause()": FunctionFragment;
+    "paused()": FunctionFragment;
     "pool()": FunctionFragment;
     "renounceRole(bytes32,address)": FunctionFragment;
     "revokeRole(bytes32,address)": FunctionFragment;
@@ -47,17 +49,18 @@ interface AaveYNFTVaultInterface extends ethers.utils.Interface {
     "supportsInterface(bytes4)": FunctionFragment;
     "totalSupply()": FunctionFragment;
     "underlyingToken()": FunctionFragment;
+    "unpause()": FunctionFragment;
     "withdrawToEther(uint256,uint256,uint256)": FunctionFragment;
-    "withdrawToUnderlyingToken(uint256)": FunctionFragment;
+    "withdrawToUnderlyingTokens(uint256)": FunctionFragment;
     "yNFT()": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "CLAIMER_ROLE",
+    functionFragment: "DEFAULT_ADMIN_ROLE",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "DEFAULT_ADMIN_ROLE",
+    functionFragment: "HARVESTER_ROLE",
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "aToken", values?: undefined): string;
@@ -83,7 +86,7 @@ interface AaveYNFTVaultInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "dexRouter", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "feePercentage",
+    functionFragment: "feePerMile",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -107,6 +110,8 @@ interface AaveYNFTVaultInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "nftToken", values?: undefined): string;
+  encodeFunctionData(functionFragment: "pause", values?: undefined): string;
+  encodeFunctionData(functionFragment: "paused", values?: undefined): string;
   encodeFunctionData(functionFragment: "pool", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "renounceRole",
@@ -140,22 +145,23 @@ interface AaveYNFTVaultInterface extends ethers.utils.Interface {
     functionFragment: "underlyingToken",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "withdrawToEther",
     values: [BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "withdrawToUnderlyingToken",
+    functionFragment: "withdrawToUnderlyingTokens",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "yNFT", values?: undefined): string;
 
   decodeFunctionResult(
-    functionFragment: "CLAIMER_ROLE",
+    functionFragment: "DEFAULT_ADMIN_ROLE",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "DEFAULT_ADMIN_ROLE",
+    functionFragment: "HARVESTER_ROLE",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "aToken", data: BytesLike): Result;
@@ -174,10 +180,7 @@ interface AaveYNFTVaultInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "dexRouter", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "feePercentage",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "feePerMile", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getAmountToClaim",
     data: BytesLike
@@ -193,6 +196,8 @@ interface AaveYNFTVaultInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "nftToken", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pool", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceRole",
@@ -220,26 +225,33 @@ interface AaveYNFTVaultInterface extends ethers.utils.Interface {
     functionFragment: "underlyingToken",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "withdrawToEther",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "withdrawToUnderlyingToken",
+    functionFragment: "withdrawToUnderlyingTokens",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "yNFT", data: BytesLike): Result;
 
   events: {
+    "Paused(address)": EventFragment;
     "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
     "RoleGranted(bytes32,address,address)": EventFragment;
     "RoleRevoked(bytes32,address,address)": EventFragment;
+    "Unpaused(address)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleAdminChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleRevoked"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
 }
+
+export type PausedEvent = TypedEvent<[string] & { account: string }>;
 
 export type RoleAdminChangedEvent = TypedEvent<
   [string, string, string] & {
@@ -256,6 +268,8 @@ export type RoleGrantedEvent = TypedEvent<
 export type RoleRevokedEvent = TypedEvent<
   [string, string, string] & { role: string; account: string; sender: string }
 >;
+
+export type UnpausedEvent = TypedEvent<[string] & { account: string }>;
 
 export class AaveYNFTVault extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -301,9 +315,9 @@ export class AaveYNFTVault extends BaseContract {
   interface: AaveYNFTVaultInterface;
 
   functions: {
-    CLAIMER_ROLE(overrides?: CallOverrides): Promise<[string]>;
-
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
+
+    HARVESTER_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
     aToken(overrides?: CallOverrides): Promise<[string]>;
 
@@ -336,7 +350,7 @@ export class AaveYNFTVault extends BaseContract {
 
     dexRouter(overrides?: CallOverrides): Promise<[string]>;
 
-    feePercentage(overrides?: CallOverrides): Promise<[BigNumber]>;
+    feePerMile(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     getAmountToClaim(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -357,6 +371,12 @@ export class AaveYNFTVault extends BaseContract {
     incentivesController(overrides?: CallOverrides): Promise<[string]>;
 
     nftToken(overrides?: CallOverrides): Promise<[string]>;
+
+    pause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    paused(overrides?: CallOverrides): Promise<[boolean]>;
 
     pool(overrides?: CallOverrides): Promise<[string]>;
 
@@ -380,7 +400,7 @@ export class AaveYNFTVault extends BaseContract {
     ): Promise<ContractTransaction>;
 
     setFee(
-      _feePercentage: BigNumberish,
+      _feePerMile: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -393,6 +413,10 @@ export class AaveYNFTVault extends BaseContract {
 
     underlyingToken(overrides?: CallOverrides): Promise<[string]>;
 
+    unpause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     withdrawToEther(
       _nftTokenId: BigNumberish,
       _amountOutMin: BigNumberish,
@@ -400,7 +424,7 @@ export class AaveYNFTVault extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    withdrawToUnderlyingToken(
+    withdrawToUnderlyingTokens(
       _nftTokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -408,9 +432,9 @@ export class AaveYNFTVault extends BaseContract {
     yNFT(overrides?: CallOverrides): Promise<[string]>;
   };
 
-  CLAIMER_ROLE(overrides?: CallOverrides): Promise<string>;
-
   DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
+
+  HARVESTER_ROLE(overrides?: CallOverrides): Promise<string>;
 
   aToken(overrides?: CallOverrides): Promise<string>;
 
@@ -440,7 +464,7 @@ export class AaveYNFTVault extends BaseContract {
 
   dexRouter(overrides?: CallOverrides): Promise<string>;
 
-  feePercentage(overrides?: CallOverrides): Promise<BigNumber>;
+  feePerMile(overrides?: CallOverrides): Promise<BigNumber>;
 
   getAmountToClaim(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -461,6 +485,12 @@ export class AaveYNFTVault extends BaseContract {
   incentivesController(overrides?: CallOverrides): Promise<string>;
 
   nftToken(overrides?: CallOverrides): Promise<string>;
+
+  pause(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  paused(overrides?: CallOverrides): Promise<boolean>;
 
   pool(overrides?: CallOverrides): Promise<string>;
 
@@ -484,7 +514,7 @@ export class AaveYNFTVault extends BaseContract {
   ): Promise<ContractTransaction>;
 
   setFee(
-    _feePercentage: BigNumberish,
+    _feePerMile: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -497,6 +527,10 @@ export class AaveYNFTVault extends BaseContract {
 
   underlyingToken(overrides?: CallOverrides): Promise<string>;
 
+  unpause(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   withdrawToEther(
     _nftTokenId: BigNumberish,
     _amountOutMin: BigNumberish,
@@ -504,7 +538,7 @@ export class AaveYNFTVault extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  withdrawToUnderlyingToken(
+  withdrawToUnderlyingTokens(
     _nftTokenId: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -512,9 +546,9 @@ export class AaveYNFTVault extends BaseContract {
   yNFT(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
-    CLAIMER_ROLE(overrides?: CallOverrides): Promise<string>;
-
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
+
+    HARVESTER_ROLE(overrides?: CallOverrides): Promise<string>;
 
     aToken(overrides?: CallOverrides): Promise<string>;
 
@@ -529,7 +563,7 @@ export class AaveYNFTVault extends BaseContract {
       _amountOutMin: BigNumberish,
       _deadline: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<boolean>;
+    ): Promise<void>;
 
     createYNFT(
       _tokenIn: string,
@@ -547,7 +581,7 @@ export class AaveYNFTVault extends BaseContract {
 
     dexRouter(overrides?: CallOverrides): Promise<string>;
 
-    feePercentage(overrides?: CallOverrides): Promise<BigNumber>;
+    feePerMile(overrides?: CallOverrides): Promise<BigNumber>;
 
     getAmountToClaim(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -568,6 +602,10 @@ export class AaveYNFTVault extends BaseContract {
     incentivesController(overrides?: CallOverrides): Promise<string>;
 
     nftToken(overrides?: CallOverrides): Promise<string>;
+
+    pause(overrides?: CallOverrides): Promise<void>;
+
+    paused(overrides?: CallOverrides): Promise<boolean>;
 
     pool(overrides?: CallOverrides): Promise<string>;
 
@@ -591,7 +629,7 @@ export class AaveYNFTVault extends BaseContract {
     ): Promise<void>;
 
     setFee(
-      _feePercentage: BigNumberish,
+      _feePerMile: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -604,22 +642,30 @@ export class AaveYNFTVault extends BaseContract {
 
     underlyingToken(overrides?: CallOverrides): Promise<string>;
 
+    unpause(overrides?: CallOverrides): Promise<void>;
+
     withdrawToEther(
       _nftTokenId: BigNumberish,
       _amountOutMin: BigNumberish,
       _deadline: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<boolean>;
+    ): Promise<void>;
 
-    withdrawToUnderlyingToken(
+    withdrawToUnderlyingTokens(
       _nftTokenId: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<boolean>;
+    ): Promise<void>;
 
     yNFT(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {
+    "Paused(address)"(
+      account?: null
+    ): TypedEventFilter<[string], { account: string }>;
+
+    Paused(account?: null): TypedEventFilter<[string], { account: string }>;
+
     "RoleAdminChanged(bytes32,bytes32,bytes32)"(
       role?: BytesLike | null,
       previousAdminRole?: BytesLike | null,
@@ -673,12 +719,18 @@ export class AaveYNFTVault extends BaseContract {
       [string, string, string],
       { role: string; account: string; sender: string }
     >;
+
+    "Unpaused(address)"(
+      account?: null
+    ): TypedEventFilter<[string], { account: string }>;
+
+    Unpaused(account?: null): TypedEventFilter<[string], { account: string }>;
   };
 
   estimateGas: {
-    CLAIMER_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
-
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
+
+    HARVESTER_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
     aToken(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -711,7 +763,7 @@ export class AaveYNFTVault extends BaseContract {
 
     dexRouter(overrides?: CallOverrides): Promise<BigNumber>;
 
-    feePercentage(overrides?: CallOverrides): Promise<BigNumber>;
+    feePerMile(overrides?: CallOverrides): Promise<BigNumber>;
 
     getAmountToClaim(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -736,6 +788,12 @@ export class AaveYNFTVault extends BaseContract {
 
     nftToken(overrides?: CallOverrides): Promise<BigNumber>;
 
+    pause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    paused(overrides?: CallOverrides): Promise<BigNumber>;
+
     pool(overrides?: CallOverrides): Promise<BigNumber>;
 
     renounceRole(
@@ -758,7 +816,7 @@ export class AaveYNFTVault extends BaseContract {
     ): Promise<BigNumber>;
 
     setFee(
-      _feePercentage: BigNumberish,
+      _feePerMile: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -771,6 +829,10 @@ export class AaveYNFTVault extends BaseContract {
 
     underlyingToken(overrides?: CallOverrides): Promise<BigNumber>;
 
+    unpause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     withdrawToEther(
       _nftTokenId: BigNumberish,
       _amountOutMin: BigNumberish,
@@ -778,7 +840,7 @@ export class AaveYNFTVault extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    withdrawToUnderlyingToken(
+    withdrawToUnderlyingTokens(
       _nftTokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -787,11 +849,11 @@ export class AaveYNFTVault extends BaseContract {
   };
 
   populateTransaction: {
-    CLAIMER_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     DEFAULT_ADMIN_ROLE(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    HARVESTER_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     aToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -824,7 +886,7 @@ export class AaveYNFTVault extends BaseContract {
 
     dexRouter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    feePercentage(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    feePerMile(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getAmountToClaim(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -851,6 +913,12 @@ export class AaveYNFTVault extends BaseContract {
 
     nftToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    pause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     pool(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     renounceRole(
@@ -873,7 +941,7 @@ export class AaveYNFTVault extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     setFee(
-      _feePercentage: BigNumberish,
+      _feePerMile: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -886,6 +954,10 @@ export class AaveYNFTVault extends BaseContract {
 
     underlyingToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    unpause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     withdrawToEther(
       _nftTokenId: BigNumberish,
       _amountOutMin: BigNumberish,
@@ -893,7 +965,7 @@ export class AaveYNFTVault extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    withdrawToUnderlyingToken(
+    withdrawToUnderlyingTokens(
       _nftTokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
