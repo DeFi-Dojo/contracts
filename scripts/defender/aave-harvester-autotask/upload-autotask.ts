@@ -8,7 +8,7 @@ const {
 } = configEnv;
 
 const PATH_TO_COMPILED_SRC_CODE =
-  "./dist/scripts/defender/aave-claimer-autotask/src";
+  "./dist/scripts/defender/aave-harvester-autotask/src";
 
 async function main() {
   const client = new AutotaskClient({

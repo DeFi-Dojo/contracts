@@ -18,6 +18,7 @@ const {
   DEFENDER_AUTOTASK_ID,
   HARVESTER_ADDRESS,
   HARDHAT_FORKING_URL,
+  NFT_FACTORY_OWNER_ADDRESS,
 } = process.env;
 
 if (
@@ -34,7 +35,8 @@ if (
   DEFENDER_TEAM_API_SECRET === undefined ||
   DEFENDER_AUTOTASK_ID === undefined ||
   HARVESTER_ADDRESS === undefined ||
-  HARDHAT_FORKING_URL === undefined
+  HARDHAT_FORKING_URL === undefined ||
+  NFT_FACTORY_OWNER_ADDRESS === undefined
 ) {
   throw new Error("ENV not valid");
 }
@@ -55,4 +57,5 @@ export default {
   DEFENDER_AUTOTASK_ID,
   HARVESTER_ADDRESS,
   HARDHAT_FORKING_URL,
+  NFT_FACTORY_OWNER_ADDRESS,
 };

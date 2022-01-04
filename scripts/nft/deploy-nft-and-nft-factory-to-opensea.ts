@@ -5,7 +5,12 @@ import { deployContract, waitForReceipt } from "../../utils/deployment";
 import { MAX_SUPPLY_OF_NFT } from "../../consts";
 import configEnv from "../../config";
 
-const { NFT_BASE_URI, NFT_FACTORY_BASE_URI, ADDRESSES } = configEnv;
+const {
+  NFT_BASE_URI,
+  NFT_FACTORY_BASE_URI,
+  ADDRESSES,
+  NFT_FACTORY_OWNER_ADDRESS,
+} = configEnv;
 
 async function main() {
   const [owner] = await ethers.getSigners();
@@ -29,7 +34,13 @@ async function main() {
 
   await dojoNFT.transferOwnership(openSeaFactory.address).then(waitForReceipt);
 
-  console.log("ownership transfered");
+  console.log("dojoNFT ownership transfered");
+
+  await openSeaFactory
+    .transferOwnership(NFT_FACTORY_OWNER_ADDRESS)
+    .then(waitForReceipt);
+
+  console.log("openSeaFactory ownership transfered");
 }
 
 main()
