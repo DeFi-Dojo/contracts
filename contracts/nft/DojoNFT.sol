@@ -22,7 +22,7 @@ contract DojoNFT is ContextMixin, ERC721Enumerable, NativeMetaTransaction, Ownab
     using SafeMath for uint256;
 
     address private proxyRegistryAddress;
-    uint256 private _currentTokenId = 1;
+    uint256 private _nextTokenId = 0;
     string private baseURI;
 
     struct Characteristics {
@@ -85,7 +85,7 @@ contract DojoNFT is ContextMixin, ERC721Enumerable, NativeMetaTransaction, Ownab
     }
 
      function exist(uint256 tokenId) public view returns (bool) {
-        return tokenId < _currentTokenId;
+        return tokenId < _nextTokenId;
     }
 
     function _randPercentage(uint256 _tokenId, string memory _prefix, uint256 _blockTimestamp, uint256 _blockDifficulty) internal view returns (uint) {
@@ -144,18 +144,18 @@ contract DojoNFT is ContextMixin, ERC721Enumerable, NativeMetaTransaction, Ownab
     }
 
     /**
-     * @dev calculates the next token ID based on value of _currentTokenId
+     * @dev calculates the next token ID based on value of _nextTokenId
      * @return uint256 for the next token ID
      */
     function _getNextTokenId() internal view returns (uint256) {
-        return _currentTokenId;
+        return _nextTokenId;
     }
 
     /**
-     * @dev increments the value of _currentTokenId
+     * @dev increments the value of _nextTokenId
      */
     function _incrementTokenId() internal {
-        _currentTokenId++;
+        _nextTokenId++;
     }
 
     function tokenURI(uint256 _tokenId) override public view returns (string memory) {

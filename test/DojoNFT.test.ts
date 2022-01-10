@@ -3,20 +3,26 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import { Contract } from "ethers";
 import { deployContract, waitForReceipt } from "../utils/deployment";
-import { ExposedDojoNFT } from "../typechain";
-import { PROXY_REGISTRY_ADDRESS_RINKEBY } from "../consts";
+import { ExposedDojoNFT, ProxyRegistry } from "../typechain";
 
 describe("DojoNFT", () => {
   let dojoNFT: Contract;
+  let proxyRegistry: Contract;
 
   const NFT_BASE_URI = "https://creatures-api.opensea.io/api/creature/";
   const BLOCK_TIMESTAMP = 1634550719723;
   const BLOCK_DIFFUCLTY = 100000000;
 
   beforeEach(async () => {
+    proxyRegistry = await deployContract<ProxyRegistry>(
+        "ProxyRegistry",
+        [],
+        undefined
+    );
+
     dojoNFT = await deployContract<ExposedDojoNFT>(
       "ExposedDojoNFT",
-      [NFT_BASE_URI, PROXY_REGISTRY_ADDRESS_RINKEBY],
+      [NFT_BASE_URI, proxyRegistry.address],
       undefined
     );
   });

@@ -4,7 +4,6 @@ import { ethers } from "hardhat";
 import { Contract } from "ethers";
 import { deployContract, waitForReceipt } from "../utils/deployment";
 import { OpenSeaFactory, DojoNFT, MockProxyRegistry } from "../typechain";
-import { PROXY_REGISTRY_ADDRESS_RINKEBY } from "../consts";
 
 describe("DojoNFT", () => {
   let dojoNFT: Contract;
@@ -17,15 +16,15 @@ describe("DojoNFT", () => {
   const FACTORY_BASE_URI = "https://creatures-api.opensea.io/api/factory/";
 
   beforeEach(async () => {
-    dojoNFT = await deployContract<DojoNFT>(
-      "DojoNFT",
-      [NFT_BASE_URI, PROXY_REGISTRY_ADDRESS_RINKEBY],
-      undefined
-    );
-
     mockProxyRegistry = await deployContract<MockProxyRegistry>(
       "MockProxyRegistry",
       [],
+      undefined
+    );
+
+    dojoNFT = await deployContract<DojoNFT>(
+      "DojoNFT",
+      [NFT_BASE_URI, mockProxyRegistry.address],
       undefined
     );
 
