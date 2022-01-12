@@ -40,11 +40,11 @@ contract DojoNFT is ContextMixin, ERC721Enumerable, NativeMetaTransaction, Ownab
     mapping(uint256 => uint256) public rarityIndex;
 
     uint8[][] public equipmentDistributionMatrix = [
-        [40, 65, 85, 95, 100], // faceMask
-        [10, 40, 55, 60, 100], // eyes
-        [40, 60, 80, 85, 100], // symbol
-        [30, 35, 40, 55, 100], // horn
-        [50, 70, 85, 90, 100] // weapon
+        [50, 70, 85, 95, 100], // faceMask
+        [50, 70, 85, 95, 100], // eyes
+        [50, 70, 85, 95, 100], // symbol
+        [50, 70, 85, 95, 100], // horn
+        [50, 70, 85, 95, 100] // weapon
     ];
 
     uint8[][] public armorDistributionMatrix = [
