@@ -95,7 +95,7 @@ contract DojoNFT is ContextMixin, ERC721Enumerable, NativeMetaTransaction, Ownab
     function _getOption(uint _rarity, uint8[] memory _distribution) internal pure returns (RarityOption memory rarityOption) {
         uint256 arrayLength = _distribution.length;
         for (uint8 i=0; i<arrayLength; i++) {
-            if(_distribution[i] > _rarity) {
+            if(_distribution[i] >= _rarity) {
                 if(i == 0) {
                     return RarityOption({optionId: i, rarity: _distribution[i] });
                 }
