@@ -41,5 +41,36 @@ describe("DojoToken", () => {
 
   });
 
+  it('should revert setBeneficiary if no DEFAULT_ADMIN_ROLE rights', async () => {
+    const signers = await ethers.getSigners();
+    await expectRevert(quickswapYnftVault.connect(signers[1]).setBeneficiary(signers[2].address),
+        "AccessControl: account ", signers[1].address, " is missing role 0x0000000000000000000000000000000000000000000000000000000000000000'");
+  });
 
+  it('should change beneficiary by setBeneficiary when role set', async () => {
+    const signers = await ethers.getSigners();
+    await quickswapYnftVault.grantRole("0x0000000000000000000000000000000000000000000000000000000000000000", signers[1].address)
+    await quickswapYnftVault.connect(signers[1]).setBeneficiary(signers[2].address);
+    expect(await quickswapYnftVault.beneficiary()).to.equal(signers[2].address);
+  })
+
+  it('should revert setFee if no DEFAULT_ADMIN_ROLE rights', async () => {
+    const FEE = 12;
+    const signers = await ethers.getSigners();
+    await expectRevert(quickswapYnftVault.connect(signers[1]).setFee(FEE),
+        "AccessControl: account ", signers[1].address, " is missing role 0x0000000000000000000000000000000000000000000000000000000000000000'");
+  });
+
+  it('should set proper fee by setFee when role set', async () => {
+    const FEE = 12;
+    const signers = await ethers.getSigners();
+    await quickswapYnftVault.grantRole("0x0000000000000000000000000000000000000000000000000000000000000000", signers[1].address)
+    await quickswapYnftVault.connect(signers[1]).setFee(FEE);
+    expect(await quickswapYnftVault.feePerMile()).to.equal(FEE);
+  });
+
+  it('should revert setFee if fee above 100', async () => {
+    const FEE = 101;
+    await expectRevert(quickswapYnftVault.setFee(FEE), "Fee cannot be that much");
+  });
 });
