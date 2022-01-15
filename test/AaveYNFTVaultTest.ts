@@ -10,7 +10,6 @@ import IAaveIncentivesController from "../artifacts/contracts/interfaces/aave/IA
 import IERC20 from "../artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json";
 import ILendingPool from "../artifacts/contracts/interfaces/aave/ILendingPool.sol/ILendingPool.json";
 import {deployMockContract} from '@ethereum-waffle/mock-contract';
-import {MockProvider} from '@ethereum-waffle/provider';
 
 // @ts-ignore
 import { expectRevert } from "@openzeppelin/test-helpers";
