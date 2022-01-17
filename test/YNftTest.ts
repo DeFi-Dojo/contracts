@@ -8,7 +8,7 @@ import { YNFT } from "../typechain";
 // @ts-ignore
 import { expectRevert } from "@openzeppelin/test-helpers";
 
-describe("DojoToken", () => {
+describe("YNFTVault", () => {
   let ynft: Contract;
 
   beforeEach(async () => {

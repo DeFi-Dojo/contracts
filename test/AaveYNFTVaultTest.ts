@@ -15,20 +15,25 @@ import {deployMockContract} from '@ethereum-waffle/mock-contract';
 import { expectRevert } from "@openzeppelin/test-helpers";
 import {MockContract} from "ethereum-waffle";
 
-describe("DojoToken", () => {
+describe("AaveYNFTVault", () => {
   let aaveYnftVault: Contract;
+  let uniswapRouter: MockContract;
   let aToken: MockContract;
   let aaveIncentivesController: MockContract;
+  let rewardToken: MockContract;
+  let underlyingToken: MockContract;
+  let pool: MockContract;
 
   beforeEach(async () => {
     const signers = await ethers.getSigners();
-    const uniswapRouter = await deployMockContract(signers[0], IUniswapV2Router02.abi);
+    uniswapRouter = await deployMockContract(signers[0], IUniswapV2Router02.abi);
     aToken = await deployMockContract(signers[0], IAToken.abi);
     aaveIncentivesController = await deployMockContract(signers[0], IAaveIncentivesController.abi);
-    const rewardToken = await deployMockContract(signers[0], IERC20.abi);
-    const pool = await deployMockContract(signers[0], ILendingPool.abi);
+    rewardToken = await deployMockContract(signers[0], IERC20.abi);
+    underlyingToken = await deployMockContract(signers[0], IERC20.abi);
+    pool = await deployMockContract(signers[0], ILendingPool.abi);
     await aaveIncentivesController.mock.REWARD_TOKEN.returns(rewardToken.address);
-    await aToken.mock.UNDERLYING_ASSET_ADDRESS.returns(rewardToken.address);
+    await aToken.mock.UNDERLYING_ASSET_ADDRESS.returns(underlyingToken.address);
     await aToken.mock.POOL.returns(pool.address);
 
 
@@ -76,6 +81,34 @@ describe("DojoToken", () => {
   it('should revert setFee if fee above 100', async () => {
     const FEE = 101;
     await expectRevert(aaveYnftVault.setFee(FEE), "Fee cannot be that much");
+  });
+
+  it('should revert claimRewards if caller has no HARVESTER_ROLE', async () => {
+    const MIN_AMOUNT = 101;
+    const DEADLINE = 101;
+    const signers = await ethers.getSigners();
+    await expectRevert(aaveYnftVault.claimRewards(MIN_AMOUNT, DEADLINE),
+        "AccessControl: account ", signers[0].address, " is missing role ", ethers.utils.keccak256(ethers.utils.toUtf8Bytes("HARVESTER_ROLE")));
+  });
+
+  it('should deposit in pool when claimRewards called', async () => {
+    const MIN_AMOUNT = 101;
+    const DEADLINE = 101;
+    const AMOUNT_TO_CLAIM = 1500;
+    const signers = await ethers.getSigners();
+    await aaveYnftVault.grantRole(ethers.utils.keccak256(ethers.utils.toUtf8Bytes("HARVESTER_ROLE")), signers[0].address);
+    await aaveIncentivesController.mock.getRewardsBalance.withArgs([aToken.address], aaveYnftVault.address).returns(AMOUNT_TO_CLAIM);
+    await aaveIncentivesController.mock.claimRewards.withArgs([aToken.address], AMOUNT_TO_CLAIM, aaveYnftVault.address).returns(AMOUNT_TO_CLAIM);
+    await rewardToken.mock.approve.withArgs(uniswapRouter.address, AMOUNT_TO_CLAIM).returns(true);
+
+    await uniswapRouter.mock.swapExactTokensForTokens.returns([AMOUNT_TO_CLAIM, AMOUNT_TO_CLAIM]);
+    await underlyingToken.mock.approve.withArgs(pool.address, AMOUNT_TO_CLAIM).returns(true);
+
+    // hack to omit "AssertionError: Waffle's calledOnContractWith is not supported by Hardhat"
+    await pool.mock.deposit.withArgs(underlyingToken.address, AMOUNT_TO_CLAIM, aaveYnftVault.address, 0).revertsWithReason('calledOnContract: pool, [underlyingToken.address, AMOUNT_TO_CLAIM, aaveYnftVault.address, 0]')
+
+    await expectRevert(aaveYnftVault.claimRewards(MIN_AMOUNT, DEADLINE), 'calledOnContract: pool, [underlyingToken.address, AMOUNT_TO_CLAIM, aaveYnftVault.address, 0]');
+    // expect("deposit").to.be.calledOnContractWith(pool, [underlyingToken.address, AMOUNT_TO_CLAIM, aaveYnftVault.address, 0]);
   });
 
 });

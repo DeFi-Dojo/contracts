@@ -15,6 +15,6 @@ export const deployContract = async <T extends Contract>(
   const contract = await contractFactory.deploy(...constructorArgs);
   await contract.deployed();
 
-  console.log(`${contractName} deployed to: `, contract.address);
+  // console.log(`${contractName} deployed to: `, contract.address);
   return contract as T;
 };

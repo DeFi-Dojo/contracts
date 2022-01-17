@@ -15,7 +15,7 @@ import {deployMockContract} from '@ethereum-waffle/mock-contract';
 // @ts-ignore
 import { expectRevert } from "@openzeppelin/test-helpers";
 
-describe("DojoToken", () => {
+describe("QuickswapYNFTVault", () => {
   let quickswapYnftVault: Contract;
 
   beforeEach(async () => {
