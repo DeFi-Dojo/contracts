@@ -107,8 +107,64 @@ describe("AaveYNFTVault", () => {
     // hack to omit "AssertionError: Waffle's calledOnContractWith is not supported by Hardhat"
     await pool.mock.deposit.withArgs(underlyingToken.address, AMOUNT_TO_CLAIM, aaveYnftVault.address, 0).revertsWithReason('calledOnContract: pool, [underlyingToken.address, AMOUNT_TO_CLAIM, aaveYnftVault.address, 0]')
 
+    // if contract reverted with defined reason, that means particular mock was called
     await expectRevert(aaveYnftVault.claimRewards(MIN_AMOUNT, DEADLINE), 'calledOnContract: pool, [underlyingToken.address, AMOUNT_TO_CLAIM, aaveYnftVault.address, 0]');
     // expect("deposit").to.be.calledOnContractWith(pool, [underlyingToken.address, AMOUNT_TO_CLAIM, aaveYnftVault.address, 0]);
   });
+
+  it('should revert if rewardToken not approved when claimRewards called', async () => {
+    const MIN_AMOUNT = 101;
+    const DEADLINE = 101;
+    const AMOUNT_TO_CLAIM = 1500;
+    const signers = await ethers.getSigners();
+    await aaveYnftVault.grantRole(ethers.utils.keccak256(ethers.utils.toUtf8Bytes("HARVESTER_ROLE")), signers[0].address);
+    await aaveIncentivesController.mock.getRewardsBalance.withArgs([aToken.address], aaveYnftVault.address).returns(AMOUNT_TO_CLAIM);
+    await aaveIncentivesController.mock.claimRewards.withArgs([aToken.address], AMOUNT_TO_CLAIM, aaveYnftVault.address).returns(AMOUNT_TO_CLAIM);
+    await rewardToken.mock.approve.withArgs(uniswapRouter.address, AMOUNT_TO_CLAIM).returns(false);
+
+    await expectRevert(aaveYnftVault.claimRewards(MIN_AMOUNT, DEADLINE), "approve failed.");
+  });
+
+  it('should revert if underlyingToken not approved when claimRewards called', async () => {
+    const MIN_AMOUNT = 101;
+    const DEADLINE = 101;
+    const AMOUNT_TO_CLAIM = 1500;
+    const signers = await ethers.getSigners();
+    await aaveYnftVault.grantRole(ethers.utils.keccak256(ethers.utils.toUtf8Bytes("HARVESTER_ROLE")), signers[0].address);
+    await aaveIncentivesController.mock.getRewardsBalance.withArgs([aToken.address], aaveYnftVault.address).returns(AMOUNT_TO_CLAIM);
+    await aaveIncentivesController.mock.claimRewards.withArgs([aToken.address], AMOUNT_TO_CLAIM, aaveYnftVault.address).returns(AMOUNT_TO_CLAIM);
+    await rewardToken.mock.approve.withArgs(uniswapRouter.address, AMOUNT_TO_CLAIM).returns(true);
+
+    await uniswapRouter.mock.swapExactTokensForTokens.returns([AMOUNT_TO_CLAIM, AMOUNT_TO_CLAIM]);
+    await underlyingToken.mock.approve.withArgs(pool.address, AMOUNT_TO_CLAIM).returns(false);
+
+    await expectRevert(aaveYnftVault.claimRewards(MIN_AMOUNT, DEADLINE), "approve failed.");
+  });
+
+  it('should revert withdrawToUnderlyingTokens if contract paused', async () => {
+    const TOKEN_ID = 1;
+    await aaveYnftVault.pause();
+    await expectRevert(aaveYnftVault.withdrawToUnderlyingTokens(TOKEN_ID), "Pausable: paused");
+  });
+
+  it('should revert withdrawToEther if contract paused', async () => {
+    const TOKEN_ID = 1;
+    const MIN_AMOUNT = 101;
+    const DEADLINE = 101;
+    await aaveYnftVault.pause();
+    await expectRevert(aaveYnftVault.withdrawToEther(TOKEN_ID, MIN_AMOUNT, DEADLINE), "Pausable: paused");
+  });
+
+  it('should revert createYNFT if contract paused', async () => {
+    const TOKEN_ID = 1;
+    const MIN_AMOUNT = 101;
+    const DEADLINE = 101;
+    await aaveYnftVault.pause();
+    await expectRevert(aaveYnftVault.createYNFT(underlyingToken, MIN_AMOUNT, DEADLINE), "Pausable: paused");
+  });
+
+  // TODO: checks for onlyNftOwner
+
+
 
 });
