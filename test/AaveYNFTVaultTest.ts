@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import { Contract } from "ethers";
 import { deployContract, waitForReceipt } from "../utils/deployment";
-import { AaveYNFTVault } from "../typechain";
+import {AaveYNFTVault, ERC20} from "../typechain";
 import IUniswapV2Router02 from "../artifacts/contracts/interfaces/uniswapv2/IUniswapV2Router02.sol/IUniswapV2Router02.json";
 import IAToken from "../artifacts/contracts/interfaces/aave/IAToken.sol/IAToken.json";
 import IAaveIncentivesController from "../artifacts/contracts/interfaces/aave/IAaveIncentivesController.sol/IAaveIncentivesController.json";
@@ -156,15 +156,123 @@ describe("AaveYNFTVault", () => {
   });
 
   it('should revert createYNFT if contract paused', async () => {
-    const TOKEN_ID = 1;
     const MIN_AMOUNT = 101;
     const DEADLINE = 101;
     await aaveYnftVault.pause();
-    await expectRevert(aaveYnftVault.createYNFT(underlyingToken, MIN_AMOUNT, DEADLINE), "Pausable: paused");
+    await expectRevert(aaveYnftVault.createYNFT(underlyingToken.address, MIN_AMOUNT, MIN_AMOUNT, DEADLINE), "Pausable: paused");
   });
 
   // TODO: checks for onlyNftOwner
 
+  async function init_createYNFT_mocks(token: MockContract) {
+    const ATOKEN_BALANCE = 12000;
+    await token.mock.transferFrom.returns(true);
+    await token.mock.approve.returns(true);
+    await aToken.mock.balanceOf.returns(ATOKEN_BALANCE);
+    await pool.mock.deposit.returns();
+  }
+
+  it('should call transferFrom on underlyingToken when calling createYNFT for underlyingToken', async () => {
+    const MIN_AMOUNT = 101;
+    const DEADLINE = 101;
+    await init_createYNFT_mocks(underlyingToken);
+
+    // calledOnContractWith hack for underlyingToken.revertsWithReason
+    await underlyingToken.mock.transferFrom.revertsWithReason("calledOnContract: underlyingToken.transferFrom, []");
+    await expectRevert(aaveYnftVault.createYNFT(underlyingToken.address, MIN_AMOUNT, MIN_AMOUNT, DEADLINE), "calledOnContract: underlyingToken.transferFrom, []");
+  });
+
+  it('should approve underlyingToken when calling createYNFT for underlyingToken', async () => {
+    const MIN_AMOUNT = 101;
+    const DEADLINE = 101;
+    await init_createYNFT_mocks(underlyingToken);
+
+    // calledOnContractWith hack for underlyingToken.revertsWithReason
+    await underlyingToken.mock.approve.revertsWithReason("calledOnContract: underlyingToken.approve, []");
+    await expectRevert(aaveYnftVault.createYNFT(underlyingToken.address, MIN_AMOUNT, MIN_AMOUNT, DEADLINE), "calledOnContract: underlyingToken.approve, []");
+  });
+  // pool.deposit(address(underlyingToken), _tokenAmount, address(this), 0);
+
+  it('should deposit underlyingToken in pool when calling createYNFT for underlyingToken', async () => {
+    const MIN_AMOUNT = 101;
+    const DEADLINE = 101;
+    await init_createYNFT_mocks(underlyingToken);
+
+    // calledOnContractWith hack for pool.deposit
+    await pool.mock.deposit.revertsWithReason("calledOnContract: pool.deposit, []")
+    await expectRevert(aaveYnftVault.createYNFT(underlyingToken.address, MIN_AMOUNT, MIN_AMOUNT, DEADLINE), "calledOnContract: pool.deposit, []");
+  });
+
+
+  it('should call transferFrom on input token when calling createYNFT for token other than underlyingToken', async () => {
+    const MIN_AMOUNT = 101;
+    const DEADLINE = 101;
+    const signers = await ethers.getSigners();
+    await init_createYNFT_mocks(underlyingToken);
+    const otherToken = await await deployMockContract(signers[0], IERC20.abi);
+
+    // calledOnContractWith hack for tokenIn.transferFrom
+    await otherToken.mock.transferFrom.revertsWithReason("calledOnContract: otherToken.transferFrom, []");
+    await expectRevert(aaveYnftVault.createYNFT(otherToken.address, MIN_AMOUNT, MIN_AMOUNT, DEADLINE), "calledOnContract: otherToken.transferFrom, []");
+  });
+
+  it('should approve underlyingToken when calling createYNFT for token other than underlyingToken', async () => {
+    const MIN_AMOUNT = 101;
+    const DEADLINE = 101;
+    const signers = await ethers.getSigners();
+    await init_createYNFT_mocks(underlyingToken);
+    const otherToken = await await deployMockContract(signers[0], IERC20.abi);
+    await otherToken.mock.transferFrom.returns(true);
+    await otherToken.mock.approve.returns(true);
+    await uniswapRouter.mock.swapExactTokensForTokens.returns([MIN_AMOUNT, MIN_AMOUNT]);
+
+    // calledOnContractWith hack for underlyingToken.revertsWithReason
+    await underlyingToken.mock.approve.revertsWithReason("calledOnContract: underlyingToken, []");
+    await expectRevert(aaveYnftVault.createYNFT(otherToken.address, MIN_AMOUNT, MIN_AMOUNT, DEADLINE), "calledOnContract: underlyingToken, []");
+  });
+
+  it('should deposit underlyingToken in pool when calling createYNFT for token other than underlyingToken', async () => {
+    const MIN_AMOUNT = 101;
+    const DEADLINE = 101;
+    const signers = await ethers.getSigners();
+    await init_createYNFT_mocks(underlyingToken);
+    const otherToken = await await deployMockContract(signers[0], IERC20.abi);
+    await otherToken.mock.transferFrom.returns(true);
+    await otherToken.mock.approve.returns(true);
+    await uniswapRouter.mock.swapExactTokensForTokens.returns([MIN_AMOUNT, MIN_AMOUNT]);
+
+    // calledOnContractWith hack for pool.deposit
+    await pool.mock.deposit.revertsWithReason("calledOnContract: pool.deposit, []")
+    await expectRevert(aaveYnftVault.createYNFT(otherToken.address, MIN_AMOUNT, MIN_AMOUNT, DEADLINE), "calledOnContract: pool.deposit, []");
+  });
+
+  it('should approve input token for dex router when calling createYNFT for token other than underlyingToken', async () => {
+    const MIN_AMOUNT = 101;
+    const DEADLINE = 101;
+    const signers = await ethers.getSigners();
+    await init_createYNFT_mocks(underlyingToken);
+    const otherToken = await await deployMockContract(signers[0], IERC20.abi);
+    await otherToken.mock.transferFrom.returns(true);
+    // await otherToken.mock.approve.returns(true);
+
+    // calledOnContractWith hack for _tokenIn.approve
+    await otherToken.mock.approve.revertsWithReason("calledOnContract: otherToken.approve, []")
+    await expectRevert(aaveYnftVault.createYNFT(otherToken.address, MIN_AMOUNT, MIN_AMOUNT, DEADLINE), "calledOnContract: otherToken.approve, []");
+  });
+
+  it('should call swapExactTokensForTokens from router when calling createYNFT for token other than underlyingToken', async () => {
+    const MIN_AMOUNT = 101;
+    const DEADLINE = 101;
+    const signers = await ethers.getSigners();
+    await init_createYNFT_mocks(underlyingToken);
+    const otherToken = await await deployMockContract(signers[0], IERC20.abi);
+    await otherToken.mock.transferFrom.returns(true);
+    await otherToken.mock.approve.returns(true);
+
+    // calledOnContractWith hack for dexRouter.swapExactTokensForTokens
+    await uniswapRouter.mock.swapExactTokensForTokens.revertsWithReason("calledOnContract: exRouter.swapExactTokensForTokens, []")
+    await expectRevert(aaveYnftVault.createYNFT(otherToken.address, MIN_AMOUNT, MIN_AMOUNT, DEADLINE), "calledOnContract: exRouter.swapExactTokensForTokens, []");
+  });
 
 
 });
