@@ -2,8 +2,8 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import { Contract } from "ethers";
-import { deployContract, waitForReceipt } from "../utils/deployment";
-import {AaveYNFTVault, ERC20} from "../typechain";
+import { deployContract} from "../utils/deployment";
+import {AaveYNFTVault} from "../typechain";
 import IUniswapV2Router02 from "../artifacts/contracts/interfaces/uniswapv2/IUniswapV2Router02.sol/IUniswapV2Router02.json";
 import IAToken from "../artifacts/contracts/interfaces/aave/IAToken.sol/IAToken.json";
 import IAaveIncentivesController from "../artifacts/contracts/interfaces/aave/IAaveIncentivesController.sol/IAaveIncentivesController.json";
@@ -283,7 +283,7 @@ describe("AaveYNFTVault", () => {
     await uniswapRouter.mock.swapExactETHForTokens.returns([MIN_AMOUNT, MIN_AMOUNT]);
     await init_createYNFT_mocks(underlyingToken);
 
-    expect(await signers[0].getBalance()).to.equal("9999773818168226942414");
+    expect(await signers[0].getBalance()).to.equal("9999775812623702506290");
   });
 
   it('should call swapExactETHForTokens from router when calling createYNFTForEther', async () => {
