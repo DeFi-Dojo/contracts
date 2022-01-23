@@ -226,4 +226,30 @@ describe("AaveYNFTVault", () => {
         expect(pool.deposit).to.have.been.called;
     });
 
+    it('should withdraw from pool on withdrawToEther', async () => {
+        const MIN_AMOUNT = 101;
+        const DEADLINE = 101;
+        await init_createYNFT_mocks(underlyingToken);
+
+        await aaveYnftVault.createYNFT(underlyingToken.address, MIN_AMOUNT, MIN_AMOUNT, DEADLINE);
+
+        await uniswapRouter.swapExactTokensForETH.returns([MIN_AMOUNT, MIN_AMOUNT]);
+
+        await aaveYnftVault.withdrawToEther(0, MIN_AMOUNT, DEADLINE);
+
+        expect(underlyingToken.approve).to.have.been.called;
+        expect(uniswapRouter.swapExactTokensForETH).to.have.been.called;
+        expect(pool.withdraw).to.have.been.called;
+    });
+
+    it('should withdraw from pool on withdrawToUnderlyingTokens', async () => {
+        const MIN_AMOUNT = 101;
+        const DEADLINE = 101;
+        await init_createYNFT_mocks(underlyingToken);
+
+        await aaveYnftVault.createYNFT(underlyingToken.address, MIN_AMOUNT, MIN_AMOUNT, DEADLINE);
+
+        await aaveYnftVault.withdrawToUnderlyingTokens(0);
+        expect(pool.withdraw).to.have.been.called;
+    });
 });
