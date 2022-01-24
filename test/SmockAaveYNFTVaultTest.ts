@@ -16,6 +16,7 @@ import { expectRevert } from "@openzeppelin/test-helpers";
 import {smock} from "@defi-wonderland/smock";
 import {FakeContract} from "@defi-wonderland/smock/dist/src/types";
 import {deployMockContract} from "@ethereum-waffle/mock-contract";
+import {SignerWithAddress} from "@nomiclabs/hardhat-ethers/dist/src/signers";
 
 chai.use(smock.matchers)
 
@@ -27,12 +28,14 @@ describe("AaveYNFTVault", () => {
     let rewardToken: FakeContract;
     let underlyingToken: FakeContract;
     let pool: FakeContract;
+    let signers: SignerWithAddress[];
+
+    const ATOKEN_BALANCE = 12000;
 
     beforeEach(async () => {
         uniswapRouter = await smock.fake(IUniswapV2Router02.abi);
         aToken =  await smock.fake(IAToken.abi);
         aaveIncentivesController =  await smock.fake(IAaveIncentivesController.abi);
-
 
         rewardToken = await smock.fake(IERC20.abi);
         underlyingToken = await smock.fake(IERC20.abi);
@@ -42,8 +45,7 @@ describe("AaveYNFTVault", () => {
         aToken.UNDERLYING_ASSET_ADDRESS.returns(underlyingToken.address);
         aToken.POOL.returns(pool.address);
 
-        const signers = await ethers.getSigners();
-
+        signers = await ethers.getSigners();
 
         aaveYnftVault = await deployContract<AaveYNFTVault>(
             "AaveYNFTVault",
@@ -59,13 +61,11 @@ describe("AaveYNFTVault", () => {
     });
 
     it('should revert setBeneficiary if no DEFAULT_ADMIN_ROLE rights', async () => {
-        const signers = await ethers.getSigners();
         await expectRevert(aaveYnftVault.connect(signers[1]).setBeneficiary(signers[2].address),
             "AccessControl: account ", signers[1].address, " is missing role 0x0000000000000000000000000000000000000000000000000000000000000000'");
     });
 
     it('should change beneficiary by setBeneficiary when role set', async () => {
-        const signers = await ethers.getSigners();
         await aaveYnftVault.grantRole("0x0000000000000000000000000000000000000000000000000000000000000000", signers[1].address)
         await aaveYnftVault.connect(signers[1]).setBeneficiary(signers[2].address);
         expect(await aaveYnftVault.beneficiary()).to.equal(signers[2].address);
@@ -74,14 +74,12 @@ describe("AaveYNFTVault", () => {
 
     it('should revert setFee if no DEFAULT_ADMIN_ROLE rights', async () => {
         const FEE = 12;
-        const signers = await ethers.getSigners();
         await expectRevert(aaveYnftVault.connect(signers[1]).setFee(FEE),
             "AccessControl: account ", signers[1].address, " is missing role 0x0000000000000000000000000000000000000000000000000000000000000000'");
     });
 
     it('should set proper fee by setFee when role set', async () => {
         const FEE = 12;
-        const signers = await ethers.getSigners();
         await aaveYnftVault.grantRole("0x0000000000000000000000000000000000000000000000000000000000000000", signers[1].address)
         await aaveYnftVault.connect(signers[1]).setFee(FEE);
         expect(await aaveYnftVault.feePerMile()).to.equal(FEE);
@@ -95,7 +93,6 @@ describe("AaveYNFTVault", () => {
     it('should revert claimRewards if caller has no HARVESTER_ROLE', async () => {
         const MIN_AMOUNT = 101;
         const DEADLINE = 101;
-        const signers = await ethers.getSigners();
         await expectRevert(aaveYnftVault.claimRewards(MIN_AMOUNT, DEADLINE),
             "AccessControl: account ", signers[0].address, " is missing role ", ethers.utils.keccak256(ethers.utils.toUtf8Bytes("HARVESTER_ROLE")));
     });
@@ -104,7 +101,6 @@ describe("AaveYNFTVault", () => {
         const MIN_AMOUNT = 101;
         const DEADLINE = 101;
         const AMOUNT_TO_CLAIM = 1500;
-        const signers = await ethers.getSigners();
         await aaveYnftVault.grantRole(ethers.utils.keccak256(ethers.utils.toUtf8Bytes("HARVESTER_ROLE")), signers[0].address);
         aaveIncentivesController.getRewardsBalance.whenCalledWith([aToken.address], aaveYnftVault.address).returns(AMOUNT_TO_CLAIM);
         aaveIncentivesController.claimRewards.whenCalledWith([aToken.address], AMOUNT_TO_CLAIM, aaveYnftVault.address).returns(AMOUNT_TO_CLAIM);
@@ -119,7 +115,6 @@ describe("AaveYNFTVault", () => {
         const MIN_AMOUNT = 101;
         const DEADLINE = 101;
         const AMOUNT_TO_CLAIM = 1500;
-        const signers = await ethers.getSigners();
         await aaveYnftVault.grantRole(ethers.utils.keccak256(ethers.utils.toUtf8Bytes("HARVESTER_ROLE")), signers[0].address);
         aaveIncentivesController.getRewardsBalance.whenCalledWith([aToken.address], aaveYnftVault.address).returns(AMOUNT_TO_CLAIM);
         aaveIncentivesController.claimRewards.whenCalledWith([aToken.address], AMOUNT_TO_CLAIM, aaveYnftVault.address).returns(AMOUNT_TO_CLAIM);
@@ -132,7 +127,6 @@ describe("AaveYNFTVault", () => {
         const MIN_AMOUNT = 101;
         const DEADLINE = 101;
         const AMOUNT_TO_CLAIM = 1500;
-        const signers = await ethers.getSigners();
         await aaveYnftVault.grantRole(ethers.utils.keccak256(ethers.utils.toUtf8Bytes("HARVESTER_ROLE")), signers[0].address);
         aaveIncentivesController.getRewardsBalance.whenCalledWith([aToken.address], aaveYnftVault.address).returns(AMOUNT_TO_CLAIM);
         aaveIncentivesController.claimRewards.whenCalledWith([aToken.address], AMOUNT_TO_CLAIM, aaveYnftVault.address).returns(AMOUNT_TO_CLAIM);
@@ -166,7 +160,6 @@ describe("AaveYNFTVault", () => {
     });
 
     async function init_createYNFT_mocks(token: FakeContract) {
-        const ATOKEN_BALANCE = 12000;
         await token.transferFrom.returns(true);
         await token.approve.returns(true);
         await aToken.balanceOf.returns(ATOKEN_BALANCE);
@@ -174,72 +167,76 @@ describe("AaveYNFTVault", () => {
     }
 
     it('should call transferFrom on underlyingToken when calling createYNFT for underlyingToken', async () => {
-        const MIN_AMOUNT = 101;
+        const MIN_AMOUNT = 123000;
         const DEADLINE = 101;
         await init_createYNFT_mocks(underlyingToken);
 
-        await aaveYnftVault.createYNFT(underlyingToken.address, MIN_AMOUNT, MIN_AMOUNT, DEADLINE);
+        await aaveYnftVault.connect(signers[1]).createYNFT(underlyingToken.address, MIN_AMOUNT, MIN_AMOUNT, DEADLINE);
 
-        expect(underlyingToken.transferFrom).to.have.been.called;
-        expect(underlyingToken.approve).to.have.been.called;
-        expect(pool.deposit).to.have.been.called;
+        const EXPECTED_FEE = MIN_AMOUNT * 5 / 1000;
+        expect(underlyingToken.transferFrom).to.have.been.calledWith(signers[1].address, signers[0].address, EXPECTED_FEE);
+        expect(underlyingToken.approve).to.have.been.calledWith(pool.address, MIN_AMOUNT - EXPECTED_FEE);
+        expect(pool.deposit).to.have.been.calledWith(underlyingToken.address, MIN_AMOUNT - EXPECTED_FEE, aaveYnftVault.address, 0);
    });
 
     it('should call transferFrom on input token when calling createYNFT for token other than underlyingToken', async () => {
-        const MIN_AMOUNT = 101;
+        const MIN_AMOUNT = 123000;
+        const SWAPPED_AMOUNT = 246000;
         const DEADLINE = 101;
-        const signers = await ethers.getSigners();
         await init_createYNFT_mocks(underlyingToken);
-        // const otherToken = await deployMockContract(signers[0], IERC20.abi);
         const otherToken = await smock.fake(IERC20.abi);
         otherToken.transferFrom.returns(true);
         otherToken.approve.returns(true);
-        uniswapRouter.swapExactTokensForTokens.returns([MIN_AMOUNT, MIN_AMOUNT]);
+        uniswapRouter.swapExactTokensForTokens.returns([MIN_AMOUNT, SWAPPED_AMOUNT]);
 
-        await aaveYnftVault.createYNFT(otherToken.address, MIN_AMOUNT, MIN_AMOUNT, DEADLINE);
+        await aaveYnftVault.connect(signers[1]).createYNFT(otherToken.address, MIN_AMOUNT, MIN_AMOUNT, DEADLINE);
 
-        expect(otherToken.transferFrom).to.have.been.called;
-        expect(underlyingToken.approve).to.have.been.called;
-        expect(pool.deposit).to.have.been.called;
-        expect(otherToken.approve).to.have.been.called;
-        expect(uniswapRouter.swapExactTokensForTokens).to.have.been.called;
+        const EXPECTED_FEE = MIN_AMOUNT * 5 / 1000;
+        expect(otherToken.transferFrom).to.have.been.calledWith(signers[1].address, signers[0].address, EXPECTED_FEE);
+        expect(underlyingToken.approve).to.have.been.calledWith(pool.address, SWAPPED_AMOUNT);
+        expect(pool.deposit).to.have.been.calledWith(underlyingToken.address, SWAPPED_AMOUNT, aaveYnftVault.address, 0);
+        expect(otherToken.approve).to.have.been.calledWith(uniswapRouter.address, MIN_AMOUNT - EXPECTED_FEE);
+        expect(uniswapRouter.swapExactTokensForTokens).to.have.been.calledWith(
+                MIN_AMOUNT - EXPECTED_FEE,
+                MIN_AMOUNT,
+                [otherToken.address, underlyingToken.address],
+                aaveYnftVault.address,
+                DEADLINE);
     });
 
     it('should collect proper fee when calling createYNFTForEther', async () => {
         const MIN_AMOUNT = 101;
+        const SWAPPED_AMOUNT = 246000;
         const DEADLINE = 101;
-        const signers = await ethers.getSigners();
 
         const WethMock = await await deployMockContract(signers[0], IERC20.abi);
         await uniswapRouter.WETH.returns(WethMock.address);
-        await uniswapRouter.swapExactETHForTokens.returns([MIN_AMOUNT, MIN_AMOUNT]);
+        await uniswapRouter.swapExactETHForTokens.returns([MIN_AMOUNT, SWAPPED_AMOUNT]);
         await init_createYNFT_mocks(underlyingToken);
 
-        const balance_before = await signers[0].getBalance();
         await aaveYnftVault.createYNFTForEther(MIN_AMOUNT, DEADLINE);
-        const balance_after = await signers[0].getBalance();
 
-        // expect(balance_before.sub(balance_after)).to.equal("169503229193092");
-
-        expect(uniswapRouter.swapExactETHForTokens).to.have.been.called;
-        expect(underlyingToken.approve).to.have.been.called;
-        expect(pool.deposit).to.have.been.called;
+        expect(uniswapRouter.swapExactETHForTokens).to.have.been.calledWith(MIN_AMOUNT, [await uniswapRouter.WETH(), underlyingToken.address], aaveYnftVault.address, DEADLINE);
+        expect(underlyingToken.approve).to.have.been.calledWith(pool.address, SWAPPED_AMOUNT);
+        expect(pool.deposit).to.have.been.calledWith(underlyingToken.address, SWAPPED_AMOUNT, aaveYnftVault.address, 0);
     });
 
     it('should withdraw from pool on withdrawToEther', async () => {
-        const MIN_AMOUNT = 101;
+        const MIN_AMOUNT = 123000;
         const DEADLINE = 101;
+        const POOL_WITHDRAW_VALUE = 100000;
         await init_createYNFT_mocks(underlyingToken);
 
         await aaveYnftVault.createYNFT(underlyingToken.address, MIN_AMOUNT, MIN_AMOUNT, DEADLINE);
 
         await uniswapRouter.swapExactTokensForETH.returns([MIN_AMOUNT, MIN_AMOUNT]);
+        pool.withdraw.returns(POOL_WITHDRAW_VALUE);
 
         await aaveYnftVault.withdrawToEther(0, MIN_AMOUNT, DEADLINE);
 
-        expect(underlyingToken.approve).to.have.been.called;
-        expect(uniswapRouter.swapExactTokensForETH).to.have.been.called;
-        expect(pool.withdraw).to.have.been.called;
+        expect(underlyingToken.approve).to.have.been.calledWith(uniswapRouter.address, POOL_WITHDRAW_VALUE);
+        expect(uniswapRouter.swapExactTokensForETH).to.have.been.calledWith(POOL_WITHDRAW_VALUE, MIN_AMOUNT, [underlyingToken.address, await uniswapRouter.WETH()], signers[0].address, DEADLINE);
+        expect(pool.withdraw).to.have.been.calledWith(underlyingToken.address, ATOKEN_BALANCE, aaveYnftVault.address);
     });
 
     it('should withdraw from pool on withdrawToUnderlyingTokens', async () => {
@@ -247,9 +244,9 @@ describe("AaveYNFTVault", () => {
         const DEADLINE = 101;
         await init_createYNFT_mocks(underlyingToken);
 
-        await aaveYnftVault.createYNFT(underlyingToken.address, MIN_AMOUNT, MIN_AMOUNT, DEADLINE);
+        await aaveYnftVault.connect(signers[1]).createYNFT(underlyingToken.address, MIN_AMOUNT, MIN_AMOUNT, DEADLINE);
 
-        await aaveYnftVault.withdrawToUnderlyingTokens(0);
-        expect(pool.withdraw).to.have.been.called;
+        await aaveYnftVault.connect(signers[1]).withdrawToUnderlyingTokens(0);
+        expect(pool.withdraw).to.have.been.calledWith(underlyingToken.address, ATOKEN_BALANCE, signers[1].address);
     });
 });
