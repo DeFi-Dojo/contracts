@@ -22,7 +22,7 @@ contract DojoNFT is ContextMixin, ERC721Enumerable, NativeMetaTransaction, Ownab
     using SafeMath for uint256;
 
     address private proxyRegistryAddress;
-    uint256 private _nextTokenId = 0;
+    uint256 private _nextTokenId = 1;
     string private baseURI;
 
     struct Characteristics {

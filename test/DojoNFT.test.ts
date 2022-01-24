@@ -40,13 +40,13 @@ describe("DojoNFT", () => {
   it("_getNextTokenId & _incrementTokenId", async () => {
     const tokenId = await dojoNFT.public_getNextTokenId();
 
-    expect(tokenId).to.equal(0);
+    expect(tokenId).to.equal(1);
 
     await dojoNFT.public_incrementTokenId();
 
     const newTokenId = await dojoNFT.public_getNextTokenId();
 
-    expect(newTokenId).to.equal(1);
+    expect(newTokenId).to.equal(2);
   });
 
   it("tokenURI", async () => {
@@ -57,7 +57,7 @@ describe("DojoNFT", () => {
   });
 
   it("exist", async () => {
-    const TOKEN_ID = 0;
+    const TOKEN_ID = 1;
     const [owner] = await ethers.getSigners();
 
     expect(await dojoNFT.exist(TOKEN_ID)).to.equal(false);
@@ -93,17 +93,17 @@ describe("DojoNFT", () => {
       bust,
     }).to.deep.equal({
       eyes: 0,
-      faceMask: 3,
+      faceMask: 0,
       helmet: 0,
       horn: 0,
-      bust: 2,
-      symbol: 2,
-      weapon: 1,
+      bust: 0,
+      symbol: 0,
+      weapon: 0,
     });
 
-    const rarityIndex = await dojoNFT.rarityIndex(0);
+    const rarityIndex = await dojoNFT.rarityIndex(1);
 
-    expect(rarityIndex).to.equal(170);
+    expect(rarityIndex).to.equal(265);
   });
 
   it("_randPercentage", async () => {
