@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import { expect } from "chai";
 import chai from "chai";
 import { ethers } from "hardhat";
@@ -15,7 +14,6 @@ import ILendingPool from "../artifacts/contracts/interfaces/aave/ILendingPool.so
 import { expectRevert } from "@openzeppelin/test-helpers";
 import {smock} from "@defi-wonderland/smock";
 import {FakeContract} from "@defi-wonderland/smock/dist/src/types";
-import {deployMockContract} from "@ethereum-waffle/mock-contract";
 import {SignerWithAddress} from "@nomiclabs/hardhat-ethers/dist/src/signers";
 
 chai.use(smock.matchers)
@@ -209,7 +207,7 @@ describe("AaveYNFTVault", () => {
         const SWAPPED_AMOUNT = 246000;
         const DEADLINE = 101;
 
-        const WethMock = await await deployMockContract(signers[0], IERC20.abi);
+        const WethMock = await smock.fake(IERC20.abi);
         await uniswapRouter.WETH.returns(WethMock.address);
         await uniswapRouter.swapExactETHForTokens.returns([MIN_AMOUNT, SWAPPED_AMOUNT]);
         await init_createYNFT_mocks(underlyingToken);

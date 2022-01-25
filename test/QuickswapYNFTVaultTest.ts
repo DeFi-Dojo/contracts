@@ -36,11 +36,7 @@ describe("QuickswapYNFTVault", () => {
       undefined
     );
   });
-
-  it('empty testcase', async () => {
-
-  });
-
+  
   it('should revert setBeneficiary if no DEFAULT_ADMIN_ROLE rights', async () => {
     const signers = await ethers.getSigners();
     await expectRevert(quickswapYnftVault.connect(signers[1]).setBeneficiary(signers[2].address),
