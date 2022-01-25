@@ -1,0 +1,76 @@
+@startuml
+title Defi Dojo yNFT AaveVault use cases [v. 25.01.22]
+participant "Frontend"
+participant "Aave yNFT Vault" as AaveVault
+participant yNFT
+participant "Underlying token\nERC20" as UnderlyingToken
+participant "Other token\nERC20" as OtherToken
+participant aToken
+participant Pool
+participant UniswapRouter
+participant Beneficiary
+participant AaveIncentivesController
+participant RewardToken
+
+== UC 1A: User creates yNFT and pays with underlying token ==
+Frontend -> AaveVault: createYNFT(UnderlyingToken.address, AMOUNT_IN, AMOUNT_OUT_MIN, DEADLINE)
+AaveVault -> UnderlyingToken: safeTransferFrom(msg.sender, beneficiary, fee)
+AaveVault -> yNFT: mint(msg.sender)
+AaveVault -> UnderlyingToken: approve(Pool.address, AMOUNT_IN - fee)
+AaveVault -> Pool: deposit(UnderlyingToken.address, AMOUNT_IN - fee, AaveVault.address, 0)
+
+== UC 1B: User creates yNFT and pays with token other than underlying ==
+Frontend -> AaveVault: createYNFT(OtherToken.address, AMOUNT_IN, AMOUNT_OUT_MIN, DEADLINE)
+AaveVault -> OtherToken: safeTransferFrom(msg.sender, beneficiary, fee)
+AaveVault -> OtherToken: safeTransferFrom(msg.sender, AaveVault.address, AMOUNT_IN - fee)
+AaveVault -> OtherToken: approve(UniswapRouter.address, AMOUNT_IN - fee)
+AaveVault -> UniswapRouter: swapExactTokensForTokens(AMOUNT_IN - fee, AMOUNT_OUT_MIN, path, AaveVault.address, DEADLINE)
+AaveVault -> yNFT: mint(msg.sender)
+AaveVault -> UnderlyingToken: approve(Pool.address, AMOUNT_IN - fee)
+AaveVault -> Pool: deposit(UnderlyingToken.address, AMOUNT_IN - fee, AaveVault.address, 0)
+
+== UC 1C: User creates yNFT and pays with native currency (ether, matic etc.) ==
+Frontend -> AaveVault: createYNFTForEther(AMOUNT_OUT_MIN, DEADLINE)
+AaveVault -> Beneficiary: call{value: fee}
+AaveVault -> UniswapRouter: swapExactETHForTokens(msg.value - fee, path, UnderlyingToken.address, DEADLINE)
+
+== UC 2A: User extracts yNFT to underlying token ==
+Frontend -> AaveVault: withdrawToUnderlyingTokens(nftTokenId)
+AaveVault -> yNFT: burn(nftTokenId)
+AaveVault -> aToken: balanceOf(AaveVault.address)
+aToken -> AaveVault: ATOKEN_BALANCE
+note over AaveVault
+amountToWithdraw = balanceOf[_nftTokenId] * ATOKEN_BALANCE / totalSupply
+end note
+AaveVault -> Pool: withdraw(UnderlyingToken.address, amountToWithdraw, msg.sender)
+
+== UC 2B:  User extracts yNFT to native currency (ether, matic etc.) ==
+Frontend -> AaveVault: withdrawToEther(nftTokenId, AMOUNT_OUT_MIN, DEADLINE)
+AaveVault -> yNFT: burn(nftTokenId)
+AaveVault -> aToken: balanceOf(AaveVault.address)
+aToken --> AaveVault: ATOKEN_BALANCE
+note over AaveVault
+amountToWithdraw = balanceOf[nftTokenId] * ATOKEN_BALANCE / totalSupply
+end note
+AaveVault -> Pool: withdraw(UnderlyingToken.address, amountToWithdraw, AaveVault.address)
+Pool --> AaveVault: WITHDRAWN_VALUE
+AaveVault -> UnderlyingToken: approve(UniswapRouter.address, WITHDRAWN_VALUE)
+AaveVault -> UniswapRouter: swapExactTokensForETH(WITHDRAWN_VALUE, AMOUNT_OUT_MIN, path, msg.sender, DEADLINE)
+
+== UC 3:  Harvester claims rewards from underlying protocol ==
+Frontend -> AaveVault: claimRewards(AMOUNT_OUT_MIN, DEADLINE)
+note over AaveVault: onlyRole(HARVESTER_ROLE)
+AaveVault -> AaveIncentivesController: getRewardsBalance(aToken.address, AaveVault.address)
+AaveIncentivesController --> AaveVault: CLAIMABLE_AMOUNT
+AaveVault -> AaveIncentivesController: claimRewards(aToken.address, CLAIMABLE_AMOUNT, AaveVault.address)
+AaveIncentivesController --> AaveVault: CLAIMED_AMOUNT
+AaveVault -> RewardToken: approve(UniswapRouter.address, CLAIMED_AMOUNT)
+AaveVault -> UniswapRouter: swapExactTokensForTokens(CLAIMED_AMOUNT, AMOUNT_OUT_MIN, [RewardToken.address, UnderlyingToken.address], AaveVault.address, DEADLINE)
+UniswapRouter --> AaveVault: SWAPPED_AMOUNT
+AaveVault -> UnderlyingToken: approve(Pool.address, SWAPPED_AMOUNT)
+AaveVault -> Pool: deposit(UnderlyingToken.address, SWAPPED_AMOUNT, AaveVault.address, 0);
+
+
+
+footer Maciej Grychowski | Pragmatic Coders
+@enduml
