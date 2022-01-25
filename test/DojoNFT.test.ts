@@ -41,8 +41,8 @@ describe("DojoNFT", () => {
     const tokenId = await dojoNFT.public_getNextTokenId();
 
     expect(tokenId).to.equal(1);
-
-    await dojoNFT.public_incrementTokenId();
+    const signers = await ethers.getSigners();
+    await  dojoNFT.mintTo(signers[0].address);
 
     const newTokenId = await dojoNFT.public_getNextTokenId();
 
