@@ -32,11 +32,11 @@ describe("QuickswapYNFTVault", () => {
 
     quickswapYnftVault = await deployContract<QuickswapYNFTVault>(
       "QuickswapYNFTVault",
-      [uniswapRouterMock.address, uniswapPairMock.address, stakingDualRewardsMock.address, stakingRewardsMock.address, dQuickMock.address, signers[1].address],
+      [uniswapRouterMock.address, uniswapPairMock.address, stakingDualRewardsMock.address, stakingRewardsMock.address, dQuickMock.address, signers[1].address, signers[0].address],
       undefined
     );
   });
-  
+
   it('should revert setBeneficiary if no DEFAULT_ADMIN_ROLE rights', async () => {
     const signers = await ethers.getSigners();
     await expectRevert(quickswapYnftVault.connect(signers[1]).setBeneficiary(signers[2].address),

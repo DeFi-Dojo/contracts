@@ -25,8 +25,9 @@ contract AaveYNFTVault is YNFTVault {
         IUniswapV2Router02 _dexRouter,
         IAToken _aToken,
         IAaveIncentivesController _incentivesController,
-        address _harvester
-    ) YNFTVault(_dexRouter, _harvester) {
+        address _harvester,
+        address _beneficiary
+    ) YNFTVault(_dexRouter, _harvester, _beneficiary) {
         incentivesController = _incentivesController;
         rewardToken = IERC20(incentivesController.REWARD_TOKEN());
         aToken = _aToken;
