@@ -51,8 +51,7 @@ contract AaveYNFTVault is YNFTVault {
         uint256 amountToClaim = incentivesController.getRewardsBalance(claimAssets, address(this));
         uint256 amountClaimed = incentivesController.claimRewards(claimAssets, amountToClaim, address(this));
 
-        require(rewardToken.approve(address(dexRouter), amountClaimed), "approve failed.");
-
+        require(rewardToken.approve(address(dexRouter), amountClaimed), "approve failed."); // TODO: check for duplication
         uint amount = _swapTokenToToken(
                 address(this),
                 amountClaimed,
@@ -65,7 +64,6 @@ contract AaveYNFTVault is YNFTVault {
         require(underlyingToken.approve(address(pool), amount), "approve failed.");
 
         pool.deposit(address(underlyingToken), amount, address(this), 0);
-
     }
 
     function _withdraw(uint256 _nftTokenId, address _receiver) private returns (uint) {

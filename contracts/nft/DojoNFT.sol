@@ -22,7 +22,7 @@ contract DojoNFT is ContextMixin, ERC721Enumerable, NativeMetaTransaction, Ownab
     using SafeMath for uint256;
 
     address private proxyRegistryAddress;
-    uint256 private _currentTokenId = 1;
+    uint256 public currentTokenId = 1;
     string private baseURI;
 
     struct Characteristics {
@@ -85,7 +85,7 @@ contract DojoNFT is ContextMixin, ERC721Enumerable, NativeMetaTransaction, Ownab
     }
 
      function exist(uint256 tokenId) public view returns (bool) {
-        return tokenId < _currentTokenId;
+        return tokenId < currentTokenId;
     }
 
     function _randPercentage(uint256 _tokenId, string memory _prefix, uint256 _blockTimestamp, uint256 _blockDifficulty) internal view returns (uint) {
@@ -113,7 +113,7 @@ contract DojoNFT is ContextMixin, ERC721Enumerable, NativeMetaTransaction, Ownab
      * @param _to address of the future owner of the token
      */
     function _mintTo(address _to, uint256 _blockTimestamp, uint256 _blockDifficulty) internal returns (uint256)  {
-        uint256 newTokenId = _getNextTokenId();
+        uint256 newTokenId = currentTokenId;
 
         RarityInfo memory rarityInfo = RarityInfo({
             faceMask: _getOption(_randPercentage(newTokenId, "faceMask", _blockTimestamp, _blockDifficulty), equipmentDistributionMatrix[0]),
@@ -138,24 +138,9 @@ contract DojoNFT is ContextMixin, ERC721Enumerable, NativeMetaTransaction, Ownab
         rarityIndex[newTokenId] = rarityInfo.faceMask.rarity + rarityInfo.eyes.rarity + rarityInfo.symbol.rarity + rarityInfo.horn.rarity + rarityInfo.weapon.rarity + rarityInfo.helmet.rarity + rarityInfo.bust.rarity;
 
         _safeMint(_to, newTokenId);
-        _incrementTokenId();
+        currentTokenId += 1;
 
         return newTokenId;
-    }
-
-    /**
-     * @dev calculates the next token ID based on value of _currentTokenId
-     * @return uint256 for the next token ID
-     */
-    function _getNextTokenId() internal view returns (uint256) {
-        return _currentTokenId;
-    }
-
-    /**
-     * @dev increments the value of _currentTokenId
-     */
-    function _incrementTokenId() internal {
-        _currentTokenId++;
     }
 
     function tokenURI(uint256 _tokenId) override public view returns (string memory) {

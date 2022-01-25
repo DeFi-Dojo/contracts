@@ -15,11 +15,11 @@ contract ExposedDojoNFT is DojoNFT {
     /* solhint-enable no-empty-blocks */
 
     function public_getNextTokenId() public view returns (uint) {
-        return _getNextTokenId();
+        return currentTokenId;
     }
 
     function public_incrementTokenId() public {
-        _incrementTokenId();
+
     }
 
     function public_randPercentage(uint256 tokenId, string memory prefix, uint256 _blockTimestamp, uint256 _blockDifficulty) public view returns (uint) {

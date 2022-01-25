@@ -3,20 +3,26 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import { Contract } from "ethers";
 import { deployContract, waitForReceipt } from "../utils/deployment";
-import { ExposedDojoNFT } from "../typechain";
-import { PROXY_REGISTRY_ADDRESS_RINKEBY } from "../consts";
+import { ExposedDojoNFT, ProxyRegistry } from "../typechain";
 
 describe("DojoNFT", () => {
   let dojoNFT: Contract;
+  let proxyRegistry: Contract;
 
   const NFT_BASE_URI = "https://creatures-api.opensea.io/api/creature/";
   const BLOCK_TIMESTAMP = 1634550719723;
   const BLOCK_DIFFUCLTY = 100000000;
 
   beforeEach(async () => {
+    proxyRegistry = await deployContract<ProxyRegistry>(
+        "ProxyRegistry",
+        [],
+        undefined
+    );
+
     dojoNFT = await deployContract<ExposedDojoNFT>(
       "ExposedDojoNFT",
-      [NFT_BASE_URI, PROXY_REGISTRY_ADDRESS_RINKEBY],
+      [NFT_BASE_URI, proxyRegistry.address],
       undefined
     );
   });
@@ -34,13 +40,13 @@ describe("DojoNFT", () => {
   it("_getNextTokenId & _incrementTokenId", async () => {
     const tokenId = await dojoNFT.public_getNextTokenId();
 
-    expect(tokenId).to.equal(0);
-
-    await dojoNFT.public_incrementTokenId();
+    expect(tokenId).to.equal(1);
+    const signers = await ethers.getSigners();
+    await  dojoNFT.mintTo(signers[0].address);
 
     const newTokenId = await dojoNFT.public_getNextTokenId();
 
-    expect(newTokenId).to.equal(1);
+    expect(newTokenId).to.equal(2);
   });
 
   it("tokenURI", async () => {
@@ -51,7 +57,7 @@ describe("DojoNFT", () => {
   });
 
   it("exist", async () => {
-    const TOKEN_ID = 0;
+    const TOKEN_ID = 1;
     const [owner] = await ethers.getSigners();
 
     expect(await dojoNFT.exist(TOKEN_ID)).to.equal(false);
@@ -87,17 +93,17 @@ describe("DojoNFT", () => {
       bust,
     }).to.deep.equal({
       eyes: 0,
-      faceMask: 3,
+      faceMask: 0,
       helmet: 0,
       horn: 0,
-      bust: 2,
-      symbol: 2,
-      weapon: 1,
+      bust: 0,
+      symbol: 0,
+      weapon: 0,
     });
 
-    const rarityIndex = await dojoNFT.rarityIndex(0);
+    const rarityIndex = await dojoNFT.rarityIndex(1);
 
-    expect(rarityIndex).to.equal(170);
+    expect(rarityIndex).to.equal(265);
   });
 
   it("_randPercentage", async () => {
