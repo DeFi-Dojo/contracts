@@ -10,7 +10,7 @@ async function main() {
   const [owner] = await ethers.getSigners();
   console.log(`Deploying contracts using address: ${owner.address}`);
 
-  const yNFTVault = await ethers.getContractAt<AaveYNFTVault>(
+  const yNFTVault = await ethers.getContractAt(
     "AaveYNFTVault",
     VAULT_ADDRESS
   );
