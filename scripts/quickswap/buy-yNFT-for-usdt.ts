@@ -10,14 +10,14 @@ async function main() {
   const [owner] = await ethers.getSigners();
   console.log(`Deploying contracts using address: ${owner.address}`);
 
-  const yNFTVault = await ethers.getContractAt(
+  const yNFTVault = await ethers.getContractAt<QuickswapYNFTVault>(
     "QuickswapYNFTVault",
     VAULT_ADDRESS
   );
 
   const tokenAmountIn = BigInt(0.01 * 10 ** consts.DECIMALS.USDT);
 
-  const matic = await ethers.getContractAt("IERC20", ADDRESSES.USDT);
+  const matic = await ethers.getContractAt<IERC20>("IERC20", ADDRESSES.USDT);
 
   await matic.approve(yNFTVault.address, tokenAmountIn).then(waitForReceipt);
 

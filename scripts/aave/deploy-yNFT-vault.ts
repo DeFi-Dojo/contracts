@@ -11,7 +11,7 @@ async function main() {
   const contractName = "AaveYNFTVault";
 
   const contractFactory =
-    await ethers.getContractFactory(contractName);
+    await ethers.getContractFactory<AaveYNFTVault__factory>(contractName);
 
   const contract = await contractFactory.deploy(
     ADDRESSES.ROUTER_02_SUSHISWAP,

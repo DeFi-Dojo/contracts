@@ -11,7 +11,7 @@ async function main() {
   const contractName = "QuickswapYNFTVault";
 
   const contractFactory =
-    await ethers.getContractFactory(contractName);
+    await ethers.getContractFactory<QuickswapYNFTVault__factory>(contractName);
 
   const contract = await contractFactory.deploy(
     ADDRESSES.ROUTER_02_QUICKSWAP,

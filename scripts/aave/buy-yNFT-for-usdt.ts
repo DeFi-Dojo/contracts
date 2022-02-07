@@ -14,7 +14,7 @@ async function main() {
   const [owner] = await ethers.getSigners();
   console.log(`Deploying contracts using address: ${owner.address}`);
 
-  const yNFTVault = await ethers.getContractAt(
+  const yNFTVault = await ethers.getContractAt<AaveYNFTVault>(
     "AaveYNFTVault",
     VAULT_ADDRESS
   );
@@ -23,7 +23,7 @@ async function main() {
 
   const amountOutMin = BigInt(AMOUNT_OUT_OF_DAI * 10 ** consts.DECIMALS.DAI);
 
-  const usdt = await ethers.getContractAt("IERC20", ADDRESSES.USDT);
+  const usdt = await ethers.getContractAt<IERC20>("IERC20", ADDRESSES.USDT);
 
   await usdt.approve(yNFTVault.address, amountIn).then(waitForReceipt);
 
