@@ -9,12 +9,12 @@ import IAToken from "../artifacts/contracts/interfaces/aave/IAToken.sol/IAToken.
 import IAaveIncentivesController from "../artifacts/contracts/interfaces/aave/IAaveIncentivesController.sol/IAaveIncentivesController.json";
 import IERC20 from "../artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json";
 import ILendingPool from "../artifacts/contracts/interfaces/aave/ILendingPool.sol/ILendingPool.json";
+import {SignerWithAddress} from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 
 // @ts-ignore
 import { expectRevert } from "@openzeppelin/test-helpers";
 import {smock} from "@defi-wonderland/smock";
 import {FakeContract} from "@defi-wonderland/smock/dist/src/types";
-import {SignerWithAddress} from "@nomiclabs/hardhat-ethers/dist/src/signers";
 
 chai.use(smock.matchers)
 

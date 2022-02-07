@@ -103,7 +103,7 @@ describe("DojoNFT", () => {
 
     const rarityIndex = await dojoNFT.rarityIndex(1);
 
-    expect(rarityIndex).to.equal(265);
+    expect(rarityIndex).to.equal(260);
   });
 
   it("_randPercentage", async () => {
@@ -141,8 +141,8 @@ describe("DojoNFT", () => {
       await dojoNFT.public_getOption(50, DISTRIBUTION);
 
     expect({ optionId: optionId3, rarity: rarity3._hex }).to.deep.equal({
-      optionId: 1,
-      rarity: "0x0a",
+      optionId: 0,
+      rarity: "0x32",
     });
 
     const { optionId: optionId4, rarity: rarity4 } =

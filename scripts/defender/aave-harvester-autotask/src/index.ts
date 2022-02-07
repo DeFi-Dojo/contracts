@@ -40,6 +40,8 @@ const ALL_PERCANTAGE = 100;
 
 const DEADLINE_SECONDS = 60;
 
+const MIN_CLAIM_AMOUNT = 500000000000000000; // 0.5 MATIC
+
 export async function handler(event: AutotaskEvent) {
   if (event.credentials === undefined || event.relayerARN === undefined) {
     throw new Error("Relayer not provided");
@@ -76,6 +78,10 @@ export async function handler(event: AutotaskEvent) {
 
   if (amountToClaim.eq(0)) {
     throw new Error("Nothing to claim");
+  }
+
+  if (amountToClaim.lt(MIN_CLAIM_AMOUNT)) {
+    throw new Error("Not enough to claim");
   }
 
   const oracle = AggregatorV3Interface__factory.connect(

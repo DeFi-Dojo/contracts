@@ -19,6 +19,9 @@ async function main() {
 
   console.log("balanceBefore", balanceBefore.toString());
 
+  const amountToClaim = await yNFTVault.getAmountToClaim();
+  console.log("amountToClaim", amountToClaim.toString());
+
   const deadline = Math.round(Date.now() / 1000) + consts.SECONDS_IN_ONE_DAY;
 
   // frontend should calculate and pass it to the function, using "0" for convenience

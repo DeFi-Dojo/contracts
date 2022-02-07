@@ -6,7 +6,7 @@ import { AaveYNFTVault } from "../../typechain";
 
 const { VAULT_ADDRESS } = configEnv;
 
-const NFT_TOKEN_ID = 0;
+const NFT_TOKEN_ID = 1;
 
 async function main() {
   const [owner] = await ethers.getSigners();
