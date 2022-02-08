@@ -95,6 +95,100 @@ describe("AaveYNFTVault", () => {
             "AccessControl: account ", signers[0].address, " is missing role ", ethers.utils.keccak256(ethers.utils.toUtf8Bytes("HARVESTER_ROLE")));
     });
 
+    it('should calculate balance when withdrawing from pool', async () => {
+        const AMOUNT1 = 200;
+        const AMOUNT1_AFTER_FEE = 198;
+        const AMOUNT2 = 300;
+        const AMOUNT2_AFTER_FEE = 297;
+        const MIN_AMOUNT = 101;
+        const DEADLINE = 101;
+
+        await underlyingToken.transferFrom.returns(true);
+        await underlyingToken.approve.returns(true);
+        await aToken.balanceOf.returnsAtCall(0, 0);
+        await aToken.balanceOf.returnsAtCall(1, AMOUNT1_AFTER_FEE);
+        await aToken.balanceOf.returnsAtCall(2, AMOUNT1_AFTER_FEE + AMOUNT2_AFTER_FEE);
+        await aToken.balanceOf.returnsAtCall(3, AMOUNT2_AFTER_FEE);
+        await pool.deposit.returns();
+
+        await aaveYnftVault.setFee(10);
+        await aaveYnftVault.connect(signers[0]).createYNFT(underlyingToken.address, AMOUNT1, MIN_AMOUNT, DEADLINE);
+        expect(await aaveYnftVault.balanceOf(0)).to.equal(AMOUNT1_AFTER_FEE);
+        await aaveYnftVault.connect(signers[1]).createYNFT(underlyingToken.address, AMOUNT2, MIN_AMOUNT, DEADLINE);
+        expect(await aaveYnftVault.balanceOf(1)).to.equal(AMOUNT2_AFTER_FEE);
+
+        await aaveYnftVault.connect(signers[0]).withdrawToUnderlyingTokens(0);
+        expect(pool.withdraw).to.have.been.calledWith(underlyingToken.address, AMOUNT1_AFTER_FEE, signers[0].address);
+        await aaveYnftVault.connect(signers[1]).withdrawToUnderlyingTokens(1);
+        expect(pool.withdraw).to.have.been.calledWith(underlyingToken.address, AMOUNT2_AFTER_FEE, signers[1].address);
+        expect(aToken.balanceOf).to.have.callCount(4);
+    });
+
+    it('should calculate balance when withdrawing from pool in reverse order', async () => {
+        const AMOUNT1 = 200;
+        const AMOUNT1_AFTER_FEE = 198;
+        const AMOUNT2 = 300;
+        const AMOUNT2_AFTER_FEE = 297;
+        const MIN_AMOUNT = 101;
+        const DEADLINE = 101;
+
+        await underlyingToken.transferFrom.returns(true);
+        await underlyingToken.approve.returns(true);
+        await aToken.balanceOf.returnsAtCall(0, 0);
+        await aToken.balanceOf.returnsAtCall(1, AMOUNT1_AFTER_FEE);
+        await aToken.balanceOf.returnsAtCall(2, AMOUNT1_AFTER_FEE + AMOUNT2_AFTER_FEE);
+        await aToken.balanceOf.returnsAtCall(3, AMOUNT1_AFTER_FEE);
+        await pool.deposit.returns();
+
+        await aaveYnftVault.setFee(10);
+        await aaveYnftVault.connect(signers[0]).createYNFT(underlyingToken.address, AMOUNT1, MIN_AMOUNT, DEADLINE);
+        expect(await aaveYnftVault.balanceOf(0)).to.equal(AMOUNT1_AFTER_FEE);
+        await aaveYnftVault.connect(signers[1]).createYNFT(underlyingToken.address, AMOUNT2, MIN_AMOUNT, DEADLINE);
+        expect(await aaveYnftVault.balanceOf(1)).to.equal(297);
+
+        await aaveYnftVault.connect(signers[1]).withdrawToUnderlyingTokens(1);
+        expect(pool.withdraw).to.have.been.calledWith(underlyingToken.address, AMOUNT2_AFTER_FEE, signers[1].address);
+        await aaveYnftVault.connect(signers[0]).withdrawToUnderlyingTokens(0);
+        expect(pool.withdraw).to.have.been.calledWith(underlyingToken.address, AMOUNT1_AFTER_FEE, signers[0].address);
+        expect(aToken.balanceOf).to.have.callCount(4);
+    });
+
+    it('should calculate correct balance after claimRewards', async () => {
+        const AMOUNT1 = 100;
+        const AMOUNT1_AFTER_FEE = 99;
+        const MIN_AMOUNT = 97;
+        const DEADLINE = 101;
+        const AMOUNT_TO_CLAIM = 1000;
+        await aaveYnftVault.grantRole(ethers.utils.keccak256(ethers.utils.toUtf8Bytes("HARVESTER_ROLE")), signers[0].address);
+
+        await underlyingToken.transferFrom.returns(true);
+        await underlyingToken.approve.returns(true);
+        await aToken.balanceOf.returnsAtCall(0, 0);
+        await aToken.balanceOf.returnsAtCall(1, AMOUNT1+AMOUNT1_AFTER_FEE);
+        await pool.deposit.returns();
+
+        aaveIncentivesController.getRewardsBalance.whenCalledWith([aToken.address], aaveYnftVault.address).returns(AMOUNT_TO_CLAIM);
+        aaveIncentivesController.claimRewards.whenCalledWith([aToken.address], AMOUNT_TO_CLAIM, aaveYnftVault.address).returns(AMOUNT_TO_CLAIM);
+        rewardToken.approve.whenCalledWith(uniswapRouter.address, AMOUNT_TO_CLAIM).returns(true);
+        uniswapRouter.swapExactTokensForTokens.returns([AMOUNT_TO_CLAIM, AMOUNT1]);
+        underlyingToken.approve.whenCalledWith(pool.address, AMOUNT1).returns(true);
+
+        await aaveYnftVault.setFee(10);
+        await aaveYnftVault.connect(signers[0]).createYNFT(underlyingToken.address, AMOUNT1, MIN_AMOUNT, DEADLINE);
+        expect(await aaveYnftVault.balanceOf(0)).to.equal(AMOUNT1_AFTER_FEE);
+        expect(await aaveYnftVault.totalSupply()).to.equal(AMOUNT1_AFTER_FEE);
+
+        await aaveYnftVault.claimRewards(MIN_AMOUNT, DEADLINE);
+        expect(await aaveYnftVault.totalSupply()).to.equal(AMOUNT1_AFTER_FEE);
+
+        await aaveYnftVault.connect(signers[1]).createYNFT(underlyingToken.address, AMOUNT1, MIN_AMOUNT, DEADLINE);
+        expect(aToken.balanceOf).to.have.callCount(2);
+        expect(await aaveYnftVault.balanceOf(0)).to.equal(AMOUNT1_AFTER_FEE);
+        expect(await aaveYnftVault.balanceOf(1)).to.equal(Math.floor(AMOUNT1_AFTER_FEE/2));
+        expect(await aaveYnftVault.totalSupply()).to.equal(AMOUNT1_AFTER_FEE+Math.floor(AMOUNT1_AFTER_FEE/2));
+        expect(aToken.balanceOf).to.have.callCount(2);
+    });
+
     it('should deposit in pool when claimRewards called', async () => {
         const MIN_AMOUNT = 101;
         const DEADLINE = 101;
