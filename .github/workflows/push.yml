@@ -1,0 +1,31 @@
+name: Code Update
+
+on: 
+  push:
+
+
+jobs:
+  test:
+    name: Dependencies and Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Copy repository
+        uses: actions/checkout@v2
+
+      - name: Use Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          cache: 'yarn'
+
+      - name: Install yarn dependencies
+        run: yarn install --check-files --non-interactive --frozen-lockfile
+
+      - name: Prepare env's
+        run: cp .env.example .env
+
+      - name: hardhat test's
+        run: yarn run test
+
+      # - name: solhint
+      #   run: yarn run solhint

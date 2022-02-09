@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "private": true,
+  "engines": {
+    "node": ">=16"
+  },
   "scripts": {
     "run:node": "hardhat node",
     "deploy:nft:and:opensea:factory": "hardhat run scripts/nft/deploy-nft-and-nft-factory-to-opensea.ts",
