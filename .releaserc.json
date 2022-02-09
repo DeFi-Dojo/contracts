@@ -1,0 +1,29 @@
+{
+    "branches": ["main"],
+    "plugins": [
+      ["@semantic-release/commit-analyzer", {
+        "preset": "conventionalcommits",
+        "releaseRules": [
+          { "breaking": true, "release": "major" },
+          { "type": "feat",  "release": "minor" },
+          { "type": "fix", "release": "patch" },
+          { "type": "docs", "scope":"*README*", "release": "patch" },
+          { "type": "refactor", "release": "patch" },
+          { "type": "style", "release": "patch" },
+          { "scope": "no-release", "release": false },
+          { "type": "*", "release": "patch" }
+        ],
+        "parserOpts": {
+          "noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES"]
+        }
+      }],
+      "@semantic-release/release-notes-generator",
+      ["@semantic-release/changelog", { "changelogTitle": "# Changelog" }],
+      ["@semantic-release/npm", { "npmPublish": false }],
+      ["@semantic-release/git", { "message": "chore(release): Release v${nextRelease.version} [skip ci]" }],
+      ["@semantic-release/github", {
+        "labels": ["build failing"],
+        "addReleases": "bottom"
+      }]
+    ]
+}
