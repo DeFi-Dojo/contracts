@@ -18,7 +18,7 @@ import {FakeContract} from "@defi-wonderland/smock/dist/src/types";
 
 chai.use(smock.matchers)
 
-describe("AaveYNFTVault", () => {
+describe("DummyAaveYNFTVault", () => {
     let dummyAaveYnftVault: Contract;
     let uniswapRouter: FakeContract;
     let aToken: FakeContract;
@@ -50,6 +50,24 @@ describe("AaveYNFTVault", () => {
         );
     });
 
+    const MIN_AMOUNT = 101;
+    const SWAPPED_AMOUNT = 246000;
+    const ATOKEN_BALANCE = 1000;
+    const POOL_WITHDRAW_VALUE = 100;
+
+    async function init_createWithdrawYNFT_mocks() {
+        const WethMock = await smock.fake(IERC20.abi);
+        await uniswapRouter.WETH.returns(WethMock.address);
+        await uniswapRouter.swapExactETHForTokens.returns([MIN_AMOUNT, SWAPPED_AMOUNT]);
+        await underlyingToken.transferFrom.returns(true);
+        await underlyingToken.approve.returns(true);
+        await aToken.balanceOf.returns(ATOKEN_BALANCE);
+        await pool.deposit.returns();
+
+        pool.withdraw.returns(POOL_WITHDRAW_VALUE);
+        await uniswapRouter.swapExactTokensForETH.returns([MIN_AMOUNT, MIN_AMOUNT]);
+    }
+
     it("should return to deployer on removeVault", async () => {
         signers = await ethers.getSigners();
         const balanceBefore = await balance.current(signers[0].address);
@@ -59,14 +77,39 @@ describe("AaveYNFTVault", () => {
         expect(balanceBefore - balanceAfter).to.lt(0);
     });
 
-    it("should return to specified address on removeVaultToAddress", async () => {
+    it("should withdraw assets from lending pool for all tokens", async () => {
         signers = await ethers.getSigners();
-        const RETURN_ADDRESS = signers[3].address;
-        const balanceBefore = await balance.current(RETURN_ADDRESS);
-        await signers[1].sendTransaction({to: dummyAaveYnftVault.address,value: ethers.utils.parseEther("1") });
-        await dummyAaveYnftVault.removeVaultToAddress(RETURN_ADDRESS);
-        const balanceAfter = await balance.current(RETURN_ADDRESS);
-        expect(balanceBefore - balanceAfter).to.lt(0);
+        const DEADLINE = 101;
+
+        init_createWithdrawYNFT_mocks();
+
+        await dummyAaveYnftVault.createYNFTForEther(MIN_AMOUNT, DEADLINE, {value: ethers.utils.parseEther("100")});
+        await dummyAaveYnftVault.createYNFTForEther(MIN_AMOUNT, DEADLINE);
+
+        await dummyAaveYnftVault.removeVault();
+        expect(pool.withdraw).to.have.been.calledWith(underlyingToken.address, ATOKEN_BALANCE, dummyAaveYnftVault.address);
+        expect(pool.withdraw).to.have.callCount(2);
+        expect(uniswapRouter.swapExactTokensForETH).to.have.callCount(1);
+        expect(uniswapRouter.swapExactTokensForETH.getCall(0).args[0]).to.be.equal(2*POOL_WITHDRAW_VALUE);
+        expect(uniswapRouter.swapExactTokensForETH.getCall(0).args[1]).to.be.equal(0);
+        expect(uniswapRouter.swapExactTokensForETH.getCall(0).args[3]).to.be.equal(dummyAaveYnftVault.address);
+    });
+
+    it("should not withdraw asset from aave lending pool for already withdrawn token", async () => {
+        signers = await ethers.getSigners();
+        const DEADLINE = 101;
+
+        init_createWithdrawYNFT_mocks();
+
+        await dummyAaveYnftVault.createYNFTForEther(MIN_AMOUNT, DEADLINE);
+        await dummyAaveYnftVault.createYNFTForEther(MIN_AMOUNT, DEADLINE);
+        await dummyAaveYnftVault.withdrawToEther(0, MIN_AMOUNT, DEADLINE);
+        expect(pool.withdraw).to.have.callCount(1);
+
+        await dummyAaveYnftVault.removeVault();
+        expect(pool.withdraw).to.have.been.calledWith(underlyingToken.address, ATOKEN_BALANCE, dummyAaveYnftVault.address);
+        expect(pool.withdraw).to.have.callCount(2);
+        expect(uniswapRouter.swapExactTokensForETH).to.have.callCount(2);
     });
 
 });
