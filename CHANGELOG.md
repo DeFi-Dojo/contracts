@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.1.0](https://github.com/DeFi-Dojo/contracts/compare/v1.0.0...v1.1.0) (2022-02-10)
+
+
+### Features
+
+* **DEX-377:** Dummy contract for AaveYNFTVault ([#36](https://github.com/DeFi-Dojo/contracts/issues/36)) ([059129c](https://github.com/DeFi-Dojo/contracts/commit/059129c92d83902be6ab442c097dd2591cf5e9ac))
+
 # 1.0.0 (2022-02-09)
 
 
