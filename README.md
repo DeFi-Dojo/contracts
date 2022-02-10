@@ -46,3 +46,21 @@ Run solhint
 ```
 yarn solhint
 ```
+
+# Prettier
+To force prettier to tidy up your solidity code using command line run following command in your terminal:
+
+```
+yarn prettier:solidity
+```
+
+## VScode settings
+To enable automatic code prettifying, based on rules defined by solhint, please make sure to have below directives in your editor settings.
+
+```
+"[solidity]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+},
+
+"editor.formatOnSave": true
+```

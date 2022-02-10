@@ -2,7 +2,8 @@
 pragma solidity ^0.8.6;
 
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import {IScaledBalanceToken} from './IScaledBalanceToken.sol';
+import {IScaledBalanceToken} from "./IScaledBalanceToken.sol";
+
 interface IAToken is IERC20, IScaledBalanceToken {
   /**
    * @dev Emitted after the mint action
@@ -11,6 +12,7 @@ interface IAToken is IERC20, IScaledBalanceToken {
    * @param index The new liquidity index of the reserve
    **/
   event Mint(address indexed from, uint256 value, uint256 index);
+
   /**
    * @dev Mints `amount` aTokens to `user`
    * @param user The address receiving the minted tokens
@@ -23,6 +25,7 @@ interface IAToken is IERC20, IScaledBalanceToken {
     uint256 amount,
     uint256 index
   ) external returns (bool);
+
   /**
    * @dev Emitted after aTokens are burned
    * @param from The owner of the aTokens, getting them burned
@@ -30,7 +33,12 @@ interface IAToken is IERC20, IScaledBalanceToken {
    * @param value The amount being burned
    * @param index The new liquidity index of the reserve
    **/
-  event Burn(address indexed from, address indexed target, uint256 value, uint256 index);
+  event Burn(
+    address indexed from,
+    address indexed target,
+    uint256 value,
+    uint256 index
+  );
   /**
    * @dev Emitted during the transfer action
    * @param from The user whose tokens are being transferred
@@ -38,7 +46,13 @@ interface IAToken is IERC20, IScaledBalanceToken {
    * @param value The amount being transferred
    * @param index The new liquidity index of the reserve
    **/
-  event BalanceTransfer(address indexed from, address indexed to, uint256 value, uint256 index);
+  event BalanceTransfer(
+    address indexed from,
+    address indexed to,
+    uint256 value,
+    uint256 index
+  );
+
   /**
    * @dev Burns aTokens from `user` and sends the equivalent amount of underlying to `receiverOfUnderlying`
    * @param user The owner of the aTokens, getting them burned
@@ -52,12 +66,14 @@ interface IAToken is IERC20, IScaledBalanceToken {
     uint256 amount,
     uint256 index
   ) external;
+
   /**
    * @dev Mints aTokens to the reserve treasury
    * @param amount The amount of tokens getting minted
    * @param index The new liquidity index of the reserve
    */
   function mintToTreasury(uint256 amount, uint256 index) external;
+
   /**
    * @dev Transfers aTokens in the event of a borrow being liquidated, in case the liquidators reclaims the aToken
    * @param from The address getting liquidated, current owner of the aTokens
@@ -69,6 +85,7 @@ interface IAToken is IERC20, IScaledBalanceToken {
     address to,
     uint256 value
   ) external;
+
   /**
    * @dev Transfers the underlying asset to `target`. Used by the LendingPool to transfer
    * assets in borrow(), withdraw() and flashLoan()
@@ -76,7 +93,9 @@ interface IAToken is IERC20, IScaledBalanceToken {
    * @param amount The amount getting transferred
    * @return The amount transferred
    **/
-  function transferUnderlyingTo(address user, uint256 amount) external returns (uint256);
+  function transferUnderlyingTo(address user, uint256 amount)
+    external
+    returns (uint256);
 
   function POOL() external returns (address);
 

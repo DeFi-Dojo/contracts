@@ -2,27 +2,28 @@
 pragma solidity ^0.8.6;
 
 interface IStakingDualRewards {
-    // Views
-    function lastTimeRewardApplicable() external view returns (uint256);
+  // Views
+  function lastTimeRewardApplicable() external view returns (uint256);
 
-    function rewardPerTokenA() external view returns (uint256);
-    function rewardPerTokenB() external view returns (uint256);
+  function rewardPerTokenA() external view returns (uint256);
 
-    function earnedA(address account) external view returns (uint256);
+  function rewardPerTokenB() external view returns (uint256);
 
-    function earnedB(address account) external view returns (uint256);
+  function earnedA(address account) external view returns (uint256);
 
-    function totalSupply() external view returns (uint256);
+  function earnedB(address account) external view returns (uint256);
 
-    function balanceOf(address account) external view returns (uint256);
+  function totalSupply() external view returns (uint256);
 
-    // Mutative
+  function balanceOf(address account) external view returns (uint256);
 
-    function stake(uint256 amount) external;
+  // Mutative
 
-    function withdraw(uint256 amount) external;
+  function stake(uint256 amount) external;
 
-    function getReward() external;
+  function withdraw(uint256 amount) external;
 
-    function exit() external;
+  function getReward() external;
+
+  function exit() external;
 }
