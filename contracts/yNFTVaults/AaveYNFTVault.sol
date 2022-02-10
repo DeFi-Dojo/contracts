@@ -67,7 +67,7 @@ contract AaveYNFTVault is YNFTVault {
         pool.deposit(address(underlyingToken), amount, address(this), 0);
     }
 
-    function _withdraw(uint256 _nftTokenId, address _receiver) internal returns (uint) {
+    function _withdraw(uint256 _nftTokenId, address _receiver) private returns (uint) {
 
         uint currentAmountOfAToken = aToken.balanceOf(address(this));
 

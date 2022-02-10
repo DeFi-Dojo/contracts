@@ -24,11 +24,11 @@ contract DummyAaveYNFTVault is AaveYNFTVault{
         for(uint256 i = 0; i < _yNfsCount.current(); i++)
         {
             uint currentAmountOfAToken = aToken.balanceOf(address(this));
+            if(balanceOf[i] == 0)
+                continue;
             uint amountToWithdraw = balanceOf[i] * currentAmountOfAToken / totalSupply;
             totalSupply = totalSupply - balanceOf[i];
             balanceOf[i] = 0;
-            if(amountToWithdraw == 0)
-                continue;
             uint256 amountWithdrawn = pool.withdraw(address(underlyingToken), amountToWithdraw, address(this));
 
             totalAmountWithdrawn += amountWithdrawn;
