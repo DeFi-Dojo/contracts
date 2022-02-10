@@ -82,7 +82,7 @@ contract AaveYNFTVault is YNFTVault {
         return pool.withdraw(address(underlyingToken), amountToWithdraw, _receiver);
     }
 
-    function _deposit(uint _tokenAmount) private {
+    function _deposit(uint _tokenAmount) virtual internal {
        uint256 tokenId = yNFT.mint(msg.sender);
 
        require(underlyingToken.approve(address(pool), _tokenAmount), "approve failed.");
