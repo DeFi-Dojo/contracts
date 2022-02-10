@@ -1,5 +1,5 @@
 import { ethers } from "hardhat";
-import {DummyAaveYNFTVault__factory} from "../../typechain";
+import { DummyAaveYNFTVault__factory } from "../../typechain";
 import configEnv from "../../config";
 
 const { ADDRESSES, HARVESTER_ADDRESS, BENEFICIARY_ADDRESS } = configEnv;

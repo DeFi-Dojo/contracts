@@ -2,16 +2,13 @@
 
 pragma solidity ^0.8.0;
 
-
 import "@openzeppelin/contracts/access/Ownable.sol";
-
 
 /**
  * @dev A simple mock ProxyRegistry for use in local tests with minimal security
  */
 contract MockProxyRegistry is Ownable {
   mapping(address => address) public proxies;
-
 
   /***********************************|
   |  Public Configuration Functions   |
@@ -23,9 +20,9 @@ contract MockProxyRegistry is Ownable {
    * @param _proxyForAddress  The proxy that will act on behalf of the address
    */
   function setProxy(address _address, address _proxyForAddress)
-      external
-      onlyOwner()
+    external
+    onlyOwner
   {
-      proxies[_address] = _proxyForAddress;
+    proxies[_address] = _proxyForAddress;
   }
 }

@@ -2,7 +2,6 @@
 pragma solidity ^0.8.6;
 
 interface IAaveIncentivesController {
-  
   event RewardsAccrued(address indexed user, uint256 amount);
 
   event RewardsClaimed(
@@ -39,9 +38,10 @@ interface IAaveIncentivesController {
    * @param assets The assets to incentivize
    * @param emissionsPerSecond The emission for each asset
    */
-  function configureAssets(address[] calldata assets, uint256[] calldata emissionsPerSecond)
-    external;
-
+  function configureAssets(
+    address[] calldata assets,
+    uint256[] calldata emissionsPerSecond
+  ) external;
 
   /**
    * @dev Called by the corresponding asset on any update that affects the rewards distribution
@@ -97,10 +97,13 @@ interface IAaveIncentivesController {
    * @param user the address of the user
    * @return the unclaimed user rewards
    */
-  function getUserUnclaimedRewards(address user) external view returns (uint256);
+  function getUserUnclaimedRewards(address user)
+    external
+    view
+    returns (uint256);
 
   /**
-  * @dev for backward compatibility with previous implementation of the Incentives controller
-  */
+   * @dev for backward compatibility with previous implementation of the Incentives controller
+   */
   function REWARD_TOKEN() external view returns (address);
 }
