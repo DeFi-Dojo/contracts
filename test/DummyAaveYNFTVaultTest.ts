@@ -1,20 +1,19 @@
-import { expect } from "chai";
-import chai from "chai";
+import chai, { expect } from "chai";
 import { ethers } from "hardhat";
 import { Contract } from "ethers";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
+
+import { smock } from "@defi-wonderland/smock";
+import { FakeContract } from "@defi-wonderland/smock/dist/src/types";
+// @ts-ignore
+import { balance } from "@openzeppelin/test-helpers";
 import { deployContract} from "../utils/deployment";
-import {AaveYNFTVault, DummyAaveYNFTVault} from "../typechain";
+import { DummyAaveYNFTVault } from "../typechain";
 import IUniswapV2Router02 from "../artifacts/contracts/interfaces/uniswapv2/IUniswapV2Router02.sol/IUniswapV2Router02.json";
 import IAToken from "../artifacts/contracts/interfaces/aave/IAToken.sol/IAToken.json";
 import IAaveIncentivesController from "../artifacts/contracts/interfaces/aave/IAaveIncentivesController.sol/IAaveIncentivesController.json";
 import IERC20 from "../artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json";
 import ILendingPool from "../artifacts/contracts/interfaces/aave/ILendingPool.sol/ILendingPool.json";
-import {SignerWithAddress} from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
-
-// @ts-ignore
-import { expectRevert, balance } from "@openzeppelin/test-helpers";
-import {smock} from "@defi-wonderland/smock";
-import {FakeContract} from "@defi-wonderland/smock/dist/src/types";
 
 chai.use(smock.matchers)
 
@@ -55,6 +54,7 @@ describe("DummyAaveYNFTVault", () => {
     const ATOKEN_BALANCE = 1000;
     const POOL_WITHDRAW_VALUE = 100;
 
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     async function init_createWithdrawYNFT_mocks() {
         const WethMock = await smock.fake(IERC20.abi);
         await uniswapRouter.WETH.returns(WethMock.address);

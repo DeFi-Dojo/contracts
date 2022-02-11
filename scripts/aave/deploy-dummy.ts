@@ -1,5 +1,5 @@
 import { ethers } from "hardhat";
-import {DummyAaveYNFTVault__factory} from "../../typechain";
+import { DummyAaveYNFTVault__factory } from "../../typechain";
 import configEnv from "../../config";
 
 const { ADDRESSES, HARVESTER_ADDRESS, BENEFICIARY_ADDRESS } = configEnv;
@@ -14,7 +14,7 @@ async function main() {
         await ethers.getContractFactory<DummyAaveYNFTVault__factory>(contractName);
 
     const contract = await contractFactory.deploy(
-        ADDRESSES.ROUTER_02_SUSHISWAP,
+        ADDRESSES.ROUTER_02_QUICKSWAP,
         ADDRESSES.A_DAI,
         ADDRESSES.INCENTIVES_CONTROLLER,
         HARVESTER_ADDRESS,
