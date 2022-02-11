@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.2.0](https://github.com/DeFi-Dojo/contracts/compare/v1.1.1...v1.2.0) (2022-02-11)
+
+
+### Features
+
+* add remove dummy aave contract script ([8f49f86](https://github.com/DeFi-Dojo/contracts/commit/8f49f86188c2f57c8d1c8d079217f472bd92d722))
+
 ## [1.1.1](https://github.com/DeFi-Dojo/contracts/compare/v1.1.0...v1.1.1) (2022-02-10)
 
 # [1.1.0](https://github.com/DeFi-Dojo/contracts/compare/v1.0.0...v1.1.0) (2022-02-10)
