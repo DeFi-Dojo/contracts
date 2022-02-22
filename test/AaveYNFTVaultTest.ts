@@ -268,6 +268,7 @@ describe("AaveYNFTVault", () => {
         const EXPECTED_FEE = MIN_AMOUNT * 5 / 1000;
         expect(underlyingToken.transferFrom).to.have.been.calledWith(signers[1].address, signers[0].address, EXPECTED_FEE);
         expect(underlyingToken.approve).to.have.been.calledWith(pool.address, MIN_AMOUNT - EXPECTED_FEE);
+        expect(underlyingToken.transferFrom).to.have.been.calledWith(signers[1].address, aaveYnftVault.address, MIN_AMOUNT - EXPECTED_FEE);
         expect(pool.deposit).to.have.been.calledWith(underlyingToken.address, MIN_AMOUNT - EXPECTED_FEE, aaveYnftVault.address, 0);
    });
 
@@ -288,6 +289,7 @@ describe("AaveYNFTVault", () => {
         expect(underlyingToken.approve).to.have.been.calledWith(pool.address, SWAPPED_AMOUNT);
         expect(pool.deposit).to.have.been.calledWith(underlyingToken.address, SWAPPED_AMOUNT, aaveYnftVault.address, 0);
         expect(otherToken.approve).to.have.been.calledWith(uniswapRouter.address, MIN_AMOUNT - EXPECTED_FEE);
+        expect(otherToken.transferFrom).to.have.been.calledWith(signers[1].address, aaveYnftVault.address, MIN_AMOUNT - EXPECTED_FEE);
         expect(uniswapRouter.swapExactTokensForTokens).to.have.been.calledWith(
                 MIN_AMOUNT - EXPECTED_FEE,
                 MIN_AMOUNT,
