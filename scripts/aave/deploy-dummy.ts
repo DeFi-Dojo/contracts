@@ -13,9 +13,14 @@ async function main() {
     const contractFactory =
         await ethers.getContractFactory<DummyAaveYNFTVault__factory>(contractName);
 
+    const aaveTokenAddress = process.env.AAVE_TOKEN_ADDRESS;
+    if (!aaveTokenAddress) {
+        throw new Error("Please specify env variable AAVE_TOKEN_ADDRESS");
+    }
+
     const contract = await contractFactory.deploy(
         ADDRESSES.ROUTER_02_QUICKSWAP,
-        ADDRESSES.A_DAI,
+        aaveTokenAddress,
         ADDRESSES.INCENTIVES_CONTROLLER,
         HARVESTER_ADDRESS,
         BENEFICIARY_ADDRESS
