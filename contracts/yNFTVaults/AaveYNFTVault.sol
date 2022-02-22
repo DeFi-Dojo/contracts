@@ -156,14 +156,15 @@ contract AaveYNFTVault is YNFTVault {
   ) external whenNotPaused {
     uint256 amountInToBuy = _amountIn - _collectFeeToken(_tokenIn, _amountIn);
 
+    IERC20(_tokenIn).safeTransferFrom(
+      msg.sender,
+      address(this),
+      amountInToBuy
+    );
+
     if (_tokenIn == address(underlyingToken)) {
       _deposit(amountInToBuy);
     } else {
-      IERC20(_tokenIn).safeTransferFrom(
-        msg.sender,
-        address(this),
-        amountInToBuy
-      );
       uint256 amount = _swapTokenToToken(
         address(this),
         amountInToBuy,
