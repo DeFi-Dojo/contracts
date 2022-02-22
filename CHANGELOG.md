@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.2](https://github.com/DeFi-Dojo/contracts/compare/v1.2.1...v1.2.2) (2022-02-22)
+
+
+### Bug Fixes
+
+* creating ynft and paying with underlying token ([#40](https://github.com/DeFi-Dojo/contracts/issues/40)) ([fb5da4c](https://github.com/DeFi-Dojo/contracts/commit/fb5da4c35b80a893684d1e60a8cb2e49092c32ee))
+
 ## [1.2.1](https://github.com/DeFi-Dojo/contracts/compare/v1.2.0...v1.2.1) (2022-02-22)
 
 
