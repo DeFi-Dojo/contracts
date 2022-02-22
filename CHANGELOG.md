@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/DeFi-Dojo/contracts/compare/v1.2.0...v1.2.1) (2022-02-22)
+
+
+### Bug Fixes
+
+* pass underlying asset address to dummy vault script ([3fa310c](https://github.com/DeFi-Dojo/contracts/commit/3fa310c96fd0cd753803f8f5a59af50e09e6c79e))
+
 # [1.2.0](https://github.com/DeFi-Dojo/contracts/compare/v1.1.1...v1.2.0) (2022-02-11)
 
 
