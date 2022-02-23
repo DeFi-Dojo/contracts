@@ -398,4 +398,17 @@ contract QuickswapYNFTVault is YNFTVault {
     _mintYNFTForLiquidity(liquidity);
     _farmLiquidity(liquidity);
   }
+
+  // TODO: create quickswap specific implemetation
+  /*
+   * @dev Calculates underlying asset balance belonging to particular nft token id.
+   * @param (uint256 _nftTokenId) nft token id that gives access to certain balance of underlying asset.
+   * @return (uint256) underlying asset balance for certain nft token id.
+   */
+  function balanceOfUnderlying(uint256 _nftTokenId)
+    public
+    view
+    override
+    returns (uint256)
+  {}
 }

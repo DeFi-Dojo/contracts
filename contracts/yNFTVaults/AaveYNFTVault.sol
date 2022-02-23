@@ -156,11 +156,7 @@ contract AaveYNFTVault is YNFTVault {
   ) external whenNotPaused {
     uint256 amountInToBuy = _amountIn - _collectFeeToken(_tokenIn, _amountIn);
 
-    IERC20(_tokenIn).safeTransferFrom(
-      msg.sender,
-      address(this),
-      amountInToBuy
-    );
+    IERC20(_tokenIn).safeTransferFrom(msg.sender, address(this), amountInToBuy);
 
     if (_tokenIn == address(underlyingToken)) {
       _deposit(amountInToBuy);
@@ -193,5 +189,23 @@ contract AaveYNFTVault is YNFTVault {
     );
 
     _deposit(amount);
+  }
+
+  /*
+   * @dev Calculates underlying asset balance belonging to particular nft token id.
+   * @param (uint256 _nftTokenId) nft token id that gives access to certain balance of underlying asset.
+   * @return (uint256) underlying asset balance for certain nft token id.
+   */
+  function balanceOfUnderlying(uint256 _nftTokenId)
+    public
+    view
+    override
+    returns (uint256)
+  {
+    uint256 currentAmountOfAToken = aToken.balanceOf(address(this));
+    uint256 balance = (balanceOf[_nftTokenId] * currentAmountOfAToken) /
+      totalSupply;
+
+    return balance;
   }
 }
