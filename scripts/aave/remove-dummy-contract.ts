@@ -1,4 +1,5 @@
 import { ethers } from "hardhat";
+import { waitForReceipt } from "../../utils/deployment";
 
 import { DummyAaveYNFTVault__factory } from "../../typechain";
 
@@ -15,7 +16,7 @@ async function main() {
 
     console.log(`Trying to remove ${contractName} at address: ${contract.address}`);    
 
-    await contract.removeVault();
+    await contract.removeVault().then(waitForReceipt);
 
     console.log(`${contractName} removed`);
 }

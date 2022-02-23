@@ -7,7 +7,7 @@ import configEnv from "../../config";
 
 const { VAULT_ADDRESS } = configEnv;
 
-const NFT_TOKEN_ID = 1;
+const NFT_TOKEN_ID = 0;
 
 async function main() {
   const [owner] = await ethers.getSigners();
@@ -15,7 +15,7 @@ async function main() {
 
   const yNFTVault = await ethers.getContractAt<AaveYNFTVault>(
     "AaveYNFTVault",
-    VAULT_ADDRESS
+    VAULT_ADDRESS,
   );
   const deadline = Math.round(Date.now() / 1000) + consts.SECONDS_IN_ONE_DAY;
 

@@ -12,7 +12,7 @@ async function main() {
 
   const yNFTVault = await ethers.getContractAt<AaveYNFTVault>(
     "AaveYNFTVault",
-    VAULT_ADDRESS
+    VAULT_ADDRESS,
   );
 
   // frontend should calculate and pass it to the function, using "0" for convenience

@@ -160,5 +160,10 @@ abstract contract YNFTVault is AccessControl, ReentrancyGuard, Pausable {
     return amounts[1];
   }
 
+  function balanceOfUnderlying(uint256 _nftTokenId)
+    external
+    virtual
+    returns (uint256);
+
   receive() external payable {}
 }
