@@ -386,7 +386,7 @@ contract QuickswapYNFTVault is YNFTVault {
     );
 
     _mintYNFTForLiquidity(liquidity);
-    _farmLiquidity(liquidity);
+//    _farmLiquidity(liquidity);
   }
 
   function createYNFTForEther(
