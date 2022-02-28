@@ -83,7 +83,7 @@ describe("QuickswapYNFTVault", () => {
     await expectRevert(quickswapYnftVault.setFee(FEE), "Fee cannot be that much");
   });
 
-  it('createYNFT', async () => {
+  it('createYNFT should call swapExactTokensForTokens for both tokens', async () => {
     // let tokenIn: FakeContract;
 
     const amountIn = 1000;
@@ -113,5 +113,32 @@ describe("QuickswapYNFTVault", () => {
     expect(uniswapRouterMock.swapExactTokensForTokens).to.have.callCount(2);
     expect(uniswapRouterMock.swapExactTokensForTokens).to.have.been.calledWith(497, amountOutMinFirstToken, [tokenIn.address, token0Mock.address], quickswapYnftVault.address, DEADLINE);
     expect(uniswapRouterMock.swapExactTokensForTokens).to.have.been.calledWith(497, amountOutMinSecondToken, [tokenIn.address, token1Mock.address], quickswapYnftVault.address, DEADLINE);
+  });
+
+  it('createYNFTForEther should call swapExactETHForTokens for both tokens', async () => {
+    const amountIn = 1000;
+    const amountOutMinFirstToken = 900;
+    const amountOutMinSecondToken = 800;
+    const amountMinLiqudityFirstToken = 100;
+    const amountMinLiquditySecondToken = 100;
+    const DEADLINE = 101;
+
+    const AMOUNT_AFTER_SWAP1 = 300;
+
+    uniswapRouterMock.swapExactETHForTokens.returns([amountIn, AMOUNT_AFTER_SWAP1]);
+    await token0Mock.approve.returns(true);
+    await token1Mock.approve.returns(true);
+    uniswapPairMock.approve.returns(true);
+
+    await quickswapYnftVault.createYNFTForEther(
+        amountOutMinFirstToken,
+        amountOutMinSecondToken,
+        amountMinLiqudityFirstToken,
+        amountMinLiquditySecondToken,
+        DEADLINE);
+
+    expect(uniswapRouterMock.swapExactETHForTokens).to.have.callCount(2);
+    expect(uniswapRouterMock.swapExactETHForTokens).to.have.been.calledWith(amountOutMinFirstToken, ["0x0000000000000000000000000000000000000000", token0Mock.address], quickswapYnftVault.address, DEADLINE);
+    expect(uniswapRouterMock.swapExactETHForTokens).to.have.been.calledWith(amountOutMinSecondToken, ["0x0000000000000000000000000000000000000000", token1Mock.address], quickswapYnftVault.address, DEADLINE);
   });
 });
