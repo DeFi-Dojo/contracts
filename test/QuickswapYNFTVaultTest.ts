@@ -141,4 +141,49 @@ describe("QuickswapYNFTVault", () => {
     expect(uniswapRouterMock.swapExactETHForTokens).to.have.been.calledWith(amountOutMinFirstToken, ["0x0000000000000000000000000000000000000000", token0Mock.address], quickswapYnftVault.address, DEADLINE);
     expect(uniswapRouterMock.swapExactETHForTokens).to.have.been.calledWith(amountOutMinSecondToken, ["0x0000000000000000000000000000000000000000", token1Mock.address], quickswapYnftVault.address, DEADLINE);
   });
+
+  it('withdrawToUnderlyingTokens should call removeLiquidity', async () => {
+    uniswapRouterMock.swapExactETHForTokens.returns([1000, 300]);
+    await token0Mock.approve.returns(true);
+    await token1Mock.approve.returns(true);
+    uniswapPairMock.approve.returns(true);
+    await quickswapYnftVault.createYNFTForEther(900, 800, 100, 100, 101);
+
+    const TOKEN_ID = 0;
+    const amountOutMinFirstToken = 900;
+    const amountOutMinSecondToken = 800;
+    const DEADLINE = 101;
+    const signers = await ethers.getSigners();
+
+    await quickswapYnftVault.withdrawToUnderlyingTokens(TOKEN_ID, amountOutMinFirstToken, amountOutMinSecondToken, DEADLINE);
+
+    expect(uniswapRouterMock.removeLiquidity).to.have.callCount(1);
+    expect(uniswapRouterMock.removeLiquidity).to.have.been.calledWith(token0Mock.address, token1Mock.address, 0, 900, 800, signers[0].address, DEADLINE);
+  });
+
+
+  it('withdrawToEther should call removeLiquidity and swap to ether', async () => {
+    uniswapRouterMock.swapExactETHForTokens.returns([1000, 300]);
+    await token0Mock.approve.returns(true);
+    await token1Mock.approve.returns(true);
+    uniswapPairMock.approve.returns(true);
+    await quickswapYnftVault.createYNFTForEther(900, 800, 100, 100, 101);
+
+    const TOKEN_ID = 0;
+    const amountOutMinFirstToken = 900;
+    const amountOutMinSecondToken = 800;
+    const amountOfEthMin = 1000;
+    const DEADLINE = 101;
+    const signers = await ethers.getSigners();
+
+    await uniswapRouterMock.swapExactTokensForETH.returns([amountOutMinFirstToken, amountOfEthMin]);
+
+    await quickswapYnftVault.withdrawToEther(TOKEN_ID, amountOutMinFirstToken, amountOutMinSecondToken, amountOfEthMin, DEADLINE);
+
+    expect(uniswapRouterMock.removeLiquidity).to.have.callCount(1);
+    expect(uniswapRouterMock.swapExactTokensForETH).to.have.callCount(2);
+    expect(uniswapRouterMock.removeLiquidity).to.have.been.calledWith(token0Mock.address, token1Mock.address, 0, 900, 800, quickswapYnftVault.address, DEADLINE);
+    expect(uniswapRouterMock.swapExactTokensForETH).to.have.been.calledWith(0, amountOfEthMin/2, [token0Mock.address, "0x0000000000000000000000000000000000000000"], signers[0].address, DEADLINE);
+    expect(uniswapRouterMock.swapExactTokensForETH).to.have.been.calledWith(0, amountOfEthMin/2, [token1Mock.address, "0x0000000000000000000000000000000000000000"], signers[0].address, DEADLINE);
+  });
 });
