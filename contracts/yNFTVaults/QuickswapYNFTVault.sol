@@ -25,8 +25,20 @@ contract QuickswapYNFTVault is YNFTVault {
         IStakingRewards _dragonSyrup,
         IERC20 _dQuick,
         address _harvester,
-        address _beneficiary
-    ) YNFTVault(_dexRouter, _harvester, _beneficiary) {
+        address _beneficiary,
+        string memory _ynftName,
+        string memory _ynftBaseUri,
+        string memory _ynftPathUri
+    )
+        YNFTVault(
+            _dexRouter,
+            _harvester,
+            _beneficiary,
+            _ynftName,
+            _ynftBaseUri,
+            _ynftPathUri
+        )
+    {
         pair = _pair;
         stakingDualRewards = _stakingDualRewards;
         dragonSyrup = _dragonSyrup;

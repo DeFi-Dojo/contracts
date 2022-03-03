@@ -32,9 +32,12 @@ abstract contract YNFTVault is AccessControl, ReentrancyGuard, Pausable {
     constructor(
         IUniswapV2Router02 _dexRouter,
         address _harvester,
-        address _beneficiary
+        address _beneficiary,
+        string memory _ynftName,
+        string memory _ynftBaseUri,
+        string memory _ynftPathUri
     ) {
-        yNFT = new YNFT();
+        yNFT = new YNFT(_ynftName, "yNFT", _ynftBaseUri, _ynftPathUri);
         dexRouter = _dexRouter;
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setupRole(HARVESTER_ROLE, _harvester);
