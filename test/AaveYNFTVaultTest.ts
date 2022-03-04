@@ -46,7 +46,7 @@ describe("AaveYNFTVault", () => {
 
         aaveYnftVault = await deployContract<AaveYNFTVault>(
             "AaveYNFTVault",
-            [uniswapRouter.address, aToken.address, aaveIncentivesController.address, signers[1].address, signers[0].address],
+            [uniswapRouter.address, aToken.address, aaveIncentivesController.address, signers[1].address, signers[0].address, "", "", "" ],
             undefined
         );
     });

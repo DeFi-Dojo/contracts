@@ -14,7 +14,7 @@ describe("YNFTVault", () => {
   beforeEach(async () => {
     ynft = await deployContract<YNFT>(
       "YNFT",
-      [],
+      ["Dojo yNFT", "yNFT", "", ""],
       undefined
     );
   });

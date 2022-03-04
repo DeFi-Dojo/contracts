@@ -44,7 +44,7 @@ describe("DummyAaveYNFTVault", () => {
 
         dummyAaveYnftVault = await deployContract<DummyAaveYNFTVault>(
             "DummyAaveYNFTVault",
-            [uniswapRouter.address, aToken.address, aaveIncentivesController.address, signers[1].address, signers[0].address],
+            [uniswapRouter.address, aToken.address, aaveIncentivesController.address, signers[1].address, signers[0].address, "", "", ""],
             undefined
         );
     });
