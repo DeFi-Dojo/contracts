@@ -23,7 +23,10 @@ async function main() {
         aaveTokenAddress,
         ADDRESSES.INCENTIVES_CONTROLLER,
         HARVESTER_ADDRESS,
-        BENEFICIARY_ADDRESS
+        BENEFICIARY_ADDRESS,
+        "Dojo yNFT",
+        "", // TODO: Set base uri
+        "", // TODO: Set path uri
     );
 
     await contract.deployed();

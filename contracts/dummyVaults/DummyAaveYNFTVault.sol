@@ -14,14 +14,20 @@ contract DummyAaveYNFTVault is AaveYNFTVault {
     IAToken _aToken,
     IAaveIncentivesController _incentivesController,
     address _harvester,
-    address _beneficiary
+    address _beneficiary,
+    string memory _ynftName,
+    string memory _ynftBaseUri,
+    string memory _ynftPathUri
   )
     AaveYNFTVault(
       _dexRouter,
       _aToken,
       _incentivesController,
       _harvester,
-      _beneficiary
+      _beneficiary,
+      _ynftName,
+      _ynftBaseUri,
+      _ynftPathUri
     )
   {
     defaultReturnAddress = payable(msg.sender);
