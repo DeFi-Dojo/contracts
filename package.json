@@ -12,6 +12,7 @@
     "deploy:nft:and:opensea:factory": "hardhat run scripts/nft/deploy-nft-and-nft-factory-to-opensea.ts",
     "pretest": "hardhat compile",
     "test": "hardhat test --config test.config.ts",
+    "test:types": "tsc --project ./tsconfig.json --noEmit",
     "build": "tsc --project tsconfig.json",
     "solhint": "npx solhint 'contracts/**/*.sol'",
     "prettier:solidity": "prettier --write 'contracts/**/*.sol'",

@@ -20,7 +20,10 @@ async function main() {
     ADDRESSES.DRAGON_SYRUP_QUICKSWAP,
     ADDRESSES.DQUICK,
     HARVESTER_ADDRESS,
-    BENEFICIARY_ADDRESS
+    BENEFICIARY_ADDRESS,
+    "Dojo yNFT",
+    "", // TODO: Set base uri
+    "" // TODO: Set path uri
   );
 
   await contract.deployed();
