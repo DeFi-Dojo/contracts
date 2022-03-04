@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.4.0](https://github.com/DeFi-Dojo/contracts/compare/v1.3.0...v1.4.0) (2022-03-04)
+
+
+### Features
+
+* add token metadata ([#42](https://github.com/DeFi-Dojo/contracts/issues/42)) ([d333ba5](https://github.com/DeFi-Dojo/contracts/commit/d333ba5e0b4377ab62705bee0d05217285a69994))
+
 # [1.3.0](https://github.com/DeFi-Dojo/contracts/compare/v1.2.2...v1.3.0) (2022-02-24)
 
 
