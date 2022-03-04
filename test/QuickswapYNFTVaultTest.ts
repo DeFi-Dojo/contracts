@@ -45,7 +45,7 @@ describe("QuickswapYNFTVault", () => {
 
     quickswapYnftVault = await deployContract<QuickswapYNFTVault>(
       "QuickswapYNFTVault",
-      [uniswapRouterMock.address, uniswapPairMock.address, stakingDualRewardsMock.address, stakingRewardsMock.address, dQuickMock.address, signers[1].address, signers[0].address, '', '', ''],
+      [uniswapRouterMock.address, uniswapPairMock.address, stakingDualRewardsMock.address, dQuickMock.address, signers[1].address, signers[0].address, '', '', ''],
       undefined
     );
   });
@@ -101,6 +101,7 @@ describe("QuickswapYNFTVault", () => {
     await token0Mock.approve.returns(true);
     await token1Mock.approve.returns(true);
     await tokenIn.approve.returns(true);
+    uniswapPairMock.approve.returns(true);
 
     await quickswapYnftVault.createYNFT(tokenIn.address,
                                   amountIn,

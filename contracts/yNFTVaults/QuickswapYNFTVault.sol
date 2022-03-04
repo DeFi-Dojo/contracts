@@ -15,14 +15,12 @@ contract QuickswapYNFTVault is YNFTVault {
   IERC20 public immutable secondToken;
   IUniswapV2Pair public immutable pair;
   IStakingDualRewards public immutable stakingDualRewards;
-  IStakingRewards public immutable dragonSyrup;
   IERC20 public immutable dQuick;
 
   constructor(
     IUniswapV2Router02 _dexRouter,
     IUniswapV2Pair _pair,
     IStakingDualRewards _stakingDualRewards,
-    IStakingRewards _dragonSyrup,
     IERC20 _dQuick,
     address _harvester,
     address _beneficiary,
@@ -41,7 +39,6 @@ contract QuickswapYNFTVault is YNFTVault {
   {
     pair = _pair;
     stakingDualRewards = _stakingDualRewards;
-    dragonSyrup = _dragonSyrup;
     dQuick = _dQuick;
     firstToken = IERC20(_pair.token0());
     secondToken = IERC20(_pair.token1());
@@ -111,32 +108,6 @@ contract QuickswapYNFTVault is YNFTVault {
       "approve failed."
     );
     stakingDualRewards.stake(_liquidity);
-  }
-
-  function getRewardFromDragonSyrup()
-    external
-    onlyRole(HARVESTER_ROLE)
-    whenNotPaused
-  {
-    dragonSyrup.getReward();
-  }
-
-  function farmDQuick() external onlyRole(HARVESTER_ROLE) whenNotPaused {
-    uint256 balance = dQuick.balanceOf(address(this));
-    require(dQuick.approve(address(dragonSyrup), balance), "approve failed.");
-    dragonSyrup.stake(balance);
-  }
-
-  function withdrawDQuick(uint256 _amount)
-    external
-    onlyRole(HARVESTER_ROLE)
-    whenNotPaused
-  {
-    dragonSyrup.withdraw(_amount);
-  }
-
-  function exitDQuick() external onlyRole(HARVESTER_ROLE) whenNotPaused {
-    dragonSyrup.exit();
   }
 
   function _mintYNFTForLiquidity(uint256 _liquidity) private {
@@ -386,7 +357,7 @@ contract QuickswapYNFTVault is YNFTVault {
     );
 
     _mintYNFTForLiquidity(liquidity);
-//    _farmLiquidity(liquidity);
+    _farmLiquidity(liquidity);
   }
 
   function createYNFTForEther(
