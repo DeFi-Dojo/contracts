@@ -20,6 +20,9 @@ const {
   BENEFICIARY_ADDRESS,
   HARDHAT_FORKING_URL,
   NFT_FACTORY_OWNER_ADDRESS,
+  MORALIS_SERVER_URL,
+  MORALIS_APP_ID,
+  MORALIS_MASTER_KEY,
 } = process.env;
 
 if (
@@ -38,7 +41,10 @@ if (
   HARVESTER_ADDRESS === undefined ||
   BENEFICIARY_ADDRESS === undefined ||
   HARDHAT_FORKING_URL === undefined ||
-  NFT_FACTORY_OWNER_ADDRESS === undefined
+  NFT_FACTORY_OWNER_ADDRESS === undefined ||
+  MORALIS_SERVER_URL === undefined ||
+  MORALIS_APP_ID === undefined ||
+  MORALIS_MASTER_KEY === undefined
 ) {
   throw new Error("ENV not valid");
 }
@@ -61,4 +67,7 @@ export default {
   BENEFICIARY_ADDRESS,
   HARDHAT_FORKING_URL,
   NFT_FACTORY_OWNER_ADDRESS,
+  MORALIS_SERVER_URL,
+  MORALIS_APP_ID,
+  MORALIS_MASTER_KEY,
 };

@@ -10,6 +10,7 @@
   "scripts": {
     "run:node": "hardhat node",
     "deploy:nft:and:opensea:factory": "hardhat run scripts/nft/deploy-nft-and-nft-factory-to-opensea.ts",
+    "upload:ynft:metadata": "ts-node scripts/ynft/metadata/upload-metadata.ts",
     "pretest": "hardhat compile",
     "test": "hardhat test --config test.config.ts",
     "test:types": "tsc --project ./tsconfig.json --noEmit",

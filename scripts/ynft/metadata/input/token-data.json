@@ -1,0 +1,44 @@
+[
+  {
+    "Platform": "AAVE",
+    "Pool": "USDC",
+    "Description": "This yNFT contains USDC token. USDC is a digital dollar stablecoin. USDC is fully backed by cash and equivalents and short-duration U.S. Treasuries with a monthly public attestation reports regarding the reserve balances. Ao yNFT is deployed on Aave protocol, which is one of the biggest decentralized lending & borrowing cryptocurrency platforms. Beginning is easy - continuing is hard.",
+    "Name Suggestion": "Ao"
+  },
+  {
+    "Platform": "AAVE",
+    "Pool": "USDT",
+    "Description": "This yNFT contains USDT token. USDT is a digital token that is redeemable and exchangable with the conversion rate 1 USDT token = 1 USD. It is also the oldest stablecoin out the cryptosphere. Midori yNFT is deployed on Aave protocol, which is one of the biggest decentralized lending & borrowing cryptocurrency platforms. Opportunities multiply as they are seized.",
+    "Name Suggestion": "Midori"
+  },
+  {
+    "Platform": "AAVE",
+    "Pool": "DAI",
+    "Description": "This yNFT contains DAI token. DAI is a token created by MakerDAO that maintains a stable peg with US Dollar. DAI is a crypto-backed stablecoin, which means DAI is backed by other cryptocurrencies in a collateralized manner. Kiiro yNFT is deployed on Aave protocol, which is one of the biggest decentralized lending & borrowing cryptocurrency platforms. Give your best.",
+    "Name Suggestion": "Kiiro"
+  },
+  {
+    "Platform": "Quickswap",
+    "Pool": "MATIC/USDC",
+    "Description": "This yNFT contains MATIC and USDC tokens. MATIC is a native token of Polygon Network that is a protocol and a framework for building and connecting Ethereum-compatible blockchain networks. USDC is a digital dollar stablecoin. USDC is fully backed by cash and equivalents and short-duration U.S. Treasuries with a monthly public attestation reports regarding the reserve balances. Aosaki yNFT is deployed on QuickSwap, which is the biggest decentralized exchange utilizing Polygon Network. A samurai with no group and no horse is not a samurai at all.",
+    "Name Suggestion": "Aosaki"
+  },
+  {
+    "Platform": "Quickswap",
+    "Pool": "MATIC/QUICK",
+    "Description": "This yNFT contains MATIC and QUICK tokens. MATIC is a native token of Polygon Network that is a protocol and a framework for building and connecting Ethereum-compatible blockchain networks. QUICK is a token that powers QuickSwap exchange and can be used to create and vote on proposals governing QuickSwap. Hayai yNFT is deployed on QuickSwap, which is the biggest decentralized exchange utilizing Polygon Network. The new year begins.",
+    "Name Suggestion": "Hayai"
+  },
+  {
+    "Platform": "Quickswap",
+    "Pool": "MATIC/USDT",
+    "Description": "This yNFT contains MATIC and USDT tokens. MATIC is a native token of Polygon Network that is a protocol and a framework for building and connecting Ethereum-compatible blockchain networks. USDT is a crypto stablecoin that imitates 1:1 the value of US dollar. Ahegao yNFT is deployed on QuickSwap, which is the biggest decentralized exchange utilizing Polygon Network. Not everyone can be a samurai.",
+    "Name Suggestion": "Ahegao"
+  },
+  {
+    "Platform": "Quickswap",
+    "Pool": "MATIC/ETH",
+    "Description": "This yNFT contains MATIC and ETH tokens. MATIC is a native token of Polygon Network that is a protocol and a framework for building and connecting Ethereum-compatible blockchain networks. Ether [ETH] is the native token of Ethereum blockchain, which was the first cryptocurrency to implement smart contract functionality. Murasaki yNFT is deployed on QuickSwap, which is the biggest decentralized exchange utilizing Polygon Network. One should make his decisions within the space of seven breaths.",
+    "Name Suggestion": "Murasaki"
+  }
+]
