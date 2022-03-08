@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.5.0](https://github.com/DeFi-Dojo/contracts/compare/v1.4.0...v1.5.0) (2022-03-08)
+
+
+### Features
+
+* (dex-428) upload ynft metadata to ipfs ([#44](https://github.com/DeFi-Dojo/contracts/issues/44)) ([5c855e6](https://github.com/DeFi-Dojo/contracts/commit/5c855e6fca573e577482063c1e28396e775ba13e))
+
 # [1.4.0](https://github.com/DeFi-Dojo/contracts/compare/v1.3.0...v1.4.0) (2022-03-04)
 
 
