@@ -1,5 +1,3 @@
-/* eslint-disable no-await-in-loop */
-/* eslint-disable no-restricted-syntax */
 import { ethers } from "hardhat";
 import Moralis from "moralis/node";
 
@@ -7,6 +5,7 @@ import { DummyAaveYNFTVault__factory } from "../../typechain";
 import configEnv from "../../config";
 import { AaveVaultName, VaultsToDeploy } from "../../consts";
 import { uploadYnftMetadata } from "../../utils/ynft-metadata/upload-metadata";
+import { sequence } from "~/utils/promises";
 
 const {
   ADDRESSES,
@@ -64,15 +63,17 @@ const main = async () => {
     masterKey: MORALIS_MASTER_KEY,
   });
 
-  for (const vaultName of VaultsToDeploy) {
-    console.log(`${vaultName}: Upload metadata start`);
-    const ynftPathUri = await uploadYnftMetadata(vaultName);
-    console.log(`${vaultName}: Upload metadata success`);
+  await sequence(
+    [...VaultsToDeploy].map(async (vaultName) => {
+      console.log(`${vaultName}: Upload metadata start`);
+      const ynftPathUri = await uploadYnftMetadata(vaultName);
+      console.log(`${vaultName}: Upload metadata success`);
 
-    console.log(`${vaultName}: Deploy vault start`);
-    await deployYnftVault(aaveTokenAddresses[vaultName], ynftPathUri);
-    console.log(`${vaultName}: Deploy vault success`);
-  }
+      console.log(`${vaultName}: Deploy vault start`);
+      await deployYnftVault(aaveTokenAddresses[vaultName], ynftPathUri);
+      console.log(`${vaultName}: Deploy vault success`);
+    })
+  );
 };
 
 main()

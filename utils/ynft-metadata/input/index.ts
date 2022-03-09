@@ -1,6 +1,6 @@
 import path from "path";
-import { VaultName } from "../../../../consts";
-import { readFileInFolder } from "../moralis-ipfs";
+import { VaultName } from "../../../consts";
+import { readFileInFolder } from "../../moralis-ipfs";
 import tokensData from "./token-data.json";
 
 const imagesDirectory = path.join(__dirname, "images");

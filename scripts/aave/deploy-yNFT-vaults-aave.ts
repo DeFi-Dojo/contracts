@@ -4,6 +4,7 @@ import { AaveYNFTVault__factory } from "../../typechain";
 import configEnv from "../../config";
 import { VaultsToDeploy } from "../../consts";
 import { uploadYnftMetadata } from "../../utils/ynft-metadata/upload-metadata";
+import { sequence } from "~/utils/promises";
 
 const { ADDRESSES, HARVESTER_ADDRESS, BENEFICIARY_ADDRESS, MORALIS_IPFS_URL } =
   configEnv;
@@ -35,7 +36,7 @@ const deployYnftVault = async (ynftPathUri: string) => {
 };
 
 async function main() {
-  await Promise.all(
+  await sequence(
     [...VaultsToDeploy].map(async (vaultName) => {
       console.log(`${vaultName}: Upload metadata start`);
       const ynftPathUri = await uploadYnftMetadata(vaultName);
