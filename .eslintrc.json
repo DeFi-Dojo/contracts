@@ -10,8 +10,8 @@
   },
   "plugins": ["@typescript-eslint"],
   "rules": {
-    "import/prefer-default-export": "warn",
     "no-console": "off",
-    "@typescript-eslint/quotes": ["warn", "double"]
+    "@typescript-eslint/quotes": ["warn", "double"],
+    "import/prefer-default-export": "off"
   }
 }

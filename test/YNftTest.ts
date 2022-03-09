@@ -22,6 +22,7 @@ describe("YNFTVault", () => {
     expect(await ynft.name()).to.equal("Dojo yNFT");
     expect(await ynft.symbol()).to.equal("yNFT");
     expect(await ynft["tokenURI()"]()).to.equal("base.uri/path");
+    expect(await ynft["tokenURI(uint256)"](0)).to.equal("base.uri/path");
   });
 
   it("should not mint if not owner", async () => {

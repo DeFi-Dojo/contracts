@@ -8,6 +8,27 @@ export const DECIMALS = {
   USDC: 6,
 };
 
+export type VaultName = AaveVaultName | QuickswapVaultName;
+
+export enum AaveVaultName {
+  aaveUsdc = "Ao",
+  aaveUsdt = "Midori",
+  aaveDai = "Kiiro",
+}
+
+export enum QuickswapVaultName {
+  quickswapMaticUsdc = "Aosaki",
+  quickswapMaticQuick = "Hayai",
+  quickswapMaticUsdt = "Ahegao",
+  quickswapMaticEth = "Murasaki",
+}
+
+export const VaultsToDeploy = new Set<AaveVaultName>([
+  AaveVaultName.aaveUsdc,
+  AaveVaultName.aaveUsdt,
+  AaveVaultName.aaveDai,
+]);
+
 interface Address {
   INCENTIVES_CONTROLLER: string;
   ROUTER_02_SUSHISWAP: string;
