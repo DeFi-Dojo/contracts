@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.6.0](https://github.com/DeFi-Dojo/contracts/compare/v1.5.0...v1.6.0) (2022-03-09)
+
+
+### Features
+
+* (dex-370)(dex-293) align quickswap modifications + tests ([#43](https://github.com/DeFi-Dojo/contracts/issues/43)) ([4fe05d8](https://github.com/DeFi-Dojo/contracts/commit/4fe05d81e0235a1132ac6e35733d2b6919fa7fff))
+
 # [1.5.0](https://github.com/DeFi-Dojo/contracts/compare/v1.4.0...v1.5.0) (2022-03-08)
 
 
