@@ -5,6 +5,14 @@
 
 ### Features
 
+* add supported quickswap liquidity pair addersses ([58ac96b](https://github.com/DeFi-Dojo/contracts/commit/58ac96b06d569aa7a6249960b9badc96667b19eb))
+* dex-429/deploy vaults with metadata ([#45](https://github.com/DeFi-Dojo/contracts/issues/45)) ([b251bd9](https://github.com/DeFi-Dojo/contracts/commit/b251bd9dae8b4e24d86f414e723aa5817e2e8343))
+
+# [1.7.0](https://github.com/DeFi-Dojo/contracts/compare/v1.6.0...v1.7.0) (2022-03-09)
+
+
+### Features
+
 * dex-429/deploy vaults with metadata ([#45](https://github.com/DeFi-Dojo/contracts/issues/45)) ([12bc1ae](https://github.com/DeFi-Dojo/contracts/commit/12bc1ae95e96bb18acd9f1bef7b9bf9571d22128))
 
 # [1.6.0](https://github.com/DeFi-Dojo/contracts/compare/v1.5.0...v1.6.0) (2022-03-09)
