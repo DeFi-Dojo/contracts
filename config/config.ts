@@ -23,6 +23,7 @@ const {
   MORALIS_SERVER_URL,
   MORALIS_APP_ID,
   MORALIS_MASTER_KEY,
+  MORALIS_IPFS_URL,
 } = process.env;
 
 if (
@@ -44,7 +45,8 @@ if (
   NFT_FACTORY_OWNER_ADDRESS === undefined ||
   MORALIS_SERVER_URL === undefined ||
   MORALIS_APP_ID === undefined ||
-  MORALIS_MASTER_KEY === undefined
+  MORALIS_MASTER_KEY === undefined ||
+  MORALIS_IPFS_URL === undefined
 ) {
   throw new Error("ENV not valid");
 }
@@ -70,4 +72,5 @@ export default {
   MORALIS_SERVER_URL,
   MORALIS_APP_ID,
   MORALIS_MASTER_KEY,
+  MORALIS_IPFS_URL,
 };
