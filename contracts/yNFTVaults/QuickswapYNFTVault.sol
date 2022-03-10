@@ -115,7 +115,6 @@ contract QuickswapYNFTVault is YNFTVault {
     balanceOf[tokenId] = _liquidity;
   }
 
-  // TODO BUG: Cannot buy yNFT for WMATIC in WMATIC/USDT pool on quickswap https://jira.minebest.com/browse/DEX-322
   function _depositLiquidityForEther(
     uint256 _amountToBuyOneAsstet,
     uint256 _amountOutMinFirstToken,
@@ -195,10 +194,6 @@ contract QuickswapYNFTVault is YNFTVault {
         _deadline
       );
     }
-    require(
-      firstToken.approve(address(dexRouter), amountFirstToken),
-      "approve failed."
-    );
 
     uint256 amountSecondToken;
     if (_tokenIn == address(secondToken)) {
@@ -213,6 +208,11 @@ contract QuickswapYNFTVault is YNFTVault {
         _deadline
       );
     }
+
+    require(
+      firstToken.approve(address(dexRouter), amountFirstToken),
+      "approve failed."
+    );
     require(
       secondToken.approve(address(dexRouter), amountSecondToken),
       "approve failed."
