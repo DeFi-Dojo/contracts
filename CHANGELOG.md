@@ -1,5 +1,18 @@
 # Changelog
 
+# [1.7.0](https://github.com/DeFi-Dojo/contracts/compare/v1.6.0...v1.7.0) (2022-03-14)
+
+
+### Bug Fixes
+
+* update vault images ([#49](https://github.com/DeFi-Dojo/contracts/issues/49)) ([65020a1](https://github.com/DeFi-Dojo/contracts/commit/65020a137ab7691602ae508df9b5bde41a27fe0f))
+
+
+### Features
+
+* add supported quickswap liquidity pair addersses ([58ac96b](https://github.com/DeFi-Dojo/contracts/commit/58ac96b06d569aa7a6249960b9badc96667b19eb))
+* dex-429/deploy vaults with metadata ([#45](https://github.com/DeFi-Dojo/contracts/issues/45)) ([b251bd9](https://github.com/DeFi-Dojo/contracts/commit/b251bd9dae8b4e24d86f414e723aa5817e2e8343))
+
 # [1.7.0](https://github.com/DeFi-Dojo/contracts/compare/v1.6.0...v1.7.0) (2022-03-09)
 
 
