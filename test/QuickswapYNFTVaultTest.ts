@@ -240,6 +240,27 @@ describe("QuickswapYNFTVault", () => {
     );
   });
 
+  it("withdrawToUnderlyingTokens should revert if not called by owner", async () => {
+    uniswapRouterMock.swapExactETHForTokens.returns([1000, 300]);
+    await token0Mock.approve.returns(true);
+    await token1Mock.approve.returns(true);
+    uniswapPairMock.approve.returns(true);
+    await quickswapYnftVault.createYNFTForEther(900, 800, 100, 100, 101);
+
+    const TOKEN_ID = 0;
+    const amountOutMinFirstToken = 900;
+    const amountOutMinSecondToken = 800;
+    const DEADLINE = 101;
+    const signers = await ethers.getSigners();
+
+    await expectRevert(quickswapYnftVault.connect(signers[1]).withdrawToUnderlyingTokens(
+        TOKEN_ID,
+        amountOutMinFirstToken,
+        amountOutMinSecondToken,
+        DEADLINE
+    ), "Sender is not owner of the NFT");
+  });
+
   it("withdrawToEther should call removeLiquidity and swap to ether", async () => {
     uniswapRouterMock.swapExactETHForTokens.returns([1000, 300]);
     await token0Mock.approve.returns(true);
