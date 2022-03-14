@@ -16,6 +16,7 @@ contract QuickswapYNFTVault is YNFTVault {
   IUniswapV2Pair public immutable pair;
   IStakingDualRewards public immutable stakingDualRewards;
   IERC20 public immutable dQuick;
+  uint256 public totalSupply;
 
   constructor(
     IUniswapV2Router02 _dexRouter,
@@ -55,6 +56,7 @@ contract QuickswapYNFTVault is YNFTVault {
     require(_tokenIn != address(pair), "Cannot deposit LP tokens");
 
     uint256 balance = IERC20(_tokenIn).balanceOf(address(this));
+    totalSupply += balance;
 
     uint256 amountToBuyOneAsstet = balance / 2;
 
@@ -79,6 +81,7 @@ contract QuickswapYNFTVault is YNFTVault {
     uint256 _deadline
   ) external onlyRole(HARVESTER_ROLE) whenNotPaused {
     uint256 balance = address(this).balance;
+    totalSupply += balance;
 
     uint256 amountToBuyOneAsstet = balance / 2;
 
@@ -112,7 +115,15 @@ contract QuickswapYNFTVault is YNFTVault {
 
   function _mintYNFTForLiquidity(uint256 _liquidity) private {
     uint256 tokenId = yNFT.mint(msg.sender);
-    balanceOf[tokenId] = _liquidity;
+    if (totalSupply == 0) {
+      balanceOf[tokenId] = _liquidity;
+      totalSupply = _liquidity;
+    } else {
+      uint256 currentLiquidity = pair.balanceOf(address(this));
+      uint256 balance = (_liquidity * totalSupply) / currentLiquidity;
+      balanceOf[tokenId] = balance;
+      totalSupply = totalSupply + balance;
+    }
   }
 
   function _depositLiquidityForEther(
@@ -243,9 +254,16 @@ contract QuickswapYNFTVault is YNFTVault {
 
     balanceOf[_nftTokenId] = 0;
 
+    uint256 currentLiquidity = pair.balanceOf(address(this));
+    uint256 balanceToWithdraw = (balance * currentLiquidity) / totalSupply;
+    totalSupply -= balance;
+
     _withrdrawFromLPMining(balance);
 
-    require(pair.approve(address(dexRouter), balance), "approve failed.");
+    require(
+      pair.approve(address(dexRouter), balanceToWithdraw),
+      "approve failed."
+    );
 
     uint256 amountFirstToken;
     uint256 amountSecondToken;
@@ -253,7 +271,7 @@ contract QuickswapYNFTVault is YNFTVault {
     if (address(firstToken) == dexRouter.WETH()) {
       (amountSecondToken, amountFirstToken) = dexRouter.removeLiquidityETH(
         address(secondToken),
-        balance,
+        balanceToWithdraw,
         _amountOutMinSecondToken,
         _amountOutMinFirstToken,
         address(this),
@@ -267,7 +285,7 @@ contract QuickswapYNFTVault is YNFTVault {
       (amountFirstToken, amountSecondToken) = dexRouter.removeLiquidity(
         address(firstToken),
         address(secondToken),
-        balance,
+        balanceToWithdraw,
         _amountOutMinFirstToken,
         _amountOutMinSecondToken,
         address(this),
@@ -302,6 +320,7 @@ contract QuickswapYNFTVault is YNFTVault {
     uint256 balance = balanceOf[_nftTokenId];
 
     balanceOf[_nftTokenId] = 0;
+    totalSupply -= balance;
 
     _withrdrawFromLPMining(balance);
 
