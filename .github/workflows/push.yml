@@ -27,5 +27,5 @@ jobs:
       - name: hardhat test's
         run: yarn run test
 
-      # - name: solhint
-      #   run: yarn run solhint
+      - name: solhint
+        run: yarn run solhint
