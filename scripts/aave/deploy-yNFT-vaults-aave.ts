@@ -2,14 +2,14 @@ import { ethers } from "hardhat";
 
 import { AaveYNFTVault__factory } from "../../typechain";
 import configEnv from "../../config";
-import { VaultsToDeploy } from "../../consts";
+import { AaveVaultsToDeploy } from "../../consts";
 import { uploadYnftMetadata } from "../../utils/ynft-metadata/upload-metadata";
-import { sequence } from "~/utils/promises";
+import { sequence } from "../../utils/promises";
 
 const { ADDRESSES, HARVESTER_ADDRESS, BENEFICIARY_ADDRESS, MORALIS_IPFS_URL } =
   configEnv;
 
-const deployYnftVault = async (ynftPathUri: string) => {
+const deployAaveYnftVault = async (ynftPathUri: string) => {
   const contractName = "AaveYNFTVault";
   const [owner] = await ethers.getSigners();
   console.log(`Deploying contracts using address: ${owner.address}`);
@@ -37,13 +37,13 @@ const deployYnftVault = async (ynftPathUri: string) => {
 
 async function main() {
   await sequence(
-    [...VaultsToDeploy].map(async (vaultName) => {
+    [...AaveVaultsToDeploy].map(async (vaultName) => {
       console.log(`${vaultName}: Upload metadata start`);
       const ynftPathUri = await uploadYnftMetadata(vaultName);
       console.log(`${vaultName}: Upload metadata success`);
 
       console.log(`${vaultName}: Deploy vault start`);
-      await deployYnftVault(ynftPathUri);
+      await deployAaveYnftVault(ynftPathUri);
       console.log(`${vaultName}: Deploy vault success`);
     })
   );

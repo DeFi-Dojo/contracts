@@ -1,47 +1,37 @@
 import { ethers } from "hardhat";
-import Moralis from "moralis/node";
 
-import { DummyAaveYNFTVault__factory } from "../../typechain";
+import { QuickswapYNFTVault__factory } from "../../typechain";
 import configEnv from "../../config";
-import { AaveVaultName, AaveVaultsToDeploy } from "../../consts";
+import { QuickswapVaultName, QuickswapVaultsToDeploy } from "../../consts";
 import { uploadYnftMetadata } from "../../utils/ynft-metadata/upload-metadata";
 import { sequence } from "../../utils/promises";
 
-const {
-  ADDRESSES,
-  HARVESTER_ADDRESS,
-  BENEFICIARY_ADDRESS,
-  MORALIS_IPFS_URL,
-  MORALIS_APP_ID,
-  MORALIS_SERVER_URL,
-  MORALIS_MASTER_KEY,
-} = configEnv;
+const { ADDRESSES, HARVESTER_ADDRESS, BENEFICIARY_ADDRESS, MORALIS_IPFS_URL } =
+  configEnv;
 
-const aaveTokenAddresses: { [k in AaveVaultName]: string } = {
-  [AaveVaultName.dai]: ADDRESSES.A_DAI,
-  [AaveVaultName.usdc]: ADDRESSES.A_USDC,
-  [AaveVaultName.usdt]: ADDRESSES.A_USDT,
+const quickswapTokenPairAddresses: { [k in QuickswapVaultName]: string } = {
+  [QuickswapVaultName.maticEth]: ADDRESSES.PAIR_WMATIC_WETH_QUICKSWAP,
+  [QuickswapVaultName.maticQuick]: ADDRESSES.PAIR_WMATIC_QUICK_QUICKSWAP,
+  [QuickswapVaultName.maticUsdc]: ADDRESSES.PAIR_WMATIC_USDC_QUICKSWAP,
+  [QuickswapVaultName.maticUsdt]: ADDRESSES.PAIR_WMATIC_USDT_QUICKSWAP,
 };
 
-const deployYnftVault = async (
-  aaveTokenAddress: string,
+const deployQuickswapYnftVault = async (
+  quickswapTokenPairAddress: string,
   ynftPathUri: string
 ) => {
-  const contractName = "DummyAaveYNFTVault";
+  const contractName = "QuickswapYNFTVault";
   const [owner] = await ethers.getSigners();
   console.log(`Deploying contracts using address: ${owner.address}`);
 
   const contractFactory =
-    await ethers.getContractFactory<DummyAaveYNFTVault__factory>(contractName);
-
-  if (!aaveTokenAddress) {
-    throw new Error("Please specify env variable AAVE_TOKEN_ADDRESS");
-  }
+    await ethers.getContractFactory<QuickswapYNFTVault__factory>(contractName);
 
   const contract = await contractFactory.deploy(
     ADDRESSES.ROUTER_02_QUICKSWAP,
-    aaveTokenAddress, // A_DAI, A_USDT, A_USDC
-    ADDRESSES.INCENTIVES_CONTROLLER,
+    quickswapTokenPairAddress,
+    ADDRESSES.STAKING_DUAL_REWARDS_QUICKSWAP,
+    ADDRESSES.DQUICK,
     HARVESTER_ADDRESS,
     BENEFICIARY_ADDRESS,
     "Dojo yNFT",
@@ -56,19 +46,22 @@ const deployYnftVault = async (
   console.log(`${contractName} ynft address: `, ynftAddress);
 };
 
-const main = async () => {
+async function main() {
   await sequence(
-    [...AaveVaultsToDeploy].map(async (vaultName) => {
+    [...QuickswapVaultsToDeploy].map(async (vaultName) => {
       console.log(`${vaultName}: Upload metadata start`);
       const ynftPathUri = await uploadYnftMetadata(vaultName);
       console.log(`${vaultName}: Upload metadata success`);
 
       console.log(`${vaultName}: Deploy vault start`);
-      await deployYnftVault(aaveTokenAddresses[vaultName], ynftPathUri);
+      await deployQuickswapYnftVault(
+        quickswapTokenPairAddresses[vaultName],
+        ynftPathUri
+      );
       console.log(`${vaultName}: Deploy vault success`);
     })
   );
-};
+}
 
 main()
   .then(() => process.exit(0))

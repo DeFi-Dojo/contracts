@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import * as consts from "../consts";
+import { Network } from "../consts";
 
 dotenv.config();
 
@@ -60,7 +61,7 @@ export default {
   NFT_FACTORY_BASE_URI,
   KOVAN_API_URL,
   POLYGON_MAINNET_API_URL,
-  ADDRESSES: consts.NETWORK_ADDRESSES[DEFAULT_NETWORK.toUpperCase()],
+  ADDRESSES: consts.NETWORK_ADDRESSES[DEFAULT_NETWORK.toUpperCase() as Network],
   VAULT_ADDRESS,
   DEFENDER_TEAM_API_KEY,
   DEFENDER_TEAM_API_SECRET,
