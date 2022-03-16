@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.8.0](https://github.com/DeFi-Dojo/contracts/compare/v1.7.0...v1.8.0) (2022-03-16)
+
+
+### Features
+
+* update quickswap deployment script with metadata ([#51](https://github.com/DeFi-Dojo/contracts/issues/51)) ([986c4da](https://github.com/DeFi-Dojo/contracts/commit/986c4da287bfd364547f96f7c5ae628dd5ac05bc))
+
 # [1.7.0](https://github.com/DeFi-Dojo/contracts/compare/v1.6.0...v1.7.0) (2022-03-15)
 
 
