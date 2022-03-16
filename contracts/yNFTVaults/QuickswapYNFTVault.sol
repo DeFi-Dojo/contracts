@@ -56,7 +56,6 @@ contract QuickswapYNFTVault is YNFTVault {
     require(_tokenIn != address(pair), "Cannot deposit LP tokens");
 
     uint256 balance = IERC20(_tokenIn).balanceOf(address(this));
-    totalSupply += balance;
 
     uint256 amountToBuyOneAsstet = balance / 2;
 
@@ -81,7 +80,6 @@ contract QuickswapYNFTVault is YNFTVault {
     uint256 _deadline
   ) external onlyRole(HARVESTER_ROLE) whenNotPaused {
     uint256 balance = address(this).balance;
-    totalSupply += balance;
 
     uint256 amountToBuyOneAsstet = balance / 2;
 
