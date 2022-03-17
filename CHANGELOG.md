@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.9.0](https://github.com/DeFi-Dojo/contracts/compare/v1.8.0...v1.9.0) (2022-03-17)
+
+
+### Features
+
+* dex 327/quickswap vault rewards accounting ([#50](https://github.com/DeFi-Dojo/contracts/issues/50)) ([967a43b](https://github.com/DeFi-Dojo/contracts/commit/967a43b21c9c52082f298f83ecd13acfeda8e565))
+
 # [1.8.0](https://github.com/DeFi-Dojo/contracts/compare/v1.7.0...v1.8.0) (2022-03-16)
 
 
