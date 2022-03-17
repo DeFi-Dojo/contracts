@@ -20,6 +20,9 @@ const moralisStartP = Moralis.start({
 
 export const uploadYnftMetadata = async (name: VaultName) => {
   await moralisStartP;
+
+  console.log(`Uploading metadata for "${name}"`);
+
   const data = getTokenDataByVault(name);
 
   const imageFile = readImageFileByVault(name);
@@ -33,9 +36,10 @@ export const uploadYnftMetadata = async (name: VaultName) => {
     imageBaseUri: MORALIS_IPFS_URL,
     imagePathUri: imageIpfsHash,
   });
+
   const metaIpfsHash = await saveJsonToIpfs([name, "json"].join("."), metadata);
 
-  console.log(`Generated metadata for ${name}`, metadata, "\n");
+  console.log(`Uploaded metadata for "${name}"`, metadata, "\n");
 
   return metaIpfsHash;
 };

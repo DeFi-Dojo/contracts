@@ -23,15 +23,15 @@ export enum QuickswapVaultName {
   maticEth = "Murasaki",
 }
 
-export const AaveVaultsToDeploy = new Set<AaveVaultName>([
+export const AaveVaultsToDeploy = [
   AaveVaultName.usdc,
   AaveVaultName.usdt,
   AaveVaultName.dai,
-]);
+];
 
-export const QuickswapVaultsToDeploy = new Set<QuickswapVaultName>([
+export const QuickswapVaultsToDeploy = [
   QuickswapVaultName.maticUsdc,
   QuickswapVaultName.maticQuick,
   QuickswapVaultName.maticUsdt,
   QuickswapVaultName.maticEth,
-]);
+];

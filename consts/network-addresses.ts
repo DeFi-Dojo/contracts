@@ -1,3 +1,5 @@
+import { AaveVaultName, QuickswapVaultName, VaultName } from "./consts";
+
 interface Addresses {
   INCENTIVES_CONTROLLER: string;
   ROUTER_02_SUSHISWAP: string;
@@ -123,4 +125,37 @@ export const NETWORK_ADDRESSES: AddressesPerNetwork = {
   MUMBAI,
   KOVAN,
   RINKEBY,
+};
+
+export const getQuickswapTokenPairAddress = (
+  ADDRESSES: Pick<
+    Addresses,
+    | "PAIR_WMATIC_QUICK_QUICKSWAP"
+    | "PAIR_WMATIC_USDC_QUICKSWAP"
+    | "PAIR_WMATIC_USDT_QUICKSWAP"
+    | "PAIR_WMATIC_WETH_QUICKSWAP"
+  >,
+  quickswapVaultName: QuickswapVaultName
+) => {
+  const tokenPairAddresses: { [k in QuickswapVaultName]: string } = {
+    [QuickswapVaultName.maticEth]: ADDRESSES.PAIR_WMATIC_WETH_QUICKSWAP,
+    [QuickswapVaultName.maticQuick]: ADDRESSES.PAIR_WMATIC_QUICK_QUICKSWAP,
+    [QuickswapVaultName.maticUsdc]: ADDRESSES.PAIR_WMATIC_USDC_QUICKSWAP,
+    [QuickswapVaultName.maticUsdt]: ADDRESSES.PAIR_WMATIC_USDT_QUICKSWAP,
+  };
+
+  return tokenPairAddresses[quickswapVaultName];
+};
+
+export const getAaveTokenAddress = (
+  ADDRESSES: Pick<Addresses, "A_DAI" | "A_USDC" | "A_USDT">,
+  aaveVaultName: AaveVaultName
+) => {
+  const aaveTokenAddresses: { [k in AaveVaultName]: string } = {
+    [AaveVaultName.dai]: ADDRESSES.A_DAI,
+    [AaveVaultName.usdc]: ADDRESSES.A_USDC,
+    [AaveVaultName.usdt]: ADDRESSES.A_USDT,
+  };
+
+  return aaveTokenAddresses[aaveVaultName];
 };
