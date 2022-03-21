@@ -47,7 +47,7 @@ contract DummyQuickswapYNFTVault is QuickswapYNFTVault {
       require(pair.approve(address(dexRouter), balance), "approve failed.");
 
       if (address(firstToken) == dexRouter.WETH()) {
-        (uint amountToken, uint amountETH) = dexRouter.removeLiquidityETH(
+        (uint256 amountToken, uint256 amountETH) = dexRouter.removeLiquidityETH(
           address(secondToken),
           balance,
           0,
@@ -57,14 +57,14 @@ contract DummyQuickswapYNFTVault is QuickswapYNFTVault {
         );
 
         _swapTokenToETH(
-            address(this),
-            amountToken,
-            0,
-            address(secondToken),
-            block.timestamp + 1 days
+          address(this),
+          amountToken,
+          0,
+          address(secondToken),
+          block.timestamp + 1 days
         );
       } else {
-        (uint amountA, uint amountB) = dexRouter.removeLiquidity(
+        (uint256 amountA, uint256 amountB) = dexRouter.removeLiquidity(
           address(firstToken),
           address(secondToken),
           balance,
@@ -75,19 +75,19 @@ contract DummyQuickswapYNFTVault is QuickswapYNFTVault {
         );
 
         _swapTokenToETH(
-        address(this),
-        amountA,
-        0,
-        address(firstToken),
-        block.timestamp + 1 days
+          address(this),
+          amountA,
+          0,
+          address(firstToken),
+          block.timestamp + 1 days
         );
 
         _swapTokenToETH(
-        address(this),
-        amountB,
-        0,
-        address(secondToken),
-        block.timestamp + 1 days
+          address(this),
+          amountB,
+          0,
+          address(secondToken),
+          block.timestamp + 1 days
         );
       }
     }
