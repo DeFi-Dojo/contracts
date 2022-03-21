@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.10.0](https://github.com/DeFi-Dojo/contracts/compare/v1.9.0...v1.10.0) (2022-03-21)
+
+
+### Features
+
+* dex-295/scripts for prod deployment ([#53](https://github.com/DeFi-Dojo/contracts/issues/53)) ([21cb140](https://github.com/DeFi-Dojo/contracts/commit/21cb14019c9b79af0854bca3dc6bd493358bffc0))
+
 # [1.9.0](https://github.com/DeFi-Dojo/contracts/compare/v1.8.0...v1.9.0) (2022-03-17)
 
 
