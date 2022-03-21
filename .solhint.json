@@ -1,14 +1,14 @@
 {
   "extends": "solhint:recommended",
-  "rules":
-  {
+  "rules": {
     "compiler-version": ["warn", "^0.8.0"],
-    "func-visibility": ["warn",{"ignoreConstructors":true}],
+    "func-visibility": ["warn", { "ignoreConstructors": true }],
     "no-empty-blocks": "off",
     "prettier/prettier": "error",
     "avoid-throw": false,
     "avoid-suicide": "error",
-    "avoid-sha3": "warn"
+    "avoid-sha3": "warn",
+    "reason-string": ["warn", { "maxLength": 64 }]
   },
   "plugins": ["prettier"]
 }

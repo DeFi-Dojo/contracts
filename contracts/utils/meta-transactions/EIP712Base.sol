@@ -47,6 +47,7 @@ contract EIP712Base is Initializable {
 
   function getChainId() public view returns (uint256) {
     uint256 id;
+    // solhint-disable-next-line no-inline-assembly
     assembly {
       id := chainid()
     }
