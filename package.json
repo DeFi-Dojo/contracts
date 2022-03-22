@@ -17,6 +17,7 @@
     "pretest": "hardhat compile",
     "test": "hardhat test --config test.config.ts",
     "test:types": "tsc --project ./tsconfig.json --noEmit",
+    "test:mythril": "./mythril-analyze.sh",
     "build": "npm run build:ts && npm run build:contracts",
     "build:ts": "tsc --project tsconfig.json",
     "build:contracts": "hardhat compile",

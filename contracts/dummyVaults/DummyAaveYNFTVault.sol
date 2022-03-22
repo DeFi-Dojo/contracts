@@ -3,7 +3,6 @@
 pragma solidity ^0.8.0;
 
 import "../yNFTVaults/AaveYNFTVault.sol";
-import "hardhat/console.sol";
 
 contract DummyAaveYNFTVault is AaveYNFTVault {
   using Counters for Counters.Counter;
