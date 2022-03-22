@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.12.0](https://github.com/DeFi-Dojo/contracts/compare/v1.11.0...v1.12.0) (2022-03-22)
+
+
+### Features
+
+* dex-492 DummyQuickswapYNFTVault contract ([#55](https://github.com/DeFi-Dojo/contracts/issues/55)) ([59c6677](https://github.com/DeFi-Dojo/contracts/commit/59c66770d1f1717919c10f25b2435ff201c69c97))
+
 # [1.11.0](https://github.com/DeFi-Dojo/contracts/compare/v1.10.0...v1.11.0) (2022-03-22)
 
 
