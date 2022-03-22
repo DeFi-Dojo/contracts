@@ -111,7 +111,7 @@ contract QuickswapYNFTVault is YNFTVault {
     stakingDualRewards.stake(_liquidity);
   }
 
-  function _mintYNFTForLiquidity(uint256 _liquidity) private {
+  function _mintYNFTForLiquidity(uint256 _liquidity) internal virtual {
     uint256 tokenId = yNFT.mint(msg.sender);
     if (totalSupply == 0) {
       balanceOf[tokenId] = _liquidity;
