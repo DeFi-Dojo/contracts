@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.11.0](https://github.com/DeFi-Dojo/contracts/compare/v1.10.0...v1.11.0) (2022-03-22)
+
+
+### Features
+
+* fix all solhint warnings ([#54](https://github.com/DeFi-Dojo/contracts/issues/54)) ([69bc180](https://github.com/DeFi-Dojo/contracts/commit/69bc1808d6ca4f6ad840a35d40726e60c4b9205f))
+
 # [1.10.0](https://github.com/DeFi-Dojo/contracts/compare/v1.9.0...v1.10.0) (2022-03-21)
 
 
