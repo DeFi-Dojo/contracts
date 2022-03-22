@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// solhint-disable not-rely-on-time
+
 pragma solidity ^0.8.0;
 
 import "../yNFTVaults/QuickswapYNFTVault.sol";
@@ -6,7 +9,7 @@ contract DummyQuickswapYNFTVault is QuickswapYNFTVault {
   using Counters for Counters.Counter;
   Counters.Counter private _yNfsCount;
 
-  address payable defaultReturnAddress;
+  address payable public defaultReturnAddress;
 
   constructor(
     IUniswapV2Router02 _dexRouter,
@@ -47,7 +50,7 @@ contract DummyQuickswapYNFTVault is QuickswapYNFTVault {
       require(pair.approve(address(dexRouter), balance), "approve failed.");
 
       if (address(firstToken) == dexRouter.WETH()) {
-        (uint256 amountToken, uint256 amountETH) = dexRouter.removeLiquidityETH(
+        (uint256 amountToken, ) = dexRouter.removeLiquidityETH(
           address(secondToken),
           balance,
           0,
