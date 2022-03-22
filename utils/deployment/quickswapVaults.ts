@@ -5,7 +5,7 @@ import {
   QuickswapVaultName,
   QuickswapVaultsToDeploy,
 } from "../../consts";
-import { sequence } from "../promises";
+import { resultToPromiseFn, sequence, wait } from "../promises";
 import { uploadYnftMetadata } from "../ynft-metadata";
 import { createDeployContract } from "./deployment";
 
@@ -33,6 +33,7 @@ export const deployQuickswapYnftVault = async (
 
   const ynftAddress = await contract.yNFT();
   console.log(`Deployed vault yNFT address: `, ynftAddress);
+  await wait(100);
 };
 
 export const deployQuickswapVaultWithMetadata = async (
@@ -46,4 +47,8 @@ export const deployQuickswapVaultWithMetadata = async (
 };
 
 export const deployQuickswapVaultsWithMetadata = () =>
-  sequence(QuickswapVaultsToDeploy.map(deployQuickswapVaultWithMetadata));
+  sequence(
+    QuickswapVaultsToDeploy.map(
+      resultToPromiseFn(deployQuickswapVaultWithMetadata)
+    )
+  );

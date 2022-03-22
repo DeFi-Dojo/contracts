@@ -5,7 +5,7 @@ import {
   AaveVaultsToDeploy,
   getAaveTokenAddress,
 } from "../../consts";
-import { sequence } from "../promises";
+import { resultToPromiseFn, sequence, wait } from "../promises";
 import { uploadYnftMetadata } from "../ynft-metadata";
 import { createDeployContract } from "./deployment";
 
@@ -31,6 +31,7 @@ export const deployAaveYnftVault = async (
 
   const ynftAddress = await contract.yNFT();
   console.log(`Deployed vault yNFT address: `, ynftAddress);
+  await wait(100);
 };
 
 export const deployAaveVaultWithMetadata = async (vaultName: AaveVaultName) => {
@@ -42,4 +43,6 @@ export const deployAaveVaultWithMetadata = async (vaultName: AaveVaultName) => {
 };
 
 export const deployAaveVaultsWithMetadata = () =>
-  sequence(AaveVaultsToDeploy.map(deployAaveVaultWithMetadata));
+  sequence(
+    AaveVaultsToDeploy.map(resultToPromiseFn(deployAaveVaultWithMetadata))
+  );

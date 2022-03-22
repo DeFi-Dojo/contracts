@@ -1,4 +1,4 @@
-import { deployQuickswapVaultsWithMetadata } from "../../utils/deployment/quickswapVaults";
+import { deployQuickswapVaultsWithMetadata } from "../../utils";
 
 deployQuickswapVaultsWithMetadata()
   .then(() => process.exit(0))
