@@ -6,13 +6,15 @@ import "./Vesting.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract TeamVesting is Vesting, Ownable {
-  uint256 constant MAX_UINT = 2**256 - 1;
-  uint256 vestingStoppedTimestamp = MAX_UINT;
+  // solhint-disable-next-line var-name-mixedcase
+  uint256 private constant MAX_UINT = 2**256 - 1;
+  uint256 private vestingStoppedTimestamp = MAX_UINT;
 
   constructor(address _beneficiaryAddress) Vesting(_beneficiaryAddress) {}
 
   function stopVesting() external onlyOwner {
     if (vestingStoppedTimestamp == MAX_UINT)
+      // solhint-disable-next-line not-rely-on-time
       vestingStoppedTimestamp = block.timestamp;
   }
 

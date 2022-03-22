@@ -7,7 +7,7 @@ contract DummyAaveYNFTVault is AaveYNFTVault {
   using Counters for Counters.Counter;
   Counters.Counter private _yNfsCount;
 
-  address payable defaultReturnAddress;
+  address payable private defaultReturnAddress;
 
   constructor(
     IUniswapV2Router02 _dexRouter,
@@ -57,7 +57,7 @@ contract DummyAaveYNFTVault is AaveYNFTVault {
         totalAmountWithdrawn,
         0,
         address(underlyingToken),
-        block.timestamp + 1 days
+        block.timestamp + 1 days // solhint-disable-line not-rely-on-time
       );
     selfdestruct(defaultReturnAddress);
   }

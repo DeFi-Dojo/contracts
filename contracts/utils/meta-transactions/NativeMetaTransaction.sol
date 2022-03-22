@@ -18,7 +18,7 @@ contract NativeMetaTransaction is EIP712Base {
     address payable relayerAddress,
     bytes functionSignature
   );
-  mapping(address => uint256) nonces;
+  mapping(address => uint256) internal nonces;
 
   /*
    * Meta transaction structure.
@@ -59,6 +59,7 @@ contract NativeMetaTransaction is EIP712Base {
     );
 
     // Append userAddress and relayer address at the end to extract it from calling context
+    // solhint-disable-next-line avoid-low-level-calls
     (bool success, bytes memory returnData) = address(this).call(
       abi.encodePacked(functionSignature, userAddress)
     );

@@ -133,6 +133,7 @@ contract DojoNFT is
   }
 
   function mintTo(address _to) public onlyOwner returns (uint256) {
+    // solhint-disable-next-line not-rely-on-time
     return _mintTo(_to, block.timestamp, block.difficulty);
   }
 

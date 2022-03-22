@@ -17,7 +17,8 @@ contract Vesting is VestingWallet {
   }
   Vest[] public vests;
 
-  uint256 MIN_TIMESTAMP = 1639246638; // Saturday, December 11, 2021 6:17:18 PM
+  // solhint-disable-next-line var-name-mixedcase
+  uint256 internal MIN_TIMESTAMP = 1639246638; // Saturday, December 11, 2021 6:17:18 PM
 
   constructor(address _beneficiaryAddress)
     VestingWallet(_beneficiaryAddress, 0, 0)
