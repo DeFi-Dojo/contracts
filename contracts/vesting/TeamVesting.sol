@@ -3,7 +3,7 @@
 pragma solidity ^0.8.0;
 
 import "./Vesting.sol";
-import "../../node_modules/@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract TeamVesting is Vesting, Ownable {
   // solhint-disable-next-line var-name-mixedcase

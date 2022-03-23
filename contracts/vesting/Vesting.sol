@@ -2,9 +2,9 @@
 
 pragma solidity ^0.8.0;
 
-import "../../node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "../../node_modules/@openzeppelin/contracts/finance/VestingWallet.sol";
-import "../../node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/finance/VestingWallet.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract Vesting is VestingWallet {
   using SafeERC20 for IERC20;

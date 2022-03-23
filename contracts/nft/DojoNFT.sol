@@ -2,12 +2,12 @@
 
 pragma solidity ^0.8.0;
 
-import "../../node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "../../node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "../../node_modules/@openzeppelin/contracts/access/Ownable.sol";
-import "../../node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "../../node_modules/@openzeppelin/contracts/utils/Strings.sol";
-import "../../node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
 import "../utils/meta-transactions/ContentMixin.sol";
 import "../utils/meta-transactions/NativeMetaTransaction.sol";
@@ -244,7 +244,7 @@ contract DojoNFT is
   function isApprovedForAll(address _owner, address _operator)
     public
     view
-    override
+    override(ERC721, IERC721)
     returns (bool)
   {
     // Whitelist OpenSea proxy contract for easy trading.
