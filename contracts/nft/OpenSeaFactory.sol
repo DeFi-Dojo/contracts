@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.6;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
+import "../../node_modules/@openzeppelin/contracts/access/Ownable.sol";
+import "../../node_modules/@openzeppelin/contracts/utils/Strings.sol";
 import "../interfaces/nft/IFactoryERC721.sol";
 import "./DojoNFT.sol";
 
