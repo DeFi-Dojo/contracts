@@ -3,6 +3,7 @@ import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-waffle";
 import "@nomiclabs/hardhat-web3";
 import "hardhat-gas-reporter";
+import "@nomiclabs/hardhat-etherscan";
 
 import { task, HardhatUserConfig } from "hardhat/config";
 import configEnv from "./config";
@@ -15,6 +16,11 @@ const {
   KOVAN_API_URL,
   POLYGON_MAINNET_API_URL,
   HARDHAT_FORKING_URL,
+  HARVESTER_ADDRESS,
+  BENEFICIARY_ADDRESS,
+  MORALIS_IPFS_URL,
+  ADDRESSES,
+  ETHERSCAN_API_KEY,
 } = configEnv;
 
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
@@ -22,6 +28,53 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 
   accounts.forEach((account) => console.log(account.address));
 });
+
+task(
+  "polygonscan-verify-aave",
+  "Verifies contract of given address on polygonscan"
+)
+  .addParam("address", "contract address")
+  .addParam("aaveTokenAddress", "address of aToken")
+  .addParam("ynftPathUri", "uri path for ynft data")
+  .setAction(async (taskArgs, hre) => {
+    await hre.run("verify:verify", {
+      address: taskArgs.address,
+      constructorArguments: [
+        ADDRESSES.ROUTER_02_QUICKSWAP,
+        taskArgs.aaveTokenAddress, // A_DAI, A_USDT, A_USDC
+        ADDRESSES.INCENTIVES_CONTROLLER,
+        HARVESTER_ADDRESS,
+        BENEFICIARY_ADDRESS,
+        "Dojo yNFT",
+        MORALIS_IPFS_URL,
+        taskArgs.ynftPathUri,
+      ],
+    });
+  });
+
+task(
+  "polygonscan-verify-quickswap",
+  "Verifies contract of given address on polygonscan"
+)
+  .addParam("address", "contract address")
+  .addParam("quickswapTokenPairAddress", "address of quickswap pair")
+  .addParam("ynftPathUri", "uri path for ynft data")
+  .setAction(async (taskArgs, hre) => {
+    await hre.run("verify:verify", {
+      address: taskArgs.address,
+      constructorArguments: [
+        ADDRESSES.ROUTER_02_QUICKSWAP,
+        taskArgs.quickswapTokenPairAddress,
+        ADDRESSES.STAKING_DUAL_REWARDS_QUICKSWAP,
+        ADDRESSES.DQUICK,
+        HARVESTER_ADDRESS,
+        BENEFICIARY_ADDRESS,
+        "Dojo yNFT",
+        MORALIS_IPFS_URL,
+        taskArgs.ynftPathUri,
+      ],
+    });
+  });
 
 const accounts = {
   mnemonic: WALLET_MNEMONIC,
@@ -102,10 +155,10 @@ const config: HardhatUserConfig = {
     settings: {
       outputSelection: {
         "*": {
-          "*": ["storageLayout"]
-        }
-      }
-    }
+          "*": ["storageLayout"],
+        },
+      },
+    },
   },
 
   paths: {
@@ -115,6 +168,9 @@ const config: HardhatUserConfig = {
   },
   mocha: {
     timeout: 20000,
+  },
+  etherscan: {
+    apiKey: ETHERSCAN_API_KEY,
   },
 };
 

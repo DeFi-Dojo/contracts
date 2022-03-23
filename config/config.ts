@@ -25,6 +25,7 @@ const {
   MORALIS_APP_ID,
   MORALIS_MASTER_KEY,
   MORALIS_IPFS_URL,
+  ETHERSCAN_API_KEY,
 } = process.env;
 
 if (
@@ -74,4 +75,5 @@ export default {
   MORALIS_APP_ID,
   MORALIS_MASTER_KEY,
   MORALIS_IPFS_URL,
+  ETHERSCAN_API_KEY,
 };
