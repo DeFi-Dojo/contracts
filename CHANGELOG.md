@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.13.0](https://github.com/DeFi-Dojo/contracts/compare/v1.12.0...v1.13.0) (2022-03-23)
+
+
+### Features
+
+* upload metadata for quickswap dummy vault, deploy dummy vault, fix deploy scripts ([#56](https://github.com/DeFi-Dojo/contracts/issues/56)) ([985d480](https://github.com/DeFi-Dojo/contracts/commit/985d480b3c877db2949bc6d180984babaf3a40ce))
+
 # [1.12.0](https://github.com/DeFi-Dojo/contracts/compare/v1.11.0...v1.12.0) (2022-03-22)
 
 
