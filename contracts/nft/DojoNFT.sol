@@ -244,7 +244,7 @@ contract DojoNFT is
   function isApprovedForAll(address _owner, address _operator)
     public
     view
-    override(ERC721, IERC721)
+    override
     returns (bool)
   {
     // Whitelist OpenSea proxy contract for easy trading.
