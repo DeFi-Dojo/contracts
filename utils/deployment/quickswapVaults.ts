@@ -1,6 +1,12 @@
-import { QuickswapYNFTVault__factory } from "../../typechain";
+import {
+  DummyQuickswapYNFTVault,
+  DummyQuickswapYNFTVault__factory,
+  QuickswapYNFTVault,
+  QuickswapYNFTVault__factory,
+} from "../../typechain";
 import configEnv from "../../config";
 import {
+  getQuickswapStakingDualRewardsAddress,
   getQuickswapTokenPairAddress,
   QuickswapVaultName,
   QuickswapVaultsToDeploy,
@@ -12,43 +18,53 @@ import { createDeployContract } from "./deployment";
 const { ADDRESSES, HARVESTER_ADDRESS, BENEFICIARY_ADDRESS, MORALIS_IPFS_URL } =
   configEnv;
 
-export const deployQuickswapYnftVault = async (
-  quickswapTokenPairAddress: string,
-  ynftPathUri: string
-) => {
-  const deploy =
-    createDeployContract<QuickswapYNFTVault__factory>("QuickswapYNFTVault");
-
-  const contract = await deploy(
-    ADDRESSES.ROUTER_02_QUICKSWAP,
-    quickswapTokenPairAddress,
-    ADDRESSES.STAKING_DUAL_REWARDS_QUICKSWAP,
-    ADDRESSES.DQUICK,
-    HARVESTER_ADDRESS,
-    BENEFICIARY_ADDRESS,
-    "Dojo yNFT",
-    MORALIS_IPFS_URL,
-    ynftPathUri
-  );
-
-  const ynftAddress = await contract.yNFT();
-  console.log(`Deployed vault yNFT address: `, ynftAddress);
-  await wait(100);
+type Config = {
+  isDummyVault?: boolean;
 };
 
-export const deployQuickswapVaultWithMetadata = async (
-  vaultName: QuickswapVaultName
-) => {
-  const ynftPathUri = await uploadYnftMetadata(vaultName);
-  await deployQuickswapYnftVault(
-    getQuickswapTokenPairAddress(ADDRESSES, vaultName),
-    ynftPathUri
-  );
-};
+const deployQuickswapYnftVault =
+  (config?: Config) =>
+  async (
+    quickswapTokenPairAddress: string,
+    stakingDualRewards: string,
+    ynftPathUri: string
+  ) => {
+    const deploy = config?.isDummyVault
+      ? createDeployContract<DummyQuickswapYNFTVault__factory>(
+          "DummyQuickswapYNFTVault"
+        )
+      : createDeployContract<QuickswapYNFTVault__factory>("QuickswapYNFTVault");
 
-export const deployQuickswapVaultsWithMetadata = () =>
+    const contract = await deploy(
+      ADDRESSES.ROUTER_02_QUICKSWAP,
+      quickswapTokenPairAddress,
+      stakingDualRewards,
+      ADDRESSES.DQUICK,
+      HARVESTER_ADDRESS,
+      BENEFICIARY_ADDRESS,
+      "Dojo yNFT",
+      MORALIS_IPFS_URL,
+      ynftPathUri
+    ).then((v) => v as DummyQuickswapYNFTVault | QuickswapYNFTVault);
+
+    const ynftAddress = await contract.yNFT();
+    console.log(`Deployed vault yNFT address: ${ynftAddress}\n`);
+    await wait(100);
+  };
+
+const deployQuickswapVaultWithMetadata =
+  (config?: Config) => async (vaultName: QuickswapVaultName) => {
+    const ynftPathUri = await uploadYnftMetadata(vaultName);
+    await deployQuickswapYnftVault(config)(
+      getQuickswapTokenPairAddress(ADDRESSES, vaultName),
+      getQuickswapStakingDualRewardsAddress(ADDRESSES, vaultName),
+      ynftPathUri
+    );
+  };
+
+export const deployQuickswapVaultsWithMetadata = (config?: Config) =>
   sequence(
     QuickswapVaultsToDeploy.map(
-      resultToPromiseFn(deployQuickswapVaultWithMetadata)
+      resultToPromiseFn(deployQuickswapVaultWithMetadata(config))
     )
   );

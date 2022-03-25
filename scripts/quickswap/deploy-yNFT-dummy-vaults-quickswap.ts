@@ -1,6 +1,6 @@
-import { deployQuickswapDummyVaultsWithMetadata } from "../../utils";
+import { deployQuickswapVaultsWithMetadata } from "../../utils";
 
-deployQuickswapDummyVaultsWithMetadata()
+deployQuickswapVaultsWithMetadata({ isDummyVault: true })
   .then(() => process.exit(0))
   .catch((error) => {
     console.error(error);

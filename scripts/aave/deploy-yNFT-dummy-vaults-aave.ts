@@ -1,6 +1,6 @@
-import { deployAaveDummyVaultsWithMetadata } from "../../utils";
+import { deployAaveVaultsWithMetadata } from "../../utils";
 
-deployAaveDummyVaultsWithMetadata()
+deployAaveVaultsWithMetadata({ isDummyVault: true })
   .then(() => process.exit(0))
   .catch((error) => {
     console.error(error);

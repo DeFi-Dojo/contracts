@@ -1,11 +1,11 @@
 import {
-  deployAaveDummyVaultsWithMetadata,
-  deployQuickswapDummyVaultsWithMetadata,
+  deployAaveVaultsWithMetadata,
+  deployQuickswapVaultsWithMetadata,
 } from "../utils";
 
 const main = async () => {
-  await deployAaveDummyVaultsWithMetadata();
-  await deployQuickswapDummyVaultsWithMetadata();
+  await deployAaveVaultsWithMetadata({ isDummyVault: true });
+  await deployQuickswapVaultsWithMetadata({ isDummyVault: true });
 };
 
 main()
