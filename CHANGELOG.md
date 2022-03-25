@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.14.0](https://github.com/DeFi-Dojo/contracts/compare/v1.13.0...v1.14.0) (2022-03-25)
+
+
+### Features
+
+* dex-300/analyse code mythril ([#57](https://github.com/DeFi-Dojo/contracts/issues/57)) ([aecfe33](https://github.com/DeFi-Dojo/contracts/commit/aecfe33d93b4b144980f800954bcb0f0a508e237))
+
 # [1.13.0](https://github.com/DeFi-Dojo/contracts/compare/v1.12.0...v1.13.0) (2022-03-23)
 
 
