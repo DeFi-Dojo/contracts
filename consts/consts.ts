@@ -35,3 +35,8 @@ export const QuickswapVaultsToDeploy = [
   QuickswapVaultName.maticUsdt,
   QuickswapVaultName.maticEth,
 ];
+
+export const AllVaultsToDeploy = [
+  ...AaveVaultsToDeploy,
+  ...QuickswapVaultsToDeploy,
+];

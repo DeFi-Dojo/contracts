@@ -39,7 +39,9 @@ export const uploadYnftMetadata = async (name: VaultName) => {
 
   const metaIpfsHash = await saveJsonToIpfs([name, "json"].join("."), metadata);
 
-  console.log(`Uploaded metadata for "${name}"`, metadata, "\n");
+  console.log(
+    `Uploaded metadata for "${name}":\n${MORALIS_IPFS_URL}${metaIpfsHash}\n`
+  );
 
   return metaIpfsHash;
 };
