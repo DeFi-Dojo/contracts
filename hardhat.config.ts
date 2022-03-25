@@ -58,6 +58,10 @@ task(
 )
   .addParam("address", "contract address")
   .addParam("quickswapTokenPairAddress", "address of quickswap pair")
+  .addParam(
+    "quickswapStakingDualRewardsAddress",
+    "address of quickswap staking dual rewards contract"
+  )
   .addParam("ynftPathUri", "uri path for ynft data")
   .setAction(async (taskArgs, hre) => {
     await hre.run("verify:verify", {
@@ -65,7 +69,7 @@ task(
       constructorArguments: [
         ADDRESSES.ROUTER_02_QUICKSWAP,
         taskArgs.quickswapTokenPairAddress,
-        ADDRESSES.STAKING_DUAL_REWARDS_QUICKSWAP,
+        taskArgs.quickswapStakingDualRewardsAddress,
         ADDRESSES.DQUICK,
         HARVESTER_ADDRESS,
         BENEFICIARY_ADDRESS,
