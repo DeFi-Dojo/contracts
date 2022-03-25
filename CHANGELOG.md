@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.15.0](https://github.com/DeFi-Dojo/contracts/compare/v1.14.0...v1.15.0) (2022-03-25)
+
+
+### Features
+
+* dex-499/fix deploy scripts ([#58](https://github.com/DeFi-Dojo/contracts/issues/58)) ([08a5534](https://github.com/DeFi-Dojo/contracts/commit/08a55347eeb37e0d402988da121dd2b313da48f8))
+
 # [1.14.0](https://github.com/DeFi-Dojo/contracts/compare/v1.13.0...v1.14.0) (2022-03-25)
 
 
