@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.16.0](https://github.com/DeFi-Dojo/contracts/compare/v1.15.0...v1.16.0) (2022-03-28)
+
+
+### Features
+
+* DEX-302: Verify Aave and Quickswap vaults by hardhat task ([#59](https://github.com/DeFi-Dojo/contracts/issues/59)) ([42f7a48](https://github.com/DeFi-Dojo/contracts/commit/42f7a481f9e19d38cdba74ccfc2adb332ce488a4))
+
 # [1.15.0](https://github.com/DeFi-Dojo/contracts/compare/v1.14.0...v1.15.0) (2022-03-25)
 
 
