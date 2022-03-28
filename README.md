@@ -47,6 +47,19 @@ Run solhint
 yarn solhint
 ```
 
+Verify Aave Vault on Polygonscan
+```
+npx hardhat --network matic polygonscan-verify-aave --address <vault-address>
+  --aaveTokenAddress <underlying-token-address> --ynft-path-uri <ipfs-uri> 
+```
+
+Verify Quickswap Vault on Polygonscan
+```
+npx hardhat --network matic polygonscan-verify-quickswap --address <vault-address>
+  --quickswap-token-pair-address <underlying-pair-address>
+ --ynft-path-uri <ipfs-uri>  --quickswap-staking-dual-rewards-address <dual-rewards-address-for-pair>
+```
+
 # Prettier
 To force prettier to tidy up your solidity code using command line run following command in your terminal:
 
