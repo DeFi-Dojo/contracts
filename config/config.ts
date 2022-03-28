@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
-import * as consts from "../consts";
-import { Network } from "../consts";
+import { Network, NETWORK_ADDRESSES } from "../consts";
 
 dotenv.config();
 
@@ -16,7 +15,7 @@ const {
   VAULT_ADDRESS,
   DEFENDER_TEAM_API_KEY,
   DEFENDER_TEAM_API_SECRET,
-  DEFENDER_AUTOTASK_ID,
+  DEFENDER_AAVE_AUTOTASK_ID,
   HARVESTER_ADDRESS,
   BENEFICIARY_ADDRESS,
   HARDHAT_FORKING_URL,
@@ -40,7 +39,7 @@ if (
   VAULT_ADDRESS === undefined ||
   DEFENDER_TEAM_API_KEY === undefined ||
   DEFENDER_TEAM_API_SECRET === undefined ||
-  DEFENDER_AUTOTASK_ID === undefined ||
+  DEFENDER_AAVE_AUTOTASK_ID === undefined ||
   HARVESTER_ADDRESS === undefined ||
   BENEFICIARY_ADDRESS === undefined ||
   HARDHAT_FORKING_URL === undefined ||
@@ -62,11 +61,11 @@ export default {
   NFT_FACTORY_BASE_URI,
   KOVAN_API_URL,
   POLYGON_MAINNET_API_URL,
-  ADDRESSES: consts.NETWORK_ADDRESSES[DEFAULT_NETWORK.toUpperCase() as Network],
+  ADDRESSES: NETWORK_ADDRESSES[DEFAULT_NETWORK.toUpperCase() as Network],
   VAULT_ADDRESS,
   DEFENDER_TEAM_API_KEY,
   DEFENDER_TEAM_API_SECRET,
-  DEFENDER_AUTOTASK_ID,
+  DEFENDER_AAVE_AUTOTASK_ID,
   HARVESTER_ADDRESS,
   BENEFICIARY_ADDRESS,
   HARDHAT_FORKING_URL,
