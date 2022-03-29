@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.17.0](https://github.com/DeFi-Dojo/contracts/compare/v1.16.0...v1.17.0) (2022-03-29)
+
+
+### Features
+
+* dex-245 autotask quickswap rewards harvest 1/2 ([#60](https://github.com/DeFi-Dojo/contracts/issues/60)) ([215aaa0](https://github.com/DeFi-Dojo/contracts/commit/215aaa0f481c9ac1c2cad1e89282e49305d8c35f))
+
 # [1.16.0](https://github.com/DeFi-Dojo/contracts/compare/v1.15.0...v1.16.0) (2022-03-28)
 
 
