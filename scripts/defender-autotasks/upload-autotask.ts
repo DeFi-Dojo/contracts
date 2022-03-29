@@ -2,34 +2,26 @@ import { AutotaskClient } from "defender-autotask-client";
 import { readFileSync } from "fs";
 import configEnv from "../../config";
 
-const {
-  DEFENDER_TEAM_API_KEY,
-  DEFENDER_TEAM_API_SECRET,
-  DEFENDER_QUICKSWAP_GET_REWARD_AUTOTASK_ID,
-} = configEnv;
+const { DEFENDER_TEAM_API_KEY, DEFENDER_TEAM_API_SECRET } = configEnv;
 
-export async function uploadAutotaskFromFolder(bundleFolderPath: string) {
-  const client = new AutotaskClient({
-    apiKey: DEFENDER_TEAM_API_KEY,
-    apiSecret: DEFENDER_TEAM_API_SECRET,
-  });
+export const uploadAutotaskFromFolder =
+  (taskId: string) => async (bundleFolderPath: string) => {
+    const client = new AutotaskClient({
+      apiKey: DEFENDER_TEAM_API_KEY,
+      apiSecret: DEFENDER_TEAM_API_SECRET,
+    });
 
-  await client.updateCodeFromFolder(
-    DEFENDER_QUICKSWAP_GET_REWARD_AUTOTASK_ID,
-    bundleFolderPath
-  );
-}
+    await client.updateCodeFromFolder(taskId, bundleFolderPath);
+  };
 
-export async function uploadAutotaskFromFile(bundleFilePath: string) {
-  const client = new AutotaskClient({
-    apiKey: DEFENDER_TEAM_API_KEY,
-    apiSecret: DEFENDER_TEAM_API_SECRET,
-  });
+export const uploadAutotaskFromFile =
+  (taskId: string) => async (bundleFilePath: string) => {
+    const client = new AutotaskClient({
+      apiKey: DEFENDER_TEAM_API_KEY,
+      apiSecret: DEFENDER_TEAM_API_SECRET,
+    });
 
-  const bundleFile = readFileSync(bundleFilePath, { encoding: "utf-8" });
+    const bundleFile = readFileSync(bundleFilePath, { encoding: "utf-8" });
 
-  await client.updateCodeFromSources(
-    DEFENDER_QUICKSWAP_GET_REWARD_AUTOTASK_ID,
-    { "index.js": bundleFile }
-  );
-}
+    await client.updateCodeFromSources(taskId, { "index.js": bundleFile });
+  };

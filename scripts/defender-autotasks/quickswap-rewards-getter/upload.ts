@@ -1,7 +1,10 @@
 import { uploadAutotaskFromFolder } from "../upload-autotask";
+import configEnv from "../../../config";
+
+const autotaskId = configEnv.DEFENDER_QUICKSWAP_GET_REWARD_AUTOTASK_ID;
 
 console.log("Uploading autotask script");
-uploadAutotaskFromFolder(`${__dirname}/dist`)
+uploadAutotaskFromFolder(autotaskId)(`${__dirname}/dist`)
   .then(() => {
     console.log("Uploaded autotask script");
     process.exit(0);
