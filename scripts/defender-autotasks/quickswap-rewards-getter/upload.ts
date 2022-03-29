@@ -1,9 +1,11 @@
-import { uploadAutotask } from "../upload-autotask";
+import { uploadAutotaskFromFolder } from "../upload-autotask";
 
-const dirName = __dirname.replace("/contracts/", "/contracts/dist/");
-
-uploadAutotask(`${dirName}/src`)
-  .then(() => process.exit(0))
+console.log("Uploading autotask script");
+uploadAutotaskFromFolder(`${__dirname}/dist`)
+  .then(() => {
+    console.log("Uploaded autotask script");
+    process.exit(0);
+  })
   .catch((error) => {
     console.error(error);
     process.exit(1);

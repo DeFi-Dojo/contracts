@@ -3,7 +3,9 @@ import {
   DefenderRelayProvider,
 } from "defender-relay-client/lib/ethers";
 import { AutotaskEvent } from "defender-autotask-utils";
-import { QuickswapYNFTVault__factory } from "./types";
+
+import { QuickswapYNFTVault__factory } from "../../../../typechain";
+
 import { MATIC_CHAIN_ID, VAULT_ADDRESS } from "./config";
 
 export async function handler({ credentials, relayerARN }: AutotaskEvent) {
