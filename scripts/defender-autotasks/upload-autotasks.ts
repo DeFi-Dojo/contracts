@@ -1,10 +1,10 @@
 import { AutotaskClient } from "defender-autotask-client";
-import configEnv from "../../../config";
+import configEnv from "../../config";
 
 const {
   DEFENDER_TEAM_API_KEY,
   DEFENDER_TEAM_API_SECRET,
-  DEFENDER_AUTOTASK_ID,
+  DEFENDER_QUICKSWAP_GET_REWARD_AUTOTASK_ID,
 } = configEnv;
 
 const PATH_TO_COMPILED_SRC_CODE =
@@ -17,7 +17,7 @@ async function main() {
   });
 
   await client.updateCodeFromFolder(
-    DEFENDER_AUTOTASK_ID,
+    DEFENDER_QUICKSWAP_GET_REWARD_AUTOTASK_ID,
     PATH_TO_COMPILED_SRC_CODE
   );
 }
