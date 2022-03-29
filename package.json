@@ -21,6 +21,7 @@
     "build": "npm run build:ts && npm run build:contracts",
     "build:ts": "tsc --project tsconfig.json",
     "build:contracts": "hardhat compile",
+    "rm:dist": "rm -fr ./dist",
     "solhint": "npx solhint 'contracts/**/*.sol'",
     "prettier:solidity": "prettier --write 'contracts/**/*.sol'",
     "prepare": "husky install"

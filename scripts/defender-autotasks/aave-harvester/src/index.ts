@@ -7,39 +7,15 @@ import {
   AaveYNFTVault__factory,
   AggregatorV3Interface__factory,
 } from "./factories";
-
-enum ChainIds {
-  KOVAN = 42,
-  MATIC = 137,
-}
-
-interface Addresses {
-  NATIVE_TOKEN_USD: string;
-}
-
-type NetworksAddresses = { [k: number]: Addresses };
-
-const ADDRESSES: NetworksAddresses = {
-  [ChainIds.KOVAN]: {
-    NATIVE_TOKEN_USD: "0x9326BFA02ADD2366b30bacB125260Af641031331",
-  },
-  [ChainIds.MATIC]: {
-    NATIVE_TOKEN_USD: "0xAB594600376Ec9fD91F8e885dADF0CE036862dE0",
-  },
-};
-
-// TODO: how to handle vault address for diffrent vaults
-const VAULT_ADDRESS = "0x0bf97F8f2dF1cEEC3EF21827E00F11011aE2d118";
-
-const PRICE_FEED_DECIMALS = 8;
-
-const SLIPPAGE_PERCANTAGE = 3;
-
-const ALL_PERCANTAGE = 100;
-
-const DEADLINE_SECONDS = 60;
-
-const MIN_CLAIM_AMOUNT = 500000000000000000; // 0.5 MATIC
+import {
+  ADDRESSES,
+  ALL_PERCANTAGE,
+  DEADLINE_SECONDS,
+  MIN_CLAIM_AMOUNT,
+  PRICE_FEED_DECIMALS,
+  SLIPPAGE_PERCANTAGE,
+  VAULT_ADDRESS,
+} from "./config";
 
 export async function handler(event: AutotaskEvent) {
   if (event.credentials === undefined || event.relayerARN === undefined) {
