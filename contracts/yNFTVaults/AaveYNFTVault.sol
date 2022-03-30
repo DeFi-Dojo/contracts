@@ -109,14 +109,36 @@ contract AaveYNFTVault is YNFTVault {
     uint256 amountToWithdraw = (balanceOf[_nftTokenId] *
       currentAmountOfAToken) / totalSupply;
 
+    uint256 amountToWithdrawWithoutAccruedRewards = (balanceOf[_nftTokenId] *
+      balancesAtBuy[_nftTokenId].erc20Balance) /
+      balancesAtBuy[_nftTokenId].totalSupply;
+
     totalSupply = totalSupply - balanceOf[_nftTokenId];
 
     balanceOf[_nftTokenId] = 0;
 
     yNFT.burn(_nftTokenId);
 
-    return pool.withdraw(address(underlyingToken), amountToWithdraw, _receiver);
-    // TODO: count performance fee based on balancesAtBuy for _nftTokenId and transfer to beneficiary
+    uint256 performanceFee = 0;
+    if (amountToWithdraw > amountToWithdrawWithoutAccruedRewards) {
+      uint256 performanceFeeToWithdraw = (performanceFeePerMille *
+        (amountToWithdraw - amountToWithdrawWithoutAccruedRewards)) / 1000;
+      performanceFee = pool.withdraw(
+        address(underlyingToken),
+        performanceFeeToWithdraw,
+        beneficiary
+      );
+    }
+    uint256 amountWithdrawn = pool.withdraw(
+      address(underlyingToken),
+      amountToWithdrawWithoutAccruedRewards +
+        ((amountToWithdraw - amountToWithdrawWithoutAccruedRewards) *
+          (1000 - performanceFeePerMille)) /
+        1000,
+      _receiver
+    );
+
+    return amountWithdrawn - performanceFee;
   }
 
   function _deposit(uint256 _tokenAmount) internal virtual {
@@ -142,7 +164,7 @@ contract AaveYNFTVault is YNFTVault {
       totalSupply = totalSupply + balance;
     }
 
-    balancesAtBuy[tokenId].erc20Balance = currentAmountOfAToken;
+    balancesAtBuy[tokenId].erc20Balance = aToken.balanceOf(address(this));
     balancesAtBuy[tokenId].totalSupply = totalSupply;
   }
 

@@ -19,6 +19,7 @@ abstract contract YNFTVault is AccessControl, ReentrancyGuard, Pausable {
   YNFT public immutable yNFT;
   IUniswapV2Router02 public immutable dexRouter;
   uint256 public feePerMile = 5;
+  uint256 public performanceFeePerMille = 100;
   address public beneficiary;
 
   bytes32 public constant HARVESTER_ROLE = keccak256("HARVESTER_ROLE");
