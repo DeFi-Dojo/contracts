@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.18.0](https://github.com/DeFi-Dojo/contracts/compare/v1.17.0...v1.18.0) (2022-03-30)
+
+
+### Features
+
+* create quickswap token depositor autotask ([#61](https://github.com/DeFi-Dojo/contracts/issues/61)) ([8e017e9](https://github.com/DeFi-Dojo/contracts/commit/8e017e9b7f4df3df56f558cee230645acd8ab5b3))
+
 # [1.17.0](https://github.com/DeFi-Dojo/contracts/compare/v1.16.0...v1.17.0) (2022-03-29)
 
 
