@@ -1,6 +1,11 @@
 SCRIPT_DIR=$(dirname $0)
 
+rm -fr $SCRIPT_DIR/dist
+
 echo Building autotask script
 cd $SCRIPT_DIR
-npx webpack
-echo Build successfull
+if npx webpack; then
+  echo Build successfull
+else
+  echo Failed to build
+fi

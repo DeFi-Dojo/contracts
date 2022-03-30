@@ -1,0 +1,7 @@
+import { NETWORK_ADDRESSES, SECONDS_IN_ONE_DAY } from "../../../../consts";
+
+export const VAULT_ADDRESS = "0xa12f6ad67F8187ddAC8A102381A7a664F790725b";
+export const MATIC_CHAIN_ID = 137;
+export const DEADLINE_SECONDS = SECONDS_IN_ONE_DAY;
+export const ADDRESSES = NETWORK_ADDRESSES["MATIC"];
+export const GAS_LIMIT = 1000000;
