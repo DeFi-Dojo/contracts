@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.1](https://github.com/DeFi-Dojo/contracts/compare/v1.18.0...v1.18.1) (2022-03-31)
+
+
+### Bug Fixes
+
+* add implementation for quickswap balanceOfUnderlying method ([0564a26](https://github.com/DeFi-Dojo/contracts/commit/0564a26e65b3aa3317da18c5508bae5862ee010d))
+
 # [1.18.0](https://github.com/DeFi-Dojo/contracts/compare/v1.17.0...v1.18.0) (2022-03-30)
 
 
