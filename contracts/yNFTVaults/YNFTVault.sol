@@ -63,6 +63,19 @@ abstract contract YNFTVault is AccessControl, ReentrancyGuard, Pausable {
     return feePerMile;
   }
 
+  function setPerformanceFee(uint256 _performanceFeePerMille)
+    external
+    onlyRole(DEFAULT_ADMIN_ROLE)
+    returns (uint256)
+  {
+    require(
+      _performanceFeePerMille <= 200,
+      "Performance Fee cannot be that much"
+    );
+    performanceFeePerMille = _performanceFeePerMille;
+    return performanceFeePerMille;
+  }
+
   function setBeneficiary(address _beneficiary)
     external
     onlyRole(DEFAULT_ADMIN_ROLE)

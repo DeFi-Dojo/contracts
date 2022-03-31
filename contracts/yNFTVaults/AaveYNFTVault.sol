@@ -105,7 +105,6 @@ contract AaveYNFTVault is YNFTVault {
     returns (uint256)
   {
     uint256 currentAmountOfAToken = aToken.balanceOf(address(this));
-
     uint256 amountToWithdraw = (balanceOf[_nftTokenId] *
       currentAmountOfAToken) / totalSupply;
 
@@ -118,7 +117,6 @@ contract AaveYNFTVault is YNFTVault {
     balanceOf[_nftTokenId] = 0;
 
     yNFT.burn(_nftTokenId);
-
     uint256 performanceFee = 0;
     if (amountToWithdraw > amountToWithdrawWithoutAccruedRewards) {
       uint256 performanceFeeToWithdraw = (performanceFeePerMille *
@@ -157,8 +155,7 @@ contract AaveYNFTVault is YNFTVault {
       balanceOf[tokenId] = _tokenAmount;
       totalSupply = _tokenAmount;
     } else {
-      uint256 balance = (_tokenAmount * totalSupply) / currentAmountOfAToken;
-
+      uint256 balance = (_tokenAmount * totalSupply) / currentAmountOfAToken; // TODO: doesn't work if _tokenAmount * totalSupply < currentAmountOfAToken
       balanceOf[tokenId] = balance;
 
       totalSupply = totalSupply + balance;

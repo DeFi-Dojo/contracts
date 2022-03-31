@@ -411,6 +411,41 @@ describe("AaveYNFTVault", () => {
         expect(pool.withdraw).to.have.been.calledWith(underlyingToken.address, 0.1 * AMOUNT_TO_CLAIM, await aaveYnftVault.beneficiary());
     });
 
+    it("should handle changing performance fee", async () => {
+        const TOKEN_AMOUNT = 1000;
+        const TOKEN_AMOUNT_AFTER_FEE = 995;
+        const DEADLINE = 101;
+        const AMOUNT_TO_CLAIM = 300;
+
+        await init_createYNFT_mocks(underlyingToken);
+        aToken.balanceOf.reset()
+        aToken.balanceOf.returnsAtCall(0, 0);
+        aToken.balanceOf.returnsAtCall(1, TOKEN_AMOUNT_AFTER_FEE);
+        aToken.balanceOf.returnsAtCall(2, TOKEN_AMOUNT_AFTER_FEE);
+        aToken.balanceOf.returnsAtCall(3, 2*TOKEN_AMOUNT_AFTER_FEE);
+        aToken.balanceOf.returnsAtCall(4, 2*TOKEN_AMOUNT_AFTER_FEE+AMOUNT_TO_CLAIM);
+        aToken.balanceOf.returnsAtCall(5, TOKEN_AMOUNT_AFTER_FEE+0.5*AMOUNT_TO_CLAIM);
+        aaveIncentivesController.getRewardsBalance.whenCalledWith([aToken.address], aaveYnftVault.address).returns(AMOUNT_TO_CLAIM);
+        aaveIncentivesController.claimRewards.whenCalledWith([aToken.address], AMOUNT_TO_CLAIM, aaveYnftVault.address).returns(AMOUNT_TO_CLAIM);
+        rewardToken.approve.whenCalledWith(uniswapRouter.address, AMOUNT_TO_CLAIM).returns(true);
+        uniswapRouter.swapExactTokensForTokens.returns([AMOUNT_TO_CLAIM, AMOUNT_TO_CLAIM]);
+        uniswapRouter.swapExactTokensForETH.returns([AMOUNT_TO_CLAIM, AMOUNT_TO_CLAIM]);
+
+
+        await aaveYnftVault.grantRole(ethers.utils.keccak256(ethers.utils.toUtf8Bytes("HARVESTER_ROLE")), signers[0].address);
+
+        await aaveYnftVault.createYNFT(underlyingToken.address, TOKEN_AMOUNT, TOKEN_AMOUNT, DEADLINE);
+        await aaveYnftVault.createYNFT(underlyingToken.address, TOKEN_AMOUNT, TOKEN_AMOUNT, DEADLINE);
+        await aaveYnftVault.claimRewards(TOKEN_AMOUNT, DEADLINE);
+        await aaveYnftVault.withdrawToEther(0, TOKEN_AMOUNT, DEADLINE);
+        await aaveYnftVault.setPerformanceFee(200);
+        await aaveYnftVault.withdrawToEther(1, TOKEN_AMOUNT, DEADLINE);
+        expect(pool.withdraw).to.have.been.calledWith(underlyingToken.address, TOKEN_AMOUNT_AFTER_FEE + 0.9 * 0.5 * AMOUNT_TO_CLAIM, aaveYnftVault.address);
+        expect(pool.withdraw).to.have.been.calledWith(underlyingToken.address, TOKEN_AMOUNT_AFTER_FEE + 0.8 * 0.5 * AMOUNT_TO_CLAIM, aaveYnftVault.address);
+        expect(pool.withdraw).to.have.been.calledWith(underlyingToken.address, 0.1 * 0.5 * AMOUNT_TO_CLAIM, await aaveYnftVault.beneficiary());
+        expect(pool.withdraw).to.have.been.calledWith(underlyingToken.address, 0.2 * 0.5 * AMOUNT_TO_CLAIM, await aaveYnftVault.beneficiary());
+    });
+
 
     it("should return underlying asset value for the first yNFT created", async () => {
         const minAmount = 0;
