@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.19.0](https://github.com/DeFi-Dojo/contracts/compare/v1.18.1...v1.19.0) (2022-03-31)
+
+
+### Features
+
+* deploy quickswap vaults ([#63](https://github.com/DeFi-Dojo/contracts/issues/63)) ([0498ea0](https://github.com/DeFi-Dojo/contracts/commit/0498ea0ece6ffb8869ad86d46e2f9d2f30645925))
+
 ## [1.18.1](https://github.com/DeFi-Dojo/contracts/compare/v1.18.0...v1.18.1) (2022-03-31)
 
 
