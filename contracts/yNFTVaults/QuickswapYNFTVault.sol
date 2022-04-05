@@ -7,7 +7,6 @@ import "../interfaces/quickswap/IStakingDualRewards.sol";
 import "../interfaces/quickswap/IStakingRewards.sol";
 import "./YNFTVault.sol";
 import "./YNFT.sol";
-import "hardhat/console.sol";
 
 contract QuickswapYNFTVault is YNFTVault {
   using SafeERC20 for IERC20;
@@ -318,17 +317,20 @@ contract QuickswapYNFTVault is YNFTVault {
   ) external whenNotPaused onlyNftOwner(_nftTokenId) {
     uint256 balance = balanceOf[_nftTokenId];
 
+    uint256 currentLiquidity = stakingDualRewards.balanceOf(address(this));
+    uint256 balanceToWithdraw = (balance * currentLiquidity) / totalSupply;
+
     balanceOf[_nftTokenId] = 0;
     totalSupply -= balance;
 
-    _withrdrawFromLPMining(balance);
+    _withrdrawFromLPMining(balanceToWithdraw);
 
     require(pair.approve(address(dexRouter), balance), "approve failed.");
 
     if (address(firstToken) == dexRouter.WETH()) {
       dexRouter.removeLiquidityETH(
         address(secondToken),
-        balance,
+        balanceToWithdraw,
         _amountOutMinSecondToken,
         _amountOutMinFirstToken,
         msg.sender,
@@ -338,7 +340,7 @@ contract QuickswapYNFTVault is YNFTVault {
       dexRouter.removeLiquidity(
         address(firstToken),
         address(secondToken),
-        balance,
+        balanceToWithdraw,
         _amountOutMinFirstToken,
         _amountOutMinSecondToken,
         msg.sender,
