@@ -19,6 +19,7 @@ abstract contract YNFTVault is AccessControl, ReentrancyGuard, Pausable {
   YNFT public immutable yNFT;
   IUniswapV2Router02 public immutable dexRouter;
   uint256 public feePerMile = 5;
+  uint256 public performanceFeePerMille = 100;
   address public beneficiary;
 
   bytes32 public constant HARVESTER_ROLE = keccak256("HARVESTER_ROLE");
@@ -60,6 +61,19 @@ abstract contract YNFTVault is AccessControl, ReentrancyGuard, Pausable {
     require(_feePerMile <= 100, "Fee cannot be that much");
     feePerMile = _feePerMile;
     return feePerMile;
+  }
+
+  function setPerformanceFee(uint256 _performanceFeePerMille)
+    external
+    onlyRole(DEFAULT_ADMIN_ROLE)
+    returns (uint256)
+  {
+    require(
+      _performanceFeePerMille <= 200,
+      "Performance Fee cannot be that much"
+    );
+    performanceFeePerMille = _performanceFeePerMille;
+    return performanceFeePerMille;
   }
 
   function setBeneficiary(address _beneficiary)

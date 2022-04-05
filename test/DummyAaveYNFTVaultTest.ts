@@ -99,17 +99,26 @@ describe("DummyAaveYNFTVault", () => {
         signers = await ethers.getSigners();
         const DEADLINE = 101;
 
-        init_createWithdrawYNFT_mocks();
+        await uniswapRouter.swapExactETHForTokens.returns([MIN_AMOUNT, MIN_AMOUNT]);
+        await underlyingToken.approve.returns(true);
+        await uniswapRouter.swapExactTokensForETH.returns([MIN_AMOUNT, MIN_AMOUNT]);
 
-        await dummyAaveYnftVault.createYNFTForEther(MIN_AMOUNT, DEADLINE);
-        await dummyAaveYnftVault.createYNFTForEther(MIN_AMOUNT, DEADLINE);
+        aToken.balanceOf.returnsAtCall(0, 0);
+        aToken.balanceOf.returnsAtCall(1, MIN_AMOUNT);
+        aToken.balanceOf.returnsAtCall(2, MIN_AMOUNT);
+        aToken.balanceOf.returnsAtCall(3, 2*MIN_AMOUNT);
+        aToken.balanceOf.returnsAtCall(4, 2*MIN_AMOUNT);
+
+        await dummyAaveYnftVault.createYNFTForEther(MIN_AMOUNT, DEADLINE, {value: ethers.utils.parseEther("0.001")});
+        await dummyAaveYnftVault.createYNFTForEther(MIN_AMOUNT, DEADLINE, {value: ethers.utils.parseEther("0.001")});
         await dummyAaveYnftVault.withdrawToEther(0, MIN_AMOUNT, DEADLINE);
         expect(pool.withdraw).to.have.callCount(1);
+        expect(aToken.balanceOf).to.have.callCount(5);
 
         await dummyAaveYnftVault.removeVault();
-        expect(pool.withdraw).to.have.been.calledWith(underlyingToken.address, ATOKEN_BALANCE, dummyAaveYnftVault.address);
+        expect(pool.withdraw).to.have.been.calledWith(underlyingToken.address, MIN_AMOUNT, dummyAaveYnftVault.address);
         expect(pool.withdraw).to.have.callCount(2);
-        expect(uniswapRouter.swapExactTokensForETH).to.have.callCount(2);
+        expect(uniswapRouter.swapExactTokensForETH).to.have.callCount(1);
     });
 
 });
