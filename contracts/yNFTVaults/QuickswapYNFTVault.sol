@@ -117,7 +117,7 @@ contract QuickswapYNFTVault is YNFTVault {
       balanceOf[tokenId] = _liquidity;
       totalSupply = _liquidity;
     } else {
-      uint256 currentLiquidity = pair.balanceOf(address(this));
+      uint256 currentLiquidity = stakingDualRewards.balanceOf(address(this));
       uint256 balance = (_liquidity * totalSupply) / currentLiquidity;
       balanceOf[tokenId] = balance;
       totalSupply = totalSupply + balance;
@@ -252,11 +252,11 @@ contract QuickswapYNFTVault is YNFTVault {
 
     balanceOf[_nftTokenId] = 0;
 
-    uint256 currentLiquidity = pair.balanceOf(address(this));
+    uint256 currentLiquidity = stakingDualRewards.balanceOf(address(this));
     uint256 balanceToWithdraw = (balance * currentLiquidity) / totalSupply;
     totalSupply -= balance;
 
-    _withrdrawFromLPMining(balance);
+    _withrdrawFromLPMining(balanceToWithdraw);
 
     require(
       pair.approve(address(dexRouter), balanceToWithdraw),
@@ -317,17 +317,20 @@ contract QuickswapYNFTVault is YNFTVault {
   ) external whenNotPaused onlyNftOwner(_nftTokenId) {
     uint256 balance = balanceOf[_nftTokenId];
 
+    uint256 currentLiquidity = stakingDualRewards.balanceOf(address(this));
+    uint256 balanceToWithdraw = (balance * currentLiquidity) / totalSupply;
+
     balanceOf[_nftTokenId] = 0;
     totalSupply -= balance;
 
-    _withrdrawFromLPMining(balance);
+    _withrdrawFromLPMining(balanceToWithdraw);
 
     require(pair.approve(address(dexRouter), balance), "approve failed.");
 
     if (address(firstToken) == dexRouter.WETH()) {
       dexRouter.removeLiquidityETH(
         address(secondToken),
-        balance,
+        balanceToWithdraw,
         _amountOutMinSecondToken,
         _amountOutMinFirstToken,
         msg.sender,
@@ -337,7 +340,7 @@ contract QuickswapYNFTVault is YNFTVault {
       dexRouter.removeLiquidity(
         address(firstToken),
         address(secondToken),
-        balance,
+        balanceToWithdraw,
         _amountOutMinFirstToken,
         _amountOutMinSecondToken,
         msg.sender,
@@ -411,7 +414,7 @@ contract QuickswapYNFTVault is YNFTVault {
     returns (uint256)
   {
     uint256 balance = balanceOf[_nftTokenId];
-    uint256 currentLiquidity = pair.balanceOf(address(this));
+    uint256 currentLiquidity = stakingDualRewards.balanceOf(address(this));
 
     return (balance * currentLiquidity) / totalSupply;
   }

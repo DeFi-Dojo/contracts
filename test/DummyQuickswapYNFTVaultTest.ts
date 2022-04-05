@@ -71,7 +71,7 @@ describe("DummyQuickswapYNFTVault", () => {
         await uniswapRouter.swapExactTokensForETH.returns([MIN_AMOUNT, MIN_AMOUNT]);
         await uniswapRouter.removeLiquidity.returns([MIN_AMOUNT, MIN_AMOUNT]);
         await pairMock.approve.returns(true);
-        await pairMock.balanceOf.returns(LIQUIDITY);
+        await stakingRewardsMock.balanceOf.returns(LIQUIDITY);
         await uniswapRouter.addLiquidity.returns([MIN_AMOUNT, MIN_AMOUNT, LIQUIDITY]);
 
         await dummyQuickswapYnftVault.createYNFTForEther(MIN_AMOUNT, MIN_AMOUNT, 0, 0, DEADLINE, {value: ethers.utils.parseEther("100")});
@@ -104,7 +104,7 @@ describe("DummyQuickswapYNFTVault", () => {
         await uniswapRouter.swapExactTokensForETH.returns([MIN_AMOUNT, MIN_AMOUNT]);
         await uniswapRouter.removeLiquidity.returns([MIN_AMOUNT, MIN_AMOUNT]);
         await pairMock.approve.returns(true);
-        await pairMock.balanceOf.returns(LIQUIDITY);
+        await stakingRewardsMock.balanceOf.returns(LIQUIDITY);
         await uniswapRouter.addLiquidity.returns([MIN_AMOUNT, MIN_AMOUNT, LIQUIDITY]);
 
         await dummyQuickswapYnftVault.createYNFTForEther(MIN_AMOUNT, MIN_AMOUNT, 0, 0, DEADLINE);
