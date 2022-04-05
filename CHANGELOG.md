@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.20.0](https://github.com/DeFi-Dojo/contracts/compare/v1.19.1...v1.20.0) (2022-04-05)
+
+
+### Features
+
+* dex-289 aave performance fee ([#64](https://github.com/DeFi-Dojo/contracts/issues/64)) ([be8f8a3](https://github.com/DeFi-Dojo/contracts/commit/be8f8a3b09ae28daefb729e75d8a8771ea97c135))
+
 ## [1.19.1](https://github.com/DeFi-Dojo/contracts/compare/v1.19.0...v1.19.1) (2022-04-05)
 
 
