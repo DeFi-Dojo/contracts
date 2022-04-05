@@ -7,6 +7,7 @@ import "../interfaces/quickswap/IStakingDualRewards.sol";
 import "../interfaces/quickswap/IStakingRewards.sol";
 import "./YNFTVault.sol";
 import "./YNFT.sol";
+import "hardhat/console.sol";
 
 contract QuickswapYNFTVault is YNFTVault {
   using SafeERC20 for IERC20;
@@ -117,7 +118,7 @@ contract QuickswapYNFTVault is YNFTVault {
       balanceOf[tokenId] = _liquidity;
       totalSupply = _liquidity;
     } else {
-      uint256 currentLiquidity = pair.balanceOf(address(this));
+      uint256 currentLiquidity = stakingDualRewards.balanceOf(address(this));
       uint256 balance = (_liquidity * totalSupply) / currentLiquidity;
       balanceOf[tokenId] = balance;
       totalSupply = totalSupply + balance;
@@ -252,11 +253,11 @@ contract QuickswapYNFTVault is YNFTVault {
 
     balanceOf[_nftTokenId] = 0;
 
-    uint256 currentLiquidity = pair.balanceOf(address(this));
+    uint256 currentLiquidity = stakingDualRewards.balanceOf(address(this));
     uint256 balanceToWithdraw = (balance * currentLiquidity) / totalSupply;
     totalSupply -= balance;
 
-    _withrdrawFromLPMining(balance);
+    _withrdrawFromLPMining(balanceToWithdraw);
 
     require(
       pair.approve(address(dexRouter), balanceToWithdraw),
@@ -411,7 +412,7 @@ contract QuickswapYNFTVault is YNFTVault {
     returns (uint256)
   {
     uint256 balance = balanceOf[_nftTokenId];
-    uint256 currentLiquidity = pair.balanceOf(address(this));
+    uint256 currentLiquidity = stakingDualRewards.balanceOf(address(this));
 
     return (balance * currentLiquidity) / totalSupply;
   }

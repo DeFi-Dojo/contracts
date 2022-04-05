@@ -266,7 +266,7 @@ describe("QuickswapYNFTVault", () => {
     await token0Mock.approve.returns(true);
     await token1Mock.approve.returns(true);
     uniswapPairMock.approve.returns(true);
-    uniswapPairMock.balanceOf.returns(LIQUIDITY);
+    stakingDualRewardsMock.balanceOf.returns(LIQUIDITY);
     await quickswapYnftVault.createYNFTForEther(900, 800, 100, 100, 101);
 
     const TOKEN_ID = 0;
@@ -457,7 +457,7 @@ describe("QuickswapYNFTVault", () => {
     await token1Mock.approve.returns(true);
     await tokenIn.approve.returns(true);
     uniswapPairMock.approve.returns(true);
-    uniswapPairMock.balanceOf.returnsAtCall(0, 2 * LIQUIDITY);
+    stakingDualRewardsMock.balanceOf.returnsAtCall(0, 2 * LIQUIDITY);
 
     await quickswapYnftVault
       .connect(signers[0])
