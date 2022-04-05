@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.19.1](https://github.com/DeFi-Dojo/contracts/compare/v1.19.0...v1.19.1) (2022-04-05)
+
+
+### Bug Fixes
+
+* dex 514/liquidity burn error on matic buy ([#65](https://github.com/DeFi-Dojo/contracts/issues/65)) ([a3511a5](https://github.com/DeFi-Dojo/contracts/commit/a3511a59a9f53657ddc86808131b8bc04dabf586))
+
 # [1.19.0](https://github.com/DeFi-Dojo/contracts/compare/v1.18.1...v1.19.0) (2022-03-31)
 
 
