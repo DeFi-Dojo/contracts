@@ -8,7 +8,7 @@ contract DojoToken is ERC20 {
   string private symbol_ = "DOJO";
   uint256 private supply_ = 400000000;
 
-  constructor() ERC20(name_, symbol_) {
-    _mint(msg.sender, supply_);
+  constructor(address _owner) ERC20(name_, symbol_) {
+    _mint(_owner, supply_);
   }
 }
