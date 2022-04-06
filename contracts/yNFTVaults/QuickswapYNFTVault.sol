@@ -123,6 +123,8 @@ contract QuickswapYNFTVault is YNFTVault {
     if (totalSupply == 0) {
       balanceOf[tokenId] = _liquidity;
       totalSupply = _liquidity;
+      balancesAtBuy[tokenId].totalSupply = _liquidity;
+      balancesAtBuy[tokenId].tokenBalance = _liquidity;
     } else {
       uint256 currentLiquidity = stakingDualRewards.balanceOf(address(this));
       uint256 balance = (_liquidity * totalSupply) / currentLiquidity;
@@ -130,7 +132,9 @@ contract QuickswapYNFTVault is YNFTVault {
       totalSupply = totalSupply + balance;
     }
     balancesAtBuy[tokenId].totalSupply = totalSupply;
-    balancesAtBuy[tokenId].tokenBalance = stakingDualRewards.balanceOf(address(this));
+    balancesAtBuy[tokenId].tokenBalance =
+      stakingDualRewards.balanceOf(address(this)) +
+      _liquidity;
   }
 
   function _depositLiquidityForEther(
@@ -329,6 +333,16 @@ contract QuickswapYNFTVault is YNFTVault {
     uint256 currentLiquidity = stakingDualRewards.balanceOf(address(this));
     uint256 balanceToWithdraw = (balance * currentLiquidity) / totalSupply;
 
+    uint256 amountToWithdrawWithoutAccruedRewards = (balanceOf[_nftTokenId] *
+      balancesAtBuy[_nftTokenId].tokenBalance) /
+      balancesAtBuy[_nftTokenId].totalSupply;
+
+    uint256 performanceFee = 0;
+    if (balanceToWithdraw > amountToWithdrawWithoutAccruedRewards) {
+      performanceFee = (performanceFeePerMille *
+      (balanceToWithdraw - amountToWithdrawWithoutAccruedRewards)) / 1000;
+    }
+
     balanceOf[_nftTokenId] = 0;
     totalSupply -= balance;
 
@@ -337,19 +351,42 @@ contract QuickswapYNFTVault is YNFTVault {
     require(pair.approve(address(dexRouter), balance), "approve failed.");
 
     if (address(firstToken) == dexRouter.WETH()) {
+      if(performanceFee > 0)
+      {
+        dexRouter.removeLiquidityETH(
+          address(secondToken),
+          performanceFee,
+          _amountOutMinSecondToken,
+          _amountOutMinFirstToken,
+          beneficiary,
+          _deadline
+        );
+      }
       dexRouter.removeLiquidityETH(
         address(secondToken),
-        balanceToWithdraw,
+        balanceToWithdraw - performanceFee,
         _amountOutMinSecondToken,
         _amountOutMinFirstToken,
         msg.sender,
         _deadline
       );
     } else {
+      if(performanceFee > 0)
+      {
+        dexRouter.removeLiquidity(
+          address(firstToken),
+          address(secondToken),
+          performanceFee,
+          _amountOutMinFirstToken,
+          _amountOutMinSecondToken,
+          beneficiary,
+          _deadline
+        );
+      }
       dexRouter.removeLiquidity(
         address(firstToken),
         address(secondToken),
-        balanceToWithdraw,
+        balanceToWithdraw - performanceFee,
         _amountOutMinFirstToken,
         _amountOutMinSecondToken,
         msg.sender,
