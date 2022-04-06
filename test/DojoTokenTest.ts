@@ -9,9 +9,10 @@ describe("DojoToken", () => {
   let dojoToken: Contract;
 
   beforeEach(async () => {
+  const [signer] = await ethers.getSigners();
     dojoToken = await deployContract<DojoToken>(
       "DojoToken",
-      [],
+      [signer.address],
       undefined
     );
   });
