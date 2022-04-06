@@ -25,7 +25,7 @@ describe("DojoToken", () => {
 
   it('should have 400000000 coins as initial amount', async () => {
     const [signer] = await ethers.getSigners();
-    expect(await dojoToken.balanceOf(signer.address), "400000000");
+    expect(await dojoToken.balanceOf(signer.address)).to.equal(ethers.utils.parseUnits("400000000", "ether"));
   });
 
 });

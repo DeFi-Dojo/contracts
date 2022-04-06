@@ -166,7 +166,7 @@ describe("TokenVesting - cliff, slicing & early release", function () {
     );
 
     tokenVesting = await deployContract<TokenVesting>(
-      "DojoToken",
+      "TokenVesting",
       [erc20.address, ownerAccount.address],
       undefined
     );
