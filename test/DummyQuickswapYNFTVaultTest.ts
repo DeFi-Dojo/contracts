@@ -21,6 +21,7 @@ describe("DummyQuickswapYNFTVault", () => {
     let uniswapRouter: FakeContract;
     let stakingRewardsMock: FakeContract;
     let dQuickMock: FakeContract;
+    let wMaticMock: FakeContract;
     let pairMock: FakeContract;
     let token0Mock: FakeContract;
     let token1Mock: FakeContract;
@@ -32,6 +33,7 @@ describe("DummyQuickswapYNFTVault", () => {
         pairMock = await smock.fake(IUniswapV2Pair.abi);
         stakingRewardsMock = await smock.fake(IStakingDualRewards.abi);
         dQuickMock = await smock.fake(IERC20.abi);
+        wMaticMock = await smock.fake(IERC20.abi);
 
         token0Mock = await smock.fake(IERC20.abi);
         token1Mock = await smock.fake(IERC20.abi);
@@ -46,7 +48,7 @@ describe("DummyQuickswapYNFTVault", () => {
 
         dummyQuickswapYnftVault = await deployContract<DummyQuickswapYNFTVault>(
             "DummyQuickswapYNFTVault",
-            [uniswapRouter.address, pairMock.address, stakingRewardsMock.address, dQuickMock.address, signers[1].address, signers[0].address, "", "", ""],
+            [uniswapRouter.address, pairMock.address, stakingRewardsMock.address, dQuickMock.address, wMaticMock.address, signers[1].address, signers[0].address, "", "", ""],
             undefined
         );
     });

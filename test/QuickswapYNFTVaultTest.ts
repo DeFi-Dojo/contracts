@@ -26,6 +26,7 @@ describe("QuickswapYNFTVault", () => {
   let stakingDualRewardsMock: FakeContract;
   let stakingRewardsMock: FakeContract;
   let dQuickMock: FakeContract;
+  let wMaticMock: FakeContract;
   let token0Mock: FakeContract;
   let token1Mock: FakeContract;
   let tokenIn: FakeContract;
@@ -39,6 +40,7 @@ describe("QuickswapYNFTVault", () => {
     stakingDualRewardsMock = await smock.fake(IStakingDualRewards.abi);
     stakingRewardsMock = await smock.fake(IStakingRewards.abi);
     dQuickMock = await smock.fake(IERC20.abi);
+    wMaticMock = await smock.fake(IERC20.abi);
     token0Mock = await smock.fake(IERC20.abi);
     token1Mock = await smock.fake(IERC20.abi);
     tokenIn = await smock.fake(IERC20.abi);
@@ -56,6 +58,7 @@ describe("QuickswapYNFTVault", () => {
         uniswapPairMock.address,
         stakingDualRewardsMock.address,
         dQuickMock.address,
+        wMaticMock.address,
         signers[1].address,
         signers[0].address,
         "",
@@ -547,5 +550,23 @@ describe("QuickswapYNFTVault", () => {
       signers[1].address,
       DEADLINE
     );
+  });
+
+  it("should transfer tokens to beneficiary on getRewardLPMining called", async () => {
+    const BALANCE1 = 200;
+    const BALANCE2 = 300;
+    const BENEFICIARY = signers[0].address;
+
+    await dQuickMock.balanceOf.returns(BALANCE1);
+    await wMaticMock.balanceOf.returns(BALANCE2);
+
+    await quickswapYnftVault.grantRole(
+      ethers.utils.keccak256(ethers.utils.toUtf8Bytes("HARVESTER_ROLE")),
+      signers[0].address
+    );
+    await quickswapYnftVault.getRewardLPMining();
+    expect(stakingDualRewardsMock.getReward).to.have.callCount(1);
+    expect(dQuickMock.transfer).to.have.been.calledWith(BENEFICIARY, BALANCE1);
+    expect(wMaticMock.transfer).to.have.been.calledWith(BENEFICIARY, BALANCE2);
   });
 });

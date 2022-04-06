@@ -16,6 +16,7 @@ contract QuickswapYNFTVault is YNFTVault {
   IUniswapV2Pair public immutable pair;
   IStakingDualRewards public immutable stakingDualRewards;
   IERC20 public immutable dQuick;
+  IERC20 public immutable wMatic;
   uint256 public totalSupply;
 
   constructor(
@@ -23,6 +24,7 @@ contract QuickswapYNFTVault is YNFTVault {
     IUniswapV2Pair _pair,
     IStakingDualRewards _stakingDualRewards,
     IERC20 _dQuick,
+    IERC20 _wMatic,
     address _harvester,
     address _beneficiary,
     string memory _ynftName,
@@ -41,6 +43,7 @@ contract QuickswapYNFTVault is YNFTVault {
     pair = _pair;
     stakingDualRewards = _stakingDualRewards;
     dQuick = _dQuick;
+    wMatic = _wMatic;
     firstToken = IERC20(_pair.token0());
     secondToken = IERC20(_pair.token1());
   }
@@ -97,6 +100,11 @@ contract QuickswapYNFTVault is YNFTVault {
 
   function getRewardLPMining() external onlyRole(HARVESTER_ROLE) whenNotPaused {
     stakingDualRewards.getReward();
+    uint256 dQuickBalance = dQuick.balanceOf(address(this));
+    dQuick.balanceOf(address(this));
+    dQuick.transfer(beneficiary, dQuickBalance);
+    uint256 wMaticBalance = wMatic.balanceOf(address(this));
+    wMatic.transfer(beneficiary, wMaticBalance);
   }
 
   function _withrdrawFromLPMining(uint256 _balance) private {
