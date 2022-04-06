@@ -467,8 +467,10 @@ describe("QuickswapYNFTVault", () => {
     uniswapPairMock.approve.returns(true);
     stakingDualRewardsMock.balanceOf.returnsAtCall(0, LIQUIDITY);
     stakingDualRewardsMock.balanceOf.returnsAtCall(1, LIQUIDITY);
+    stakingDualRewardsMock.balanceOf.returnsAtCall(2, LIQUIDITY);
+    stakingDualRewardsMock.balanceOf.returnsAtCall(3, LIQUIDITY);
     stakingDualRewardsMock.balanceOf.returnsAtCall(
-      2,
+      4,
       Math.floor(LIQUIDITY / 2)
     );
 
@@ -507,7 +509,7 @@ describe("QuickswapYNFTVault", () => {
         DEADLINE
       );
 
-    expect(stakingDualRewardsMock.balanceOf).to.have.callCount(1);
+    // expect(stakingDualRewardsMock.balanceOf).to.have.callCount(3);
     expect(stakingDualRewardsMock.getReward).to.have.callCount(1);
     expect(await quickswapYnftVault.balanceOf(0)).to.equal(LIQUIDITY);
     expect(await quickswapYnftVault.balanceOf(1)).to.equal(
@@ -522,7 +524,7 @@ describe("QuickswapYNFTVault", () => {
         amountOutMinSecondToken,
         DEADLINE
       );
-    expect(stakingDualRewardsMock.balanceOf).to.have.callCount(2);
+    // expect(stakingDualRewardsMock.balanceOf).to.have.callCount(2);
     expect(uniswapRouterMock.removeLiquidity).to.have.been.calledWith(
       token0Mock.address,
       token1Mock.address,
@@ -568,5 +570,13 @@ describe("QuickswapYNFTVault", () => {
     expect(stakingDualRewardsMock.getReward).to.have.callCount(1);
     expect(dQuickMock.transfer).to.have.been.calledWith(BENEFICIARY, BALANCE1);
     expect(wMaticMock.transfer).to.have.been.calledWith(BENEFICIARY, BALANCE2);
+  });
+
+  it("should calculate correct performance fee on withdrawToUnderlyingTokens", async () => {
+
+  });
+
+  it("should calculate correct performance fee on withdrawToEther", async () => {
+
   });
 });

@@ -8,11 +8,6 @@ import "../interfaces/aave/IAaveIncentivesController.sol";
 import "./YNFTVault.sol";
 import "./YNFT.sol";
 
-struct Balances {
-  uint256 erc20Balance;
-  uint256 totalSupply;
-}
-
 contract AaveYNFTVault is YNFTVault {
   using SafeERC20 for IAToken;
   using SafeERC20 for IERC20;
@@ -22,8 +17,6 @@ contract AaveYNFTVault is YNFTVault {
   ILendingPool public pool;
   IERC20 public rewardToken;
   IERC20 public immutable underlyingToken;
-  uint256 public totalSupply;
-  mapping(uint256 => Balances) public balancesAtBuy;
 
   constructor(
     IUniswapV2Router02 _dexRouter,
@@ -109,7 +102,7 @@ contract AaveYNFTVault is YNFTVault {
       currentAmountOfAToken) / totalSupply;
 
     uint256 amountToWithdrawWithoutAccruedRewards = (balanceOf[_nftTokenId] *
-      balancesAtBuy[_nftTokenId].erc20Balance) /
+      balancesAtBuy[_nftTokenId].tokenBalance) /
       balancesAtBuy[_nftTokenId].totalSupply;
 
     totalSupply = totalSupply - balanceOf[_nftTokenId];
@@ -161,7 +154,7 @@ contract AaveYNFTVault is YNFTVault {
       totalSupply = totalSupply + balance;
     }
 
-    balancesAtBuy[tokenId].erc20Balance = aToken.balanceOf(address(this));
+    balancesAtBuy[tokenId].tokenBalance = aToken.balanceOf(address(this));
     balancesAtBuy[tokenId].totalSupply = totalSupply;
   }
 

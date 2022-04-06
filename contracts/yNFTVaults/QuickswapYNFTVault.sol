@@ -17,7 +17,6 @@ contract QuickswapYNFTVault is YNFTVault {
   IStakingDualRewards public immutable stakingDualRewards;
   IERC20 public immutable dQuick;
   IERC20 public immutable wMatic;
-  uint256 public totalSupply;
 
   constructor(
     IUniswapV2Router02 _dexRouter,
@@ -130,6 +129,8 @@ contract QuickswapYNFTVault is YNFTVault {
       balanceOf[tokenId] = balance;
       totalSupply = totalSupply + balance;
     }
+    balancesAtBuy[tokenId].totalSupply = totalSupply;
+    balancesAtBuy[tokenId].tokenBalance = stakingDualRewards.balanceOf(address(this));
   }
 
   function _depositLiquidityForEther(
