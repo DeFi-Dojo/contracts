@@ -572,57 +572,123 @@ describe("QuickswapYNFTVault", () => {
     expect(wMaticMock.transfer).to.have.been.calledWith(BENEFICIARY, BALANCE2);
   });
 
-  it("should calculate correct performance fee on withdrawToUnderlyingTokens", async () => {
-    const TOKEN_ID = 0;
-    const amountOutMinFirstToken = 900;
-    const amountOutMinSecondToken = 800;
-    const DEADLINE = 101;
-    const LIQUIDITY_WITH_REWARDS = 444;
-    const PERFORMANCE_FEE = 11;
-    const signers = await ethers.getSigners();
-
+  async function createTwoYNftsAndExtractOne(
+    LIQUIDITY_REWARDS: number,
+    signers: SignerWithAddress[],
+    DEADLINE: number,
+    EXTRACTED_TOKEN_ID: number
+  ) {
     uniswapRouterMock.swapExactETHForTokens.returns([1000, 300]);
     await token0Mock.approve.returns(true);
     await token1Mock.approve.returns(true);
     uniswapPairMock.approve.returns(true);
-    stakingDualRewardsMock.balanceOf.returnsAtCall(0, 0);
-    stakingDualRewardsMock.balanceOf.returnsAtCall(1, LIQUIDITY_WITH_REWARDS);
+    stakingDualRewardsMock.balanceOf.returnsAtCall(0, LIQUIDITY);
+    stakingDualRewardsMock.balanceOf.returnsAtCall(
+      1,
+      LIQUIDITY + LIQUIDITY_REWARDS
+    );
+    stakingDualRewardsMock.balanceOf.returnsAtCall(
+      2,
+      2 * LIQUIDITY + LIQUIDITY_REWARDS
+    );
+    stakingDualRewardsMock.balanceOf.returnsAtCall(
+      3,
+      2 * LIQUIDITY + 2 * LIQUIDITY_REWARDS
+    );
 
-    // yNFT bought
-    await quickswapYnftVault.connect(signers[1]).createYNFTForEther(900, 800, 100, 100, 101);
+    // 1. yNFT bought
+    await quickswapYnftVault
+      .connect(signers[1])
+      .createYNFTForEther(0, 0, 0, 0, DEADLINE);
 
-    // LP tokens earned...
+    // LIQUIDITY_REWARDS amount of LP tokens earned...
+
+    // 2. yNFT bought
+    await quickswapYnftVault
+      .connect(signers[1])
+      .createYNFTForEther(0, 0, 0, 0, DEADLINE);
+
+    // LIQUIDITY_REWARDS amount of LP tokens earned...
 
     // yNFT sold
-    await quickswapYnftVault.connect(signers[1]).withdrawToUnderlyingTokens(
-        TOKEN_ID,
-        amountOutMinFirstToken,
-        amountOutMinSecondToken,
-        DEADLINE
+    await quickswapYnftVault
+      .connect(signers[1])
+      .withdrawToUnderlyingTokens(EXTRACTED_TOKEN_ID, 0, 0, DEADLINE);
+  }
+
+  it("should calculate correct performance fee on withdrawToUnderlyingTokens when withdrawing first yNFT", async () => {
+    const EXTRACTED_TOKEN_ID = 0;
+    const DEADLINE = 101;
+    const LIQUIDITY_REWARDS = 111;
+    const EXPECTED_PAYOUT = 508;
+    const PERFORMANCE_FEE = 17;
+    const signers = await ethers.getSigners();
+
+    await createTwoYNftsAndExtractOne(
+      LIQUIDITY_REWARDS,
+      signers,
+      DEADLINE,
+      EXTRACTED_TOKEN_ID
     );
 
+    expect(stakingDualRewardsMock.balanceOf).to.have.callCount(4);
     expect(uniswapRouterMock.removeLiquidity).to.have.callCount(2);
     expect(uniswapRouterMock.removeLiquidity).to.have.been.calledWith(
-        token0Mock.address,
-        token1Mock.address,
-        LIQUIDITY_WITH_REWARDS-PERFORMANCE_FEE,
-        900,
-        800,
-        signers[1].address,
-        DEADLINE
+      token0Mock.address,
+      token1Mock.address,
+      EXPECTED_PAYOUT - PERFORMANCE_FEE,
+      0,
+      0,
+      signers[1].address,
+      DEADLINE
     );
     expect(uniswapRouterMock.removeLiquidity).to.have.been.calledWith(
-        token0Mock.address,
-        token1Mock.address,
-        PERFORMANCE_FEE,
-        900,
-        800,
-        signers[0].address,
-        DEADLINE
+      token0Mock.address,
+      token1Mock.address,
+      PERFORMANCE_FEE,
+      0,
+      0,
+      signers[0].address,
+      DEADLINE
     );
   });
 
-  it("should calculate correct performance fee on withdrawToEther", async () => {
+  it("should calculate correct performance fee on withdrawToUnderlyingTokens when withdrawing second yNFT", async () => {
+    const EXTRACTED_TOKEN_ID = 1;
+    const DEADLINE = 101;
+    const LIQUIDITY_REWARDS = 111;
+    const EXPECTED_PAYOUT = 379;
+    const PERFORMANCE_FEE = 4;
+    const signers = await ethers.getSigners();
 
+    await createTwoYNftsAndExtractOne(
+      LIQUIDITY_REWARDS,
+      signers,
+      DEADLINE,
+      EXTRACTED_TOKEN_ID
+    );
+
+    expect(stakingDualRewardsMock.balanceOf).to.have.callCount(4);
+    expect(uniswapRouterMock.removeLiquidity).to.have.callCount(2);
+    expect(uniswapRouterMock.removeLiquidity).to.have.been.calledWith(
+      token0Mock.address,
+      token1Mock.address,
+      EXPECTED_PAYOUT - PERFORMANCE_FEE,
+      0,
+      0,
+      signers[1].address,
+      DEADLINE
+    );
+    expect(uniswapRouterMock.removeLiquidity).to.have.been.calledWith(
+      token0Mock.address,
+      token1Mock.address,
+      PERFORMANCE_FEE,
+      0,
+      0,
+      signers[0].address,
+      DEADLINE
+    );
   });
+
+  it("should calculate correct performance fee on withdrawToEther", async () => {});
 });

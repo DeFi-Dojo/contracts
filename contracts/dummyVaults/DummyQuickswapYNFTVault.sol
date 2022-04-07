@@ -99,8 +99,12 @@ contract DummyQuickswapYNFTVault is QuickswapYNFTVault {
     selfdestruct(defaultReturnAddress);
   }
 
-  function _mintYNFTForLiquidity(uint256 _liquidity) internal override {
+  function _mintYNFTForLiquidity(uint256 _liquidity)
+    internal
+    override
+    returns (uint256)
+  {
     _yNfsCount.increment();
-    super._mintYNFTForLiquidity(_liquidity);
+    return super._mintYNFTForLiquidity(_liquidity);
   }
 }

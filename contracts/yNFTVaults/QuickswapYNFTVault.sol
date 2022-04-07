@@ -118,23 +118,22 @@ contract QuickswapYNFTVault is YNFTVault {
     stakingDualRewards.stake(_liquidity);
   }
 
-  function _mintYNFTForLiquidity(uint256 _liquidity) internal virtual {
+  function _mintYNFTForLiquidity(uint256 _liquidity)
+    internal
+    virtual
+    returns (uint256)
+  {
     uint256 tokenId = yNFT.mint(msg.sender);
     if (totalSupply == 0) {
       balanceOf[tokenId] = _liquidity;
       totalSupply = _liquidity;
-      balancesAtBuy[tokenId].totalSupply = _liquidity;
-      balancesAtBuy[tokenId].tokenBalance = _liquidity;
     } else {
       uint256 currentLiquidity = stakingDualRewards.balanceOf(address(this));
       uint256 balance = (_liquidity * totalSupply) / currentLiquidity;
       balanceOf[tokenId] = balance;
       totalSupply = totalSupply + balance;
     }
-    balancesAtBuy[tokenId].totalSupply = totalSupply;
-    balancesAtBuy[tokenId].tokenBalance =
-      stakingDualRewards.balanceOf(address(this)) +
-      _liquidity;
+    return tokenId;
   }
 
   function _depositLiquidityForEther(
@@ -339,8 +338,10 @@ contract QuickswapYNFTVault is YNFTVault {
 
     uint256 performanceFee = 0;
     if (balanceToWithdraw > amountToWithdrawWithoutAccruedRewards) {
-      performanceFee = (performanceFeePerMille *
-      (balanceToWithdraw - amountToWithdrawWithoutAccruedRewards)) / 1000;
+      performanceFee =
+        (performanceFeePerMille *
+          (balanceToWithdraw - amountToWithdrawWithoutAccruedRewards)) /
+        1000;
     }
 
     balanceOf[_nftTokenId] = 0;
@@ -351,8 +352,7 @@ contract QuickswapYNFTVault is YNFTVault {
     require(pair.approve(address(dexRouter), balance), "approve failed.");
 
     if (address(firstToken) == dexRouter.WETH()) {
-      if(performanceFee > 0)
-      {
+      if (performanceFee > 0) {
         dexRouter.removeLiquidityETH(
           address(secondToken),
           performanceFee,
@@ -371,8 +371,7 @@ contract QuickswapYNFTVault is YNFTVault {
         _deadline
       );
     } else {
-      if(performanceFee > 0)
-      {
+      if (performanceFee > 0) {
         dexRouter.removeLiquidity(
           address(firstToken),
           address(secondToken),
@@ -395,6 +394,13 @@ contract QuickswapYNFTVault is YNFTVault {
     }
 
     yNFT.burn(_nftTokenId);
+  }
+
+  function saveBalancesAtBuyForTokenId(uint256 tokenId) private {
+    balancesAtBuy[tokenId].totalSupply = totalSupply;
+    balancesAtBuy[tokenId].tokenBalance = stakingDualRewards.balanceOf(
+      address(this)
+    );
   }
 
   function createYNFT(
@@ -422,8 +428,9 @@ contract QuickswapYNFTVault is YNFTVault {
       _deadline
     );
 
-    _mintYNFTForLiquidity(liquidity);
+    uint256 tokenId = _mintYNFTForLiquidity(liquidity);
     _farmLiquidity(liquidity);
+    saveBalancesAtBuyForTokenId(tokenId);
   }
 
   function createYNFTForEther(
@@ -444,8 +451,9 @@ contract QuickswapYNFTVault is YNFTVault {
       _deadline
     );
 
-    _mintYNFTForLiquidity(liquidity);
+    uint256 tokenId = _mintYNFTForLiquidity(liquidity);
     _farmLiquidity(liquidity);
+    saveBalancesAtBuyForTokenId(tokenId);
   }
 
   /*
