@@ -253,6 +253,20 @@ contract QuickswapYNFTVault is YNFTVault {
     return liquidity;
   }
 
+  function calculatePerformanceFeeToWithdrawPerMille(
+    uint256 _nftTokenId,
+    uint256 _tokenBalance,
+    uint256 _balanceToWithdraw
+  ) private returns (uint256) {
+    uint256 balanceToWithdrawWithoutAccruedRewards = (_tokenBalance *
+      balancesAtBuy[_nftTokenId].tokenBalance) /
+      balancesAtBuy[_nftTokenId].totalSupply;
+
+    return
+      ((_balanceToWithdraw - balanceToWithdrawWithoutAccruedRewards) *
+        performanceFeePerMille) / _balanceToWithdraw;
+  }
+
   function withdrawToEther(
     uint256 _nftTokenId,
     uint256 _amountOutMinFirstToken,
@@ -264,9 +278,18 @@ contract QuickswapYNFTVault is YNFTVault {
 
     balanceOf[_nftTokenId] = 0;
 
-    uint256 currentLiquidity = stakingDualRewards.balanceOf(address(this));
-    uint256 balanceToWithdraw = (balance * currentLiquidity) / totalSupply;
-    totalSupply -= balance;
+    uint256 balanceToWithdraw;
+    {
+      uint256 currentLiquidity = stakingDualRewards.balanceOf(address(this));
+      balanceToWithdraw = (balance * currentLiquidity) / totalSupply;
+      totalSupply -= balance;
+    }
+
+    uint256 performanceFeeToWithdrawPerMille = calculatePerformanceFeeToWithdrawPerMille(
+        _nftTokenId,
+        balance,
+        balanceToWithdraw
+      );
 
     _withrdrawFromLPMining(balanceToWithdraw);
 
@@ -288,8 +311,17 @@ contract QuickswapYNFTVault is YNFTVault {
         _deadline
       );
 
+      uint256 performanceFee = (amountFirstToken *
+        performanceFeeToWithdrawPerMille) / 1000;
+      if (performanceFee > 0) {
+        //solhint-disable-next-line avoid-low-level-calls
+        (bool success, ) = beneficiary.call{value: performanceFee}("");
+        require(success, "Transfer failed.");
+      }
       //solhint-disable-next-line avoid-low-level-calls
-      (bool success, ) = msg.sender.call{value: amountFirstToken}("");
+      (bool success, ) = msg.sender.call{
+        value: amountFirstToken - performanceFee
+      }("");
       require(success, "Transfer failed.");
     } else {
       (amountFirstToken, amountSecondToken) = dexRouter.removeLiquidity(
@@ -301,18 +333,40 @@ contract QuickswapYNFTVault is YNFTVault {
         address(this),
         _deadline
       );
+      uint256 firstTokenPerformanceFee = (amountFirstToken *
+        performanceFeeToWithdrawPerMille) / 1000;
+
+      if (firstTokenPerformanceFee > 0) {
+        _swapTokenToETH(
+          beneficiary,
+          firstTokenPerformanceFee,
+          _amountOutETH / 2,
+          address(firstToken),
+          _deadline
+        );
+      }
       _swapTokenToETH(
         msg.sender,
-        amountFirstToken,
+        amountFirstToken - firstTokenPerformanceFee,
         _amountOutETH / 2,
         address(firstToken),
         _deadline
       );
     }
-
+    uint256 secondTokenPerformanceFee = (amountSecondToken *
+      performanceFeeToWithdrawPerMille) / 1000;
+    if (secondTokenPerformanceFee > 0) {
+      _swapTokenToETH(
+        beneficiary,
+        secondTokenPerformanceFee,
+        _amountOutETH / 2,
+        address(secondToken),
+        _deadline
+      );
+    }
     _swapTokenToETH(
       msg.sender,
-      amountSecondToken,
+      amountSecondToken - secondTokenPerformanceFee,
       _amountOutETH / 2,
       address(secondToken),
       _deadline
