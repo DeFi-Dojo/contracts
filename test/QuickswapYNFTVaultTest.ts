@@ -711,7 +711,7 @@ describe("QuickswapYNFTVault", () => {
     expect(uniswapRouterMock.removeLiquidity).to.have.callCount(4);
   });
 
-  it("should calculate correct performance fee on withdrawToEther", async () => {
+  it("should calculate correct performance fee on withdrawToEther for first token", async () => {
     const EXTRACTED_TOKEN_ID = 0;
     const DEADLINE = 101;
     const LIQUIDITY_REWARDS = 111;
@@ -777,6 +777,77 @@ describe("QuickswapYNFTVault", () => {
       [token1Mock.address, "0x0000000000000000000000000000000000000000"],
       signers[1].address,
       DEADLINE
+    );
+
+    expect(uniswapRouterMock.swapExactTokensForETH).to.have.callCount(4);
+  });
+
+  it("should calculate correct performance fee on withdrawToEther for second token", async () => {
+    const EXTRACTED_TOKEN_ID = 1;
+    const DEADLINE = 101;
+    const LIQUIDITY_REWARDS = 111;
+    const EXPECTED_PAYOUT = 379;
+    const PERFORMANCE_FEE = 2;
+    const PERFORMANCE_FEE2 = 13;
+    const AMOUNT_OUT_TOKEN = 215;
+    const AMOUNT_OUT_TOKEN2 = 1100;
+    const AMOUNT_OUT_ETH = 15002900;
+    const signers = await ethers.getSigners();
+
+    await createTwoYNfts(LIQUIDITY_REWARDS, signers, DEADLINE);
+
+    await uniswapRouterMock.swapExactTokensForETH.returns([
+      AMOUNT_OUT_TOKEN,
+      AMOUNT_OUT_ETH,
+    ]);
+    await uniswapRouterMock.removeLiquidity.returns([
+      AMOUNT_OUT_TOKEN,
+      AMOUNT_OUT_TOKEN2,
+    ]);
+
+    await quickswapYnftVault
+        .connect(signers[1])
+        .withdrawToEther(EXTRACTED_TOKEN_ID, 0, 0, 0, DEADLINE);
+
+    expect(stakingDualRewardsMock.withdraw).to.have.been.calledWith(
+        EXPECTED_PAYOUT
+    );
+    expect(uniswapRouterMock.removeLiquidity).to.have.been.calledWith(
+        token0Mock.address,
+        token1Mock.address,
+        EXPECTED_PAYOUT,
+        0,
+        0,
+        quickswapYnftVault.address,
+        DEADLINE
+    );
+    expect(uniswapRouterMock.swapExactTokensForETH).to.have.been.calledWith(
+        PERFORMANCE_FEE,
+        0,
+        [token0Mock.address, "0x0000000000000000000000000000000000000000"],
+        signers[0].address,
+        DEADLINE
+    );
+    expect(uniswapRouterMock.swapExactTokensForETH).to.have.been.calledWith(
+        AMOUNT_OUT_TOKEN - PERFORMANCE_FEE,
+        0,
+        [token0Mock.address, "0x0000000000000000000000000000000000000000"],
+        signers[1].address,
+        DEADLINE
+    );
+    expect(uniswapRouterMock.swapExactTokensForETH).to.have.been.calledWith(
+        PERFORMANCE_FEE2,
+        0,
+        [token1Mock.address, "0x0000000000000000000000000000000000000000"],
+        signers[0].address,
+        DEADLINE
+    );
+    expect(uniswapRouterMock.swapExactTokensForETH).to.have.been.calledWith(
+        AMOUNT_OUT_TOKEN2 - PERFORMANCE_FEE2,
+        0,
+        [token1Mock.address, "0x0000000000000000000000000000000000000000"],
+        signers[1].address,
+        DEADLINE
     );
 
     expect(uniswapRouterMock.swapExactTokensForETH).to.have.callCount(4);
