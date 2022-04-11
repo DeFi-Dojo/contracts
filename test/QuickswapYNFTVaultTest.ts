@@ -33,6 +33,7 @@ describe("QuickswapYNFTVault", () => {
   let signers: SignerWithAddress[];
 
   const LIQUIDITY = 333;
+  const DEADLINE = 101;
 
   beforeEach(async () => {
     uniswapRouterMock = await smock.fake(IUniswapV2Router02.abi);
@@ -45,11 +46,11 @@ describe("QuickswapYNFTVault", () => {
     token1Mock = await smock.fake(IERC20.abi);
     tokenIn = await smock.fake(IERC20.abi);
 
+    signers = await ethers.getSigners();
+
     await uniswapPairMock.token0.returns(token0Mock.address);
     await uniswapPairMock.token1.returns(token1Mock.address);
     uniswapRouterMock.addLiquidity.returns([LIQUIDITY, LIQUIDITY, LIQUIDITY]);
-
-    signers = await ethers.getSigners();
 
     quickswapYnftVault = await deployContract<QuickswapYNFTVault>(
       "QuickswapYNFTVault",
@@ -70,7 +71,6 @@ describe("QuickswapYNFTVault", () => {
   });
 
   it("should revert setBeneficiary if no DEFAULT_ADMIN_ROLE rights", async () => {
-    const signers = await ethers.getSigners();
     await expectRevert(
       quickswapYnftVault.connect(signers[1]).setBeneficiary(signers[2].address),
       "AccessControl: account ",
@@ -80,7 +80,6 @@ describe("QuickswapYNFTVault", () => {
   });
 
   it("should change beneficiary by setBeneficiary when role set", async () => {
-    const signers = await ethers.getSigners();
     await quickswapYnftVault.grantRole(
       "0x0000000000000000000000000000000000000000000000000000000000000000",
       signers[1].address
@@ -93,7 +92,6 @@ describe("QuickswapYNFTVault", () => {
 
   it("should revert setFee if no DEFAULT_ADMIN_ROLE rights", async () => {
     const FEE = 12;
-    const signers = await ethers.getSigners();
     await expectRevert(
       quickswapYnftVault.connect(signers[1]).setFee(FEE),
       "AccessControl: account ",
@@ -104,7 +102,6 @@ describe("QuickswapYNFTVault", () => {
 
   it("should set proper fee by setFee when role set", async () => {
     const FEE = 12;
-    const signers = await ethers.getSigners();
     await quickswapYnftVault.grantRole(
       "0x0000000000000000000000000000000000000000000000000000000000000000",
       signers[1].address
@@ -127,7 +124,6 @@ describe("QuickswapYNFTVault", () => {
     const amountOutMinSecondToken = 800;
     const amountMinLiqudityFirstToken = 100;
     const amountMinLiquditySecondToken = 100;
-    const DEADLINE = 101;
 
     const AMOUNT_AFTER_SWAP1 = 300;
 
@@ -175,7 +171,6 @@ describe("QuickswapYNFTVault", () => {
     const amountOutMinSecondToken = 800;
     const amountMinLiqudityFirstToken = 100;
     const amountMinLiquditySecondToken = 100;
-    const DEADLINE = 101;
 
     const AMOUNT_AFTER_SWAP1 = 300;
 
@@ -221,8 +216,6 @@ describe("QuickswapYNFTVault", () => {
     const TOKEN_ID = 0;
     const amountOutMinFirstToken = 900;
     const amountOutMinSecondToken = 800;
-    const DEADLINE = 101;
-    const signers = await ethers.getSigners();
 
     await quickswapYnftVault.withdrawToUnderlyingTokens(
       TOKEN_ID,
@@ -253,8 +246,6 @@ describe("QuickswapYNFTVault", () => {
     const TOKEN_ID = 0;
     const amountOutMinFirstToken = 900;
     const amountOutMinSecondToken = 800;
-    const DEADLINE = 101;
-    const signers = await ethers.getSigners();
 
     await expectRevert(
       quickswapYnftVault
@@ -281,8 +272,6 @@ describe("QuickswapYNFTVault", () => {
     const amountOutMinFirstToken = 900;
     const amountOutMinSecondToken = 800;
     const amountOfEthMin = 1000;
-    const DEADLINE = 101;
-    const signers = await ethers.getSigners();
 
     await uniswapRouterMock.swapExactTokensForETH.returns([
       amountOutMinFirstToken,
@@ -330,7 +319,6 @@ describe("QuickswapYNFTVault", () => {
     const amountOutMinSecondToken = 800;
     const amountMinLiqudityFirstToken = 100;
     const amountMinLiquditySecondToken = 100;
-    const DEADLINE = 101;
     const AMOUNT_AFTER_SWAP1 = 300;
 
     await quickswapYnftVault.grantRole(
@@ -391,7 +379,6 @@ describe("QuickswapYNFTVault", () => {
     const amountMinLiqudityFirstToken = 100;
     const amountMinLiquditySecondToken = 100;
     const amountOfEthMin = 1000;
-    const DEADLINE = 101;
 
     await quickswapYnftVault.grantRole(
       ethers.utils.keccak256(ethers.utils.toUtf8Bytes("HARVESTER_ROLE")),
@@ -447,7 +434,6 @@ describe("QuickswapYNFTVault", () => {
     const amountOutMinSecondToken = 800;
     const amountMinLiqudityFirstToken = 100;
     const amountMinLiquditySecondToken = 100;
-    const DEADLINE = 101;
     const AMOUNT_AFTER_SWAP1 = 300;
 
     await quickswapYnftVault.grantRole(
@@ -641,11 +627,9 @@ describe("QuickswapYNFTVault", () => {
 
   it("should calculate correct performance fee on withdrawToUnderlyingTokens when withdrawing first yNFT", async () => {
     const EXTRACTED_TOKEN_ID = 0;
-    const DEADLINE = 101;
     const LIQUIDITY_REWARDS = 111;
     const EXPECTED_PAYOUT = 508;
     const PERFORMANCE_FEE = 17;
-    const signers = await ethers.getSigners();
 
     await createTwoYNfts(LIQUIDITY_REWARDS, signers, DEADLINE);
 
@@ -678,11 +662,9 @@ describe("QuickswapYNFTVault", () => {
 
   it("should calculate correct performance fee on withdrawToUnderlyingTokens when withdrawing second yNFT", async () => {
     const EXTRACTED_TOKEN_ID = 1;
-    const DEADLINE = 101;
     const LIQUIDITY_REWARDS = 111;
     const EXPECTED_PAYOUT = 379;
     const PERFORMANCE_FEE = 4;
-    const signers = await ethers.getSigners();
 
     await createTwoYNfts(LIQUIDITY_REWARDS, signers, DEADLINE);
 
@@ -711,9 +693,31 @@ describe("QuickswapYNFTVault", () => {
     expect(uniswapRouterMock.removeLiquidity).to.have.callCount(4);
   });
 
+  function expectSwapToEthWithPerformanceFee(
+    performanceFee: number,
+    tokenAmount: number,
+    path: string[],
+    beneficiary: string,
+    owner: string
+  ) {
+    expect(uniswapRouterMock.swapExactTokensForETH).to.have.been.calledWith(
+      performanceFee,
+      0,
+      path,
+      beneficiary,
+      DEADLINE
+    );
+    expect(uniswapRouterMock.swapExactTokensForETH).to.have.been.calledWith(
+      tokenAmount - performanceFee,
+      0,
+      path,
+      owner,
+      DEADLINE
+    );
+  }
+
   it("should calculate correct performance fee on withdrawToEther for first token", async () => {
     const EXTRACTED_TOKEN_ID = 0;
-    const DEADLINE = 101;
     const LIQUIDITY_REWARDS = 111;
     const EXPECTED_PAYOUT = 508;
     const PERFORMANCE_FEE = 7;
@@ -721,7 +725,6 @@ describe("QuickswapYNFTVault", () => {
     const AMOUNT_OUT_TOKEN = 215;
     const AMOUNT_OUT_TOKEN2 = 1100;
     const AMOUNT_OUT_ETH = 15002900;
-    const signers = await ethers.getSigners();
 
     await createTwoYNfts(LIQUIDITY_REWARDS, signers, DEADLINE);
 
@@ -750,33 +753,21 @@ describe("QuickswapYNFTVault", () => {
       quickswapYnftVault.address,
       DEADLINE
     );
-    expect(uniswapRouterMock.swapExactTokensForETH).to.have.been.calledWith(
+
+    expectSwapToEthWithPerformanceFee(
       PERFORMANCE_FEE,
-      0,
+      AMOUNT_OUT_TOKEN,
       [token0Mock.address, "0x0000000000000000000000000000000000000000"],
       signers[0].address,
-      DEADLINE
+      signers[1].address
     );
-    expect(uniswapRouterMock.swapExactTokensForETH).to.have.been.calledWith(
-      AMOUNT_OUT_TOKEN - PERFORMANCE_FEE,
-      0,
-      [token0Mock.address, "0x0000000000000000000000000000000000000000"],
-      signers[1].address,
-      DEADLINE
-    );
-    expect(uniswapRouterMock.swapExactTokensForETH).to.have.been.calledWith(
+
+    expectSwapToEthWithPerformanceFee(
       PERFORMANCE_FEE2,
-      0,
+      AMOUNT_OUT_TOKEN2,
       [token1Mock.address, "0x0000000000000000000000000000000000000000"],
       signers[0].address,
-      DEADLINE
-    );
-    expect(uniswapRouterMock.swapExactTokensForETH).to.have.been.calledWith(
-      AMOUNT_OUT_TOKEN2 - PERFORMANCE_FEE2,
-      0,
-      [token1Mock.address, "0x0000000000000000000000000000000000000000"],
-      signers[1].address,
-      DEADLINE
+      signers[1].address
     );
 
     expect(uniswapRouterMock.swapExactTokensForETH).to.have.callCount(4);
@@ -784,7 +775,6 @@ describe("QuickswapYNFTVault", () => {
 
   it("should calculate correct performance fee on withdrawToEther for second token", async () => {
     const EXTRACTED_TOKEN_ID = 1;
-    const DEADLINE = 101;
     const LIQUIDITY_REWARDS = 111;
     const EXPECTED_PAYOUT = 379;
     const PERFORMANCE_FEE = 2;
@@ -792,7 +782,6 @@ describe("QuickswapYNFTVault", () => {
     const AMOUNT_OUT_TOKEN = 215;
     const AMOUNT_OUT_TOKEN2 = 1100;
     const AMOUNT_OUT_ETH = 15002900;
-    const signers = await ethers.getSigners();
 
     await createTwoYNfts(LIQUIDITY_REWARDS, signers, DEADLINE);
 
@@ -806,48 +795,36 @@ describe("QuickswapYNFTVault", () => {
     ]);
 
     await quickswapYnftVault
-        .connect(signers[1])
-        .withdrawToEther(EXTRACTED_TOKEN_ID, 0, 0, 0, DEADLINE);
+      .connect(signers[1])
+      .withdrawToEther(EXTRACTED_TOKEN_ID, 0, 0, 0, DEADLINE);
 
     expect(stakingDualRewardsMock.withdraw).to.have.been.calledWith(
-        EXPECTED_PAYOUT
+      EXPECTED_PAYOUT
     );
     expect(uniswapRouterMock.removeLiquidity).to.have.been.calledWith(
-        token0Mock.address,
-        token1Mock.address,
-        EXPECTED_PAYOUT,
-        0,
-        0,
-        quickswapYnftVault.address,
-        DEADLINE
+      token0Mock.address,
+      token1Mock.address,
+      EXPECTED_PAYOUT,
+      0,
+      0,
+      quickswapYnftVault.address,
+      DEADLINE
     );
-    expect(uniswapRouterMock.swapExactTokensForETH).to.have.been.calledWith(
-        PERFORMANCE_FEE,
-        0,
-        [token0Mock.address, "0x0000000000000000000000000000000000000000"],
-        signers[0].address,
-        DEADLINE
+
+    expectSwapToEthWithPerformanceFee(
+      PERFORMANCE_FEE,
+      AMOUNT_OUT_TOKEN,
+      [token0Mock.address, "0x0000000000000000000000000000000000000000"],
+      signers[0].address,
+      signers[1].address
     );
-    expect(uniswapRouterMock.swapExactTokensForETH).to.have.been.calledWith(
-        AMOUNT_OUT_TOKEN - PERFORMANCE_FEE,
-        0,
-        [token0Mock.address, "0x0000000000000000000000000000000000000000"],
-        signers[1].address,
-        DEADLINE
-    );
-    expect(uniswapRouterMock.swapExactTokensForETH).to.have.been.calledWith(
-        PERFORMANCE_FEE2,
-        0,
-        [token1Mock.address, "0x0000000000000000000000000000000000000000"],
-        signers[0].address,
-        DEADLINE
-    );
-    expect(uniswapRouterMock.swapExactTokensForETH).to.have.been.calledWith(
-        AMOUNT_OUT_TOKEN2 - PERFORMANCE_FEE2,
-        0,
-        [token1Mock.address, "0x0000000000000000000000000000000000000000"],
-        signers[1].address,
-        DEADLINE
+
+    expectSwapToEthWithPerformanceFee(
+      PERFORMANCE_FEE2,
+      AMOUNT_OUT_TOKEN2,
+      [token1Mock.address, "0x0000000000000000000000000000000000000000"],
+      signers[0].address,
+      signers[1].address
     );
 
     expect(uniswapRouterMock.swapExactTokensForETH).to.have.callCount(4);
@@ -855,7 +832,6 @@ describe("QuickswapYNFTVault", () => {
 
   it("should calculate correct performance fee on withdrawToEther for WETH pair", async () => {
     const EXTRACTED_TOKEN_ID = 1;
-    const DEADLINE = 101;
     const LIQUIDITY_REWARDS = 111;
     const EXPECTED_PAYOUT = 379;
     const PERFORMANCE_FEE = 2;
@@ -863,13 +839,12 @@ describe("QuickswapYNFTVault", () => {
     const AMOUNT_OUT_TOKEN = 215;
     const AMOUNT_OUT_TOKEN2 = 1100;
     const AMOUNT_OUT_ETH = 15002900;
-    const signers = await ethers.getSigners();
 
     await createTwoYNfts(LIQUIDITY_REWARDS, signers, DEADLINE);
 
     await signers[2].sendTransaction({
       to: quickswapYnftVault.address,
-      value: AMOUNT_OUT_TOKEN
+      value: AMOUNT_OUT_TOKEN,
     });
 
     await uniswapRouterMock.swapExactTokensForETH.returns([
@@ -884,42 +859,42 @@ describe("QuickswapYNFTVault", () => {
     await uniswapRouterMock.WETH.returns(token0Mock.address);
 
     const beneficiaryBalanceBefore = await balance.current(signers[0].address);
-    const vaultBalanceBefore = await balance.current(quickswapYnftVault.address);
+    const vaultBalanceBefore = await balance.current(
+      quickswapYnftVault.address
+    );
     await quickswapYnftVault
-        .connect(signers[1])
-        .withdrawToEther(EXTRACTED_TOKEN_ID, 0, 0, 0, DEADLINE);
+      .connect(signers[1])
+      .withdrawToEther(EXTRACTED_TOKEN_ID, 0, 0, 0, DEADLINE);
     const beneficiaryBalanceAfter = await balance.current(signers[0].address);
     const vaultBalanceAfter = await balance.current(quickswapYnftVault.address);
-    expect(beneficiaryBalanceAfter.sub(beneficiaryBalanceBefore).toString()).to.equal(PERFORMANCE_FEE.toString());
-    expect(vaultBalanceBefore.sub(vaultBalanceAfter).toString()).to.equal(AMOUNT_OUT_TOKEN.toString());
-    expect((await balance.current(quickswapYnftVault.address)).toString()).to.equal("0");
+    expect(
+      beneficiaryBalanceAfter.sub(beneficiaryBalanceBefore).toString()
+    ).to.equal(PERFORMANCE_FEE.toString());
+    expect(vaultBalanceBefore.sub(vaultBalanceAfter).toString()).to.equal(
+      AMOUNT_OUT_TOKEN.toString()
+    );
+    expect(
+      (await balance.current(quickswapYnftVault.address)).toString()
+    ).to.equal("0");
 
     expect(stakingDualRewardsMock.withdraw).to.have.been.calledWith(
-        EXPECTED_PAYOUT
+      EXPECTED_PAYOUT
     );
 
     expect(uniswapRouterMock.removeLiquidityETH).to.have.been.calledWith(
-        token1Mock.address,
-        EXPECTED_PAYOUT,
-        0,
-        0,
-        quickswapYnftVault.address,
-        DEADLINE
+      token1Mock.address,
+      EXPECTED_PAYOUT,
+      0,
+      0,
+      quickswapYnftVault.address,
+      DEADLINE
     );
-
-    expect(uniswapRouterMock.swapExactTokensForETH).to.have.been.calledWith(
-        PERFORMANCE_FEE2,
-        0,
-        [token1Mock.address, token0Mock.address],
-        signers[0].address,
-        DEADLINE
-    );
-    expect(uniswapRouterMock.swapExactTokensForETH).to.have.been.calledWith(
-        AMOUNT_OUT_TOKEN2 - PERFORMANCE_FEE2,
-        0,
-        [token1Mock.address, token0Mock.address],
-        signers[1].address,
-        DEADLINE
+    expectSwapToEthWithPerformanceFee(
+      PERFORMANCE_FEE2,
+      AMOUNT_OUT_TOKEN2,
+      [token1Mock.address, token0Mock.address],
+      signers[0].address,
+      signers[1].address
     );
   });
 });
