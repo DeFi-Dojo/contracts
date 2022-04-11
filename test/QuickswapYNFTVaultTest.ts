@@ -12,7 +12,7 @@ import IStakingRewards from "../artifacts/contracts/interfaces/quickswap/IStakin
 import IERC20 from "../artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json";
 
 // @ts-ignore
-import { expectRevert } from "@openzeppelin/test-helpers";
+import { expectRevert, balance } from "@openzeppelin/test-helpers";
 import { FakeContract } from "@defi-wonderland/smock/dist/src/types";
 import { smock } from "@defi-wonderland/smock";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
@@ -851,5 +851,75 @@ describe("QuickswapYNFTVault", () => {
     );
 
     expect(uniswapRouterMock.swapExactTokensForETH).to.have.callCount(4);
+  });
+
+  it("should calculate correct performance fee on withdrawToEther for WETH pair", async () => {
+    const EXTRACTED_TOKEN_ID = 1;
+    const DEADLINE = 101;
+    const LIQUIDITY_REWARDS = 111;
+    const EXPECTED_PAYOUT = 379;
+    const PERFORMANCE_FEE = 2;
+    const PERFORMANCE_FEE2 = 13;
+    const AMOUNT_OUT_TOKEN = 215;
+    const AMOUNT_OUT_TOKEN2 = 1100;
+    const AMOUNT_OUT_ETH = 15002900;
+    const signers = await ethers.getSigners();
+
+    await createTwoYNfts(LIQUIDITY_REWARDS, signers, DEADLINE);
+
+    await signers[2].sendTransaction({
+      to: quickswapYnftVault.address,
+      value: AMOUNT_OUT_TOKEN
+    });
+
+    await uniswapRouterMock.swapExactTokensForETH.returns([
+      AMOUNT_OUT_TOKEN,
+      AMOUNT_OUT_ETH,
+    ]);
+    await uniswapRouterMock.removeLiquidityETH.returns([
+      AMOUNT_OUT_TOKEN2,
+      AMOUNT_OUT_TOKEN,
+    ]);
+
+    await uniswapRouterMock.WETH.returns(token0Mock.address);
+
+    const beneficiaryBalanceBefore = await balance.current(signers[0].address);
+    const vaultBalanceBefore = await balance.current(quickswapYnftVault.address);
+    await quickswapYnftVault
+        .connect(signers[1])
+        .withdrawToEther(EXTRACTED_TOKEN_ID, 0, 0, 0, DEADLINE);
+    const beneficiaryBalanceAfter = await balance.current(signers[0].address);
+    const vaultBalanceAfter = await balance.current(quickswapYnftVault.address);
+    expect(beneficiaryBalanceAfter.sub(beneficiaryBalanceBefore).toString()).to.equal(PERFORMANCE_FEE.toString());
+    expect(vaultBalanceBefore.sub(vaultBalanceAfter).toString()).to.equal(AMOUNT_OUT_TOKEN.toString());
+    expect((await balance.current(quickswapYnftVault.address)).toString()).to.equal("0");
+
+    expect(stakingDualRewardsMock.withdraw).to.have.been.calledWith(
+        EXPECTED_PAYOUT
+    );
+
+    expect(uniswapRouterMock.removeLiquidityETH).to.have.been.calledWith(
+        token1Mock.address,
+        EXPECTED_PAYOUT,
+        0,
+        0,
+        quickswapYnftVault.address,
+        DEADLINE
+    );
+
+    expect(uniswapRouterMock.swapExactTokensForETH).to.have.been.calledWith(
+        PERFORMANCE_FEE2,
+        0,
+        [token1Mock.address, token0Mock.address],
+        signers[0].address,
+        DEADLINE
+    );
+    expect(uniswapRouterMock.swapExactTokensForETH).to.have.been.calledWith(
+        AMOUNT_OUT_TOKEN2 - PERFORMANCE_FEE2,
+        0,
+        [token1Mock.address, token0Mock.address],
+        signers[1].address,
+        DEADLINE
+    );
   });
 });
