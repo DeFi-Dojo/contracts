@@ -42,7 +42,7 @@ const replaceOpenZeppelinImportsWithRelative =
   };
 
 const runMythril = async (pattern: string) => {
-  const bashScript = `for f in ${pattern} ; do echo "echo $f; myth analyze $f \n"; done | parallel --will-cite`;
+  const bashScript = `rm $HOME/.mythril/config.ini; for f in ${pattern} ; do echo "echo $f; myth analyze $f \n"; done | parallel --will-cite`;
   const child = exec(bashScript);
 
   child.stdout?.pipe(process.stdout);
