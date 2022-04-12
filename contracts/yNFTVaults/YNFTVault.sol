@@ -11,6 +11,11 @@ import "../interfaces/uniswapv2/IUniswapV2Router02.sol";
 import "../interfaces/uniswapv2/IUniswapV2Pair.sol";
 import "./YNFT.sol";
 
+struct Balances {
+  uint256 tokenBalance;
+  uint256 totalSupply;
+}
+
 abstract contract YNFTVault is AccessControl, ReentrancyGuard, Pausable {
   using SafeERC20 for IERC20;
 
@@ -21,6 +26,8 @@ abstract contract YNFTVault is AccessControl, ReentrancyGuard, Pausable {
   uint256 public feePerMile = 5;
   uint256 public performanceFeePerMille = 100;
   address public beneficiary;
+  uint256 public totalSupply;
+  mapping(uint256 => Balances) public balancesAtBuy;
 
   bytes32 public constant HARVESTER_ROLE = keccak256("HARVESTER_ROLE");
 

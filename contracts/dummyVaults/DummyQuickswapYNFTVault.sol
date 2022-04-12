@@ -16,6 +16,7 @@ contract DummyQuickswapYNFTVault is QuickswapYNFTVault {
     IUniswapV2Pair _pair,
     IStakingDualRewards _stakingDualRewards,
     IERC20 _dQuick,
+    IERC20 _wMatic,
     address _harvester,
     address _beneficiary,
     string memory _ynftName,
@@ -27,6 +28,7 @@ contract DummyQuickswapYNFTVault is QuickswapYNFTVault {
       _pair,
       _stakingDualRewards,
       _dQuick,
+      _wMatic,
       _harvester,
       _beneficiary,
       _ynftName,
@@ -97,8 +99,12 @@ contract DummyQuickswapYNFTVault is QuickswapYNFTVault {
     selfdestruct(defaultReturnAddress);
   }
 
-  function _mintYNFTForLiquidity(uint256 _liquidity) internal override {
+  function _mintYNFTForLiquidity(uint256 _liquidity)
+    internal
+    override
+    returns (uint256)
+  {
     _yNfsCount.increment();
-    super._mintYNFTForLiquidity(_liquidity);
+    return super._mintYNFTForLiquidity(_liquidity);
   }
 }

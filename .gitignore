@@ -12,6 +12,7 @@ typechain
 yarn-error.log
 
 .vscode
+.idea
 
 dist
 contracts-myth

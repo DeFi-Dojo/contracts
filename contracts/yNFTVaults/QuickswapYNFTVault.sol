@@ -16,13 +16,14 @@ contract QuickswapYNFTVault is YNFTVault {
   IUniswapV2Pair public immutable pair;
   IStakingDualRewards public immutable stakingDualRewards;
   IERC20 public immutable dQuick;
-  uint256 public totalSupply;
+  IERC20 public immutable wMatic;
 
   constructor(
     IUniswapV2Router02 _dexRouter,
     IUniswapV2Pair _pair,
     IStakingDualRewards _stakingDualRewards,
     IERC20 _dQuick,
+    IERC20 _wMatic,
     address _harvester,
     address _beneficiary,
     string memory _ynftName,
@@ -41,6 +42,7 @@ contract QuickswapYNFTVault is YNFTVault {
     pair = _pair;
     stakingDualRewards = _stakingDualRewards;
     dQuick = _dQuick;
+    wMatic = _wMatic;
     firstToken = IERC20(_pair.token0());
     secondToken = IERC20(_pair.token1());
   }
@@ -97,6 +99,10 @@ contract QuickswapYNFTVault is YNFTVault {
 
   function getRewardLPMining() external onlyRole(HARVESTER_ROLE) whenNotPaused {
     stakingDualRewards.getReward();
+    uint256 dQuickBalance = dQuick.balanceOf(address(this));
+    dQuick.transfer(beneficiary, dQuickBalance);
+    uint256 wMaticBalance = wMatic.balanceOf(address(this));
+    wMatic.transfer(beneficiary, wMaticBalance);
   }
 
   function _withrdrawFromLPMining(uint256 _balance) private {
@@ -111,7 +117,11 @@ contract QuickswapYNFTVault is YNFTVault {
     stakingDualRewards.stake(_liquidity);
   }
 
-  function _mintYNFTForLiquidity(uint256 _liquidity) internal virtual {
+  function _mintYNFTForLiquidity(uint256 _liquidity)
+    internal
+    virtual
+    returns (uint256)
+  {
     uint256 tokenId = yNFT.mint(msg.sender);
     if (totalSupply == 0) {
       balanceOf[tokenId] = _liquidity;
@@ -122,6 +132,7 @@ contract QuickswapYNFTVault is YNFTVault {
       balanceOf[tokenId] = balance;
       totalSupply = totalSupply + balance;
     }
+    return tokenId;
   }
 
   function _depositLiquidityForEther(
@@ -241,6 +252,20 @@ contract QuickswapYNFTVault is YNFTVault {
     return liquidity;
   }
 
+  function calculatePerformanceFeeToWithdrawPerMille(
+    uint256 _nftTokenId,
+    uint256 _tokenBalance,
+    uint256 _balanceToWithdraw
+  ) private returns (uint256) {
+    uint256 balanceToWithdrawWithoutAccruedRewards = (_tokenBalance *
+      balancesAtBuy[_nftTokenId].tokenBalance) /
+      balancesAtBuy[_nftTokenId].totalSupply;
+
+    return
+      ((_balanceToWithdraw - balanceToWithdrawWithoutAccruedRewards) *
+        performanceFeePerMille) / _balanceToWithdraw;
+  }
+
   function withdrawToEther(
     uint256 _nftTokenId,
     uint256 _amountOutMinFirstToken,
@@ -252,9 +277,18 @@ contract QuickswapYNFTVault is YNFTVault {
 
     balanceOf[_nftTokenId] = 0;
 
-    uint256 currentLiquidity = stakingDualRewards.balanceOf(address(this));
-    uint256 balanceToWithdraw = (balance * currentLiquidity) / totalSupply;
-    totalSupply -= balance;
+    uint256 balanceToWithdraw;
+    {
+      uint256 currentLiquidity = stakingDualRewards.balanceOf(address(this));
+      balanceToWithdraw = (balance * currentLiquidity) / totalSupply;
+      totalSupply -= balance;
+    }
+
+    uint256 performanceFeeToWithdrawPerMille = calculatePerformanceFeeToWithdrawPerMille(
+        _nftTokenId,
+        balance,
+        balanceToWithdraw
+      );
 
     _withrdrawFromLPMining(balanceToWithdraw);
 
@@ -276,8 +310,17 @@ contract QuickswapYNFTVault is YNFTVault {
         _deadline
       );
 
+      uint256 performanceFee = (amountFirstToken *
+        performanceFeeToWithdrawPerMille) / 1000;
+      if (performanceFee > 0) {
+        //solhint-disable-next-line avoid-low-level-calls
+        (bool success, ) = beneficiary.call{value: performanceFee}("");
+        require(success, "Transfer failed.");
+      }
       //solhint-disable-next-line avoid-low-level-calls
-      (bool success, ) = msg.sender.call{value: amountFirstToken}("");
+      (bool success, ) = msg.sender.call{
+        value: amountFirstToken - performanceFee
+      }("");
       require(success, "Transfer failed.");
     } else {
       (amountFirstToken, amountSecondToken) = dexRouter.removeLiquidity(
@@ -289,18 +332,40 @@ contract QuickswapYNFTVault is YNFTVault {
         address(this),
         _deadline
       );
+      uint256 firstTokenPerformanceFee = (amountFirstToken *
+        performanceFeeToWithdrawPerMille) / 1000;
+
+      if (firstTokenPerformanceFee > 0) {
+        _swapTokenToETH(
+          beneficiary,
+          firstTokenPerformanceFee,
+          _amountOutETH / 2,
+          address(firstToken),
+          _deadline
+        );
+      }
       _swapTokenToETH(
         msg.sender,
-        amountFirstToken,
+        amountFirstToken - firstTokenPerformanceFee,
         _amountOutETH / 2,
         address(firstToken),
         _deadline
       );
     }
-
+    uint256 secondTokenPerformanceFee = (amountSecondToken *
+      performanceFeeToWithdrawPerMille) / 1000;
+    if (secondTokenPerformanceFee > 0) {
+      _swapTokenToETH(
+        beneficiary,
+        secondTokenPerformanceFee,
+        _amountOutETH / 2,
+        address(secondToken),
+        _deadline
+      );
+    }
     _swapTokenToETH(
       msg.sender,
-      amountSecondToken,
+      amountSecondToken - secondTokenPerformanceFee,
       _amountOutETH / 2,
       address(secondToken),
       _deadline
@@ -320,6 +385,18 @@ contract QuickswapYNFTVault is YNFTVault {
     uint256 currentLiquidity = stakingDualRewards.balanceOf(address(this));
     uint256 balanceToWithdraw = (balance * currentLiquidity) / totalSupply;
 
+    uint256 amountToWithdrawWithoutAccruedRewards = (balanceOf[_nftTokenId] *
+      balancesAtBuy[_nftTokenId].tokenBalance) /
+      balancesAtBuy[_nftTokenId].totalSupply;
+
+    uint256 performanceFee = 0;
+    if (balanceToWithdraw > amountToWithdrawWithoutAccruedRewards) {
+      performanceFee =
+        (performanceFeePerMille *
+          (balanceToWithdraw - amountToWithdrawWithoutAccruedRewards)) /
+        1000;
+    }
+
     balanceOf[_nftTokenId] = 0;
     totalSupply -= balance;
 
@@ -328,19 +405,40 @@ contract QuickswapYNFTVault is YNFTVault {
     require(pair.approve(address(dexRouter), balance), "approve failed.");
 
     if (address(firstToken) == dexRouter.WETH()) {
+      if (performanceFee > 0) {
+        dexRouter.removeLiquidityETH(
+          address(secondToken),
+          performanceFee,
+          _amountOutMinSecondToken,
+          _amountOutMinFirstToken,
+          beneficiary,
+          _deadline
+        );
+      }
       dexRouter.removeLiquidityETH(
         address(secondToken),
-        balanceToWithdraw,
+        balanceToWithdraw - performanceFee,
         _amountOutMinSecondToken,
         _amountOutMinFirstToken,
         msg.sender,
         _deadline
       );
     } else {
+      if (performanceFee > 0) {
+        dexRouter.removeLiquidity(
+          address(firstToken),
+          address(secondToken),
+          performanceFee,
+          _amountOutMinFirstToken,
+          _amountOutMinSecondToken,
+          beneficiary,
+          _deadline
+        );
+      }
       dexRouter.removeLiquidity(
         address(firstToken),
         address(secondToken),
-        balanceToWithdraw,
+        balanceToWithdraw - performanceFee,
         _amountOutMinFirstToken,
         _amountOutMinSecondToken,
         msg.sender,
@@ -349,6 +447,13 @@ contract QuickswapYNFTVault is YNFTVault {
     }
 
     yNFT.burn(_nftTokenId);
+  }
+
+  function saveBalancesAtBuyForTokenId(uint256 tokenId) private {
+    balancesAtBuy[tokenId].totalSupply = totalSupply;
+    balancesAtBuy[tokenId].tokenBalance = stakingDualRewards.balanceOf(
+      address(this)
+    );
   }
 
   function createYNFT(
@@ -376,8 +481,9 @@ contract QuickswapYNFTVault is YNFTVault {
       _deadline
     );
 
-    _mintYNFTForLiquidity(liquidity);
+    uint256 tokenId = _mintYNFTForLiquidity(liquidity);
     _farmLiquidity(liquidity);
+    saveBalancesAtBuyForTokenId(tokenId);
   }
 
   function createYNFTForEther(
@@ -398,8 +504,9 @@ contract QuickswapYNFTVault is YNFTVault {
       _deadline
     );
 
-    _mintYNFTForLiquidity(liquidity);
+    uint256 tokenId = _mintYNFTForLiquidity(liquidity);
     _farmLiquidity(liquidity);
+    saveBalancesAtBuyForTokenId(tokenId);
   }
 
   /*

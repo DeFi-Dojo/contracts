@@ -21,6 +21,7 @@ describe("DummyQuickswapYNFTVault", () => {
     let uniswapRouter: FakeContract;
     let stakingRewardsMock: FakeContract;
     let dQuickMock: FakeContract;
+    let wMaticMock: FakeContract;
     let pairMock: FakeContract;
     let token0Mock: FakeContract;
     let token1Mock: FakeContract;
@@ -32,6 +33,7 @@ describe("DummyQuickswapYNFTVault", () => {
         pairMock = await smock.fake(IUniswapV2Pair.abi);
         stakingRewardsMock = await smock.fake(IStakingDualRewards.abi);
         dQuickMock = await smock.fake(IERC20.abi);
+        wMaticMock = await smock.fake(IERC20.abi);
 
         token0Mock = await smock.fake(IERC20.abi);
         token1Mock = await smock.fake(IERC20.abi);
@@ -46,7 +48,7 @@ describe("DummyQuickswapYNFTVault", () => {
 
         dummyQuickswapYnftVault = await deployContract<DummyQuickswapYNFTVault>(
             "DummyQuickswapYNFTVault",
-            [uniswapRouter.address, pairMock.address, stakingRewardsMock.address, dQuickMock.address, signers[1].address, signers[0].address, "", "", ""],
+            [uniswapRouter.address, pairMock.address, stakingRewardsMock.address, dQuickMock.address, wMaticMock.address, signers[1].address, signers[0].address, "", "", ""],
             undefined
         );
     });
@@ -104,7 +106,10 @@ describe("DummyQuickswapYNFTVault", () => {
         await uniswapRouter.swapExactTokensForETH.returns([MIN_AMOUNT, MIN_AMOUNT]);
         await uniswapRouter.removeLiquidity.returns([MIN_AMOUNT, MIN_AMOUNT]);
         await pairMock.approve.returns(true);
-        await stakingRewardsMock.balanceOf.returns(LIQUIDITY);
+        stakingRewardsMock.balanceOf.returnsAtCall(0, LIQUIDITY);
+        stakingRewardsMock.balanceOf.returnsAtCall(1, LIQUIDITY);
+        stakingRewardsMock.balanceOf.returnsAtCall(2, 2*LIQUIDITY);
+        stakingRewardsMock.balanceOf.returnsAtCall(3, 2*LIQUIDITY);
         await uniswapRouter.addLiquidity.returns([MIN_AMOUNT, MIN_AMOUNT, LIQUIDITY]);
 
         await dummyQuickswapYnftVault.createYNFTForEther(MIN_AMOUNT, MIN_AMOUNT, 0, 0, DEADLINE);
@@ -117,7 +122,7 @@ describe("DummyQuickswapYNFTVault", () => {
 
         expect(uniswapRouter.removeLiquidity.getCall(0).args[0]).to.equal(token0Mock.address);
         expect(uniswapRouter.removeLiquidity.getCall(0).args[1]).to.equal(token1Mock.address);
-        expect(uniswapRouter.removeLiquidity.getCall(0).args[2]).to.equal(Math.floor(LIQUIDITY/2));
+        expect(uniswapRouter.removeLiquidity.getCall(0).args[2]).to.equal(LIQUIDITY);
         expect(uniswapRouter.removeLiquidity.getCall(0).args[3]).to.equal(MIN_AMOUNT);
         expect(uniswapRouter.removeLiquidity.getCall(0).args[4]).to.equal(MIN_AMOUNT);
         expect(uniswapRouter.removeLiquidity.getCall(0).args[5]).to.equal(dummyQuickswapYnftVault.address);

@@ -40,6 +40,7 @@ const deployQuickswapYnftVault =
       quickswapTokenPairAddress,
       stakingDualRewards,
       ADDRESSES.DQUICK,
+      ADDRESSES.WMATIC,
       HARVESTER_ADDRESS,
       BENEFICIARY_ADDRESS,
       "Dojo yNFT",
