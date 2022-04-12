@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.21.0](https://github.com/DeFi-Dojo/contracts/compare/v1.20.0...v1.21.0) (2022-04-12)
+
+
+### Features
+
+* dex-473/quickswap performance fee ([#67](https://github.com/DeFi-Dojo/contracts/issues/67)) ([37ecc83](https://github.com/DeFi-Dojo/contracts/commit/37ecc833c8188ff1d24218191f6faa965a667f7f))
+
 # [1.20.0](https://github.com/DeFi-Dojo/contracts/compare/v1.19.1...v1.20.0) (2022-04-05)
 
 
