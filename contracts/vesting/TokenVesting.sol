@@ -106,7 +106,7 @@ contract TokenVesting is Ownable, ReentrancyGuard {
     uint256 _duration,
     uint256 _slicePeriodSeconds,
     uint256 _amount
-  ) public onlyOwner vestingScheduleDoesNotExist(_beneficiary) {
+  ) external onlyOwner vestingScheduleDoesNotExist(_beneficiary) {
     require(
       getWithdrawableAmount() >= _amount,
       "TokenVesting: not enough tokens to create a vesting schedule"
@@ -137,7 +137,7 @@ contract TokenVesting is Ownable, ReentrancyGuard {
    * @param _beneficiary address of beneficiary
    */
   function releaseAll(address _beneficiary)
-    public
+    external
     onlyOwner
     vestingScheduleExists(_beneficiary)
   {
@@ -153,7 +153,7 @@ contract TokenVesting is Ownable, ReentrancyGuard {
    * @notice Withdraw the specified amount if possible.
    * @param amount the amount to withdraw
    */
-  function withdraw(uint256 amount) public nonReentrant onlyOwner {
+  function withdraw(uint256 amount) external nonReentrant onlyOwner {
     require(
       getWithdrawableAmount() >= amount,
       "TokenVesting: not enough withdrawable funds"
@@ -167,7 +167,7 @@ contract TokenVesting is Ownable, ReentrancyGuard {
    * @param _amount the amount to release
    */
   function release(address _beneficiary, uint256 _amount)
-    public
+    external
     nonReentrant
     vestingScheduleExists(_beneficiary)
   {
@@ -190,7 +190,7 @@ contract TokenVesting is Ownable, ReentrancyGuard {
    * @return the vested amount
    */
   function computeReleasableAmount(address _beneficiary)
-    public
+    external
     view
     vestingScheduleExists(_beneficiary)
     returns (uint256)
@@ -203,7 +203,7 @@ contract TokenVesting is Ownable, ReentrancyGuard {
    * @dev Returns the amount of tokens that can be withdrawn by the owner.
    * @return the amount of tokens
    */
-  function getWithdrawableAmount() public view returns (uint256) {
+  function getWithdrawableAmount() external view returns (uint256) {
     return token.balanceOf(address(this)) - vestingSchedulesTotalAmount;
   }
 
