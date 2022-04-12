@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.21.1](https://github.com/DeFi-Dojo/contracts/compare/v1.21.0...v1.21.1) (2022-04-12)
+
+
+### Bug Fixes
+
+* update mythril script ([#68](https://github.com/DeFi-Dojo/contracts/issues/68)) ([082e8a7](https://github.com/DeFi-Dojo/contracts/commit/082e8a74c17452f9eac57db5d19b5722e5c7fb0d))
+
 # [1.21.0](https://github.com/DeFi-Dojo/contracts/compare/v1.20.0...v1.21.0) (2022-04-12)
 
 
