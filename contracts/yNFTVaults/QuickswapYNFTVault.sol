@@ -100,7 +100,6 @@ contract QuickswapYNFTVault is YNFTVault {
   function getRewardLPMining() external onlyRole(HARVESTER_ROLE) whenNotPaused {
     stakingDualRewards.getReward();
     uint256 dQuickBalance = dQuick.balanceOf(address(this));
-    dQuick.balanceOf(address(this));
     dQuick.transfer(beneficiary, dQuickBalance);
     uint256 wMaticBalance = wMatic.balanceOf(address(this));
     wMatic.transfer(beneficiary, wMaticBalance);

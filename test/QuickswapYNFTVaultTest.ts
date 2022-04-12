@@ -495,7 +495,6 @@ describe("QuickswapYNFTVault", () => {
         DEADLINE
       );
 
-    // expect(stakingDualRewardsMock.balanceOf).to.have.callCount(3);
     expect(stakingDualRewardsMock.getReward).to.have.callCount(1);
     expect(await quickswapYnftVault.balanceOf(0)).to.equal(LIQUIDITY);
     expect(await quickswapYnftVault.balanceOf(1)).to.equal(
@@ -510,7 +509,6 @@ describe("QuickswapYNFTVault", () => {
         amountOutMinSecondToken,
         DEADLINE
       );
-    // expect(stakingDualRewardsMock.balanceOf).to.have.callCount(2);
     expect(uniswapRouterMock.removeLiquidity).to.have.been.calledWith(
       token0Mock.address,
       token1Mock.address,
