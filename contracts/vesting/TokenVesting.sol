@@ -203,7 +203,7 @@ contract TokenVesting is Ownable, ReentrancyGuard {
    * @dev Returns the amount of tokens that can be withdrawn by the owner.
    * @return the amount of tokens
    */
-  function getWithdrawableAmount() external view returns (uint256) {
+  function getWithdrawableAmount() public view returns (uint256) {
     return token.balanceOf(address(this)) - vestingSchedulesTotalAmount;
   }
 
