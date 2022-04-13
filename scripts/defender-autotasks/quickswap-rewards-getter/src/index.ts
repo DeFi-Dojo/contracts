@@ -6,7 +6,7 @@ import { AutotaskEvent } from "defender-autotask-utils";
 
 import { QuickswapYNFTVault__factory } from "../../../../typechain";
 
-import { MATIC_CHAIN_ID, VAULT_ADDRESS } from "./config";
+import { MATIC_CHAIN_ID, VAULTS } from "./config";
 
 export async function handler({ credentials, relayerARN }: AutotaskEvent) {
   if (!credentials || !relayerARN) {
@@ -26,9 +26,17 @@ export async function handler({ credentials, relayerARN }: AutotaskEvent) {
     { speed: "fast" }
   );
 
-  const vault = QuickswapYNFTVault__factory.connect(VAULT_ADDRESS, signer);
+  const txs = await Promise.all(
+    VAULTS.map(async ({ vaultName, vaultAddress }) => {
+      const vault = QuickswapYNFTVault__factory.connect(vaultAddress, signer);
+      try {
+        const tx = await vault.getRewardLPMining();
+        return { vaultName, vaultAddress, txHash: tx.hash };
+      } catch (error) {
+        return { vaultName, vaultAddress, error };
+      }
+    })
+  );
 
-  const tx = await vault.getRewardLPMining();
-
-  return { tx: tx.hash };
+  return txs;
 }
