@@ -65,7 +65,7 @@ export async function handler({ credentials, relayerARN }: AutotaskEvent) {
         );
         return { vaultName, vaultAddress, txWmatic, txDquick };
       } catch (error) {
-        return { vaultName, vaultAddress, error };
+        return { vaultName, vaultAddress, error: `${error}` };
       }
     })
   );

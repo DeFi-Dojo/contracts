@@ -33,7 +33,7 @@ export async function handler({ credentials, relayerARN }: AutotaskEvent) {
         const tx = await vault.getRewardLPMining();
         return { vaultName, vaultAddress, txHash: tx.hash };
       } catch (error) {
-        return { vaultName, vaultAddress, error };
+        return { vaultName, vaultAddress, error: `${error}` };
       }
     })
   );
