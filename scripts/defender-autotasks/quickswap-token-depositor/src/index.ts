@@ -8,10 +8,10 @@ import { QuickswapYNFTVault__factory } from "../../../../typechain";
 
 import {
   MATIC_CHAIN_ID,
-  VAULT_ADDRESS,
   DEADLINE_SECONDS,
   ADDRESSES,
   GAS_LIMIT,
+  VAULTS,
 } from "./config";
 
 export async function handler({ credentials, relayerARN }: AutotaskEvent) {
@@ -32,8 +32,6 @@ export async function handler({ credentials, relayerARN }: AutotaskEvent) {
     { speed: "fast" }
   );
 
-  const vault = QuickswapYNFTVault__factory.connect(VAULT_ADDRESS, signer);
-
   const amountOutMinFirstToken = 0;
   const amountOutMinSecondToken = 0;
   const amountMinLiqudityFirstToken = 0;
@@ -41,25 +39,36 @@ export async function handler({ credentials, relayerARN }: AutotaskEvent) {
 
   const deadline = Math.round(Date.now() / 1000) + DEADLINE_SECONDS;
 
-  const { hash: txWmatic } = await vault.depositTokens(
-    ADDRESSES.WMATIC,
-    amountOutMinFirstToken,
-    amountOutMinSecondToken,
-    amountMinLiqudityFirstToken,
-    amountMinLiquditySecondToken,
-    deadline,
-    { gasLimit: GAS_LIMIT }
+  const txs = await Promise.all(
+    VAULTS.map(async ({ vaultName, vaultAddress }) => {
+      const vault = QuickswapYNFTVault__factory.connect(vaultAddress, signer);
+
+      try {
+        const { hash: txWmatic } = await vault.depositTokens(
+          ADDRESSES.WMATIC,
+          amountOutMinFirstToken,
+          amountOutMinSecondToken,
+          amountMinLiqudityFirstToken,
+          amountMinLiquditySecondToken,
+          deadline,
+          { gasLimit: GAS_LIMIT }
+        );
+
+        const { hash: txDquick } = await vault.depositTokens(
+          ADDRESSES.DQUICK,
+          amountOutMinFirstToken,
+          amountOutMinSecondToken,
+          amountMinLiqudityFirstToken,
+          amountMinLiquditySecondToken,
+          deadline,
+          { gasLimit: GAS_LIMIT }
+        );
+        return { vaultName, vaultAddress, txWmatic, txDquick };
+      } catch (error) {
+        return { vaultName, vaultAddress, error };
+      }
+    })
   );
 
-  const { hash: txDquick } = await vault.depositTokens(
-    ADDRESSES.DQUICK,
-    amountOutMinFirstToken,
-    amountOutMinSecondToken,
-    amountMinLiqudityFirstToken,
-    amountMinLiquditySecondToken,
-    deadline,
-    { gasLimit: GAS_LIMIT }
-  );
-
-  return { tx: [txWmatic, txDquick] };
+  return txs;
 }
