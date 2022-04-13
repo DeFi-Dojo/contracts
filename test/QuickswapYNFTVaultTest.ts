@@ -118,6 +118,68 @@ describe("QuickswapYNFTVault", () => {
     );
   });
 
+  it("createYNFT for underlying tokens", async () => {
+    const amountIn = 1000;
+    const amountOutMinFirstToken = 900;
+    const amountOutMinSecondToken = 800;
+    const amountMinLiqudityFirstToken = 100;
+    const amountMinLiquditySecondToken = 100;
+
+    const AMOUNT_AFTER_SWAP1 = 300;
+
+    await token0Mock.transferFrom.returns(true);
+    await token0Mock.approve.returns(true);
+    uniswapRouterMock.swapExactTokensForTokens.returns([
+      amountIn,
+      AMOUNT_AFTER_SWAP1,
+    ]);
+    await token0Mock.approve.returns(true);
+    await token1Mock.approve.returns(true);
+    await tokenIn.approve.returns(true);
+    uniswapPairMock.approve.returns(true);
+
+    await quickswapYnftVault.createYNFT(
+        token0Mock.address,
+        amountIn,
+        amountOutMinFirstToken,
+        amountOutMinSecondToken,
+        amountMinLiqudityFirstToken,
+        amountMinLiquditySecondToken,
+        DEADLINE
+    );
+
+    expect(uniswapRouterMock.swapExactTokensForTokens).to.have.callCount(1);
+    expect(uniswapRouterMock.swapExactTokensForTokens).to.have.been.calledWith(
+        497,
+        amountOutMinSecondToken,
+        [token0Mock.address, token1Mock.address],
+        quickswapYnftVault.address,
+        DEADLINE
+    );
+
+    await token1Mock.transferFrom.returns(true);
+
+    stakingDualRewardsMock.balanceOf.returns(LIQUIDITY);
+
+    await quickswapYnftVault.createYNFT(
+        token1Mock.address,
+        amountIn,
+        amountOutMinFirstToken,
+        amountOutMinSecondToken,
+        amountMinLiqudityFirstToken,
+        amountMinLiquditySecondToken,
+        DEADLINE
+    );
+    expect(uniswapRouterMock.swapExactTokensForTokens).to.have.callCount(2);
+    expect(uniswapRouterMock.swapExactTokensForTokens).to.have.been.calledWith(
+        497,
+        amountOutMinFirstToken,
+        [token1Mock.address, token0Mock.address],
+        quickswapYnftVault.address,
+        DEADLINE
+    );
+  });
+
   it("createYNFT should call swapExactTokensForTokens for both tokens", async () => {
     const amountIn = 1000;
     const amountOutMinFirstToken = 900;
@@ -164,6 +226,49 @@ describe("QuickswapYNFTVault", () => {
       DEADLINE
     );
   });
+
+  it("createYNFTForEther should revert if one of tokens not approved", async () => {
+    const amountIn = 1000;
+    const amountOutMinFirstToken = 900;
+    const amountOutMinSecondToken = 800;
+    const amountMinLiqudityFirstToken = 100;
+    const amountMinLiquditySecondToken = 100;
+
+    const AMOUNT_AFTER_SWAP1 = 300;
+
+    uniswapRouterMock.swapExactETHForTokens.returns([
+      amountIn,
+      AMOUNT_AFTER_SWAP1,
+    ]);
+
+    await token1Mock.approve.returns(false);
+    uniswapPairMock.approve.returns(true);
+
+    await expectRevert(quickswapYnftVault.createYNFTForEther(
+        amountOutMinFirstToken,
+        amountOutMinSecondToken,
+        amountMinLiqudityFirstToken,
+        amountMinLiquditySecondToken,
+        DEADLINE
+    ),
+        "approve failed."
+    )
+
+    await token0Mock.approve.returns(false);
+    await token1Mock.approve.returns(true);
+
+    await expectRevert(quickswapYnftVault.createYNFTForEther(
+            amountOutMinFirstToken,
+            amountOutMinSecondToken,
+            amountMinLiqudityFirstToken,
+            amountMinLiquditySecondToken,
+            DEADLINE
+        ),
+        "approve failed."
+    )
+  });
+
+
 
   it("createYNFTForEther should call swapExactETHForTokens for both tokens", async () => {
     const amountIn = 1000;
@@ -372,6 +477,26 @@ describe("QuickswapYNFTVault", () => {
     );
     expect(stakingDualRewardsMock.stake).to.have.been.calledWith(LIQUIDITY);
   });
+
+  it("depositTokens should revert if LP tokens deposited", async () => {
+    await quickswapYnftVault.grantRole(
+      ethers.utils.keccak256(ethers.utils.toUtf8Bytes("HARVESTER_ROLE")),
+      signers[0].address
+    );
+
+    await expectRevert(
+      quickswapYnftVault.depositTokens(
+        uniswapPairMock.address,
+        0,
+        0,
+        0,
+        0,
+        DEADLINE
+      ),
+      "Cannot deposit LP tokens"
+    );
+  });
+
 
   it("depositETH should swap and add liquidity", async () => {
     const amountOutMinFirstToken = 900;
