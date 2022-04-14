@@ -86,6 +86,18 @@ const accounts = {
 };
 
 const config: HardhatUserConfig = {
+  dodoc: {
+    exclude: [
+      "dummyVaults",
+      "elin",
+      "interfaces",
+      "test",
+      "console",
+      "utils",
+      "OwnableDelegateProxy",
+    ],
+    freshOutput: true,
+  },
   defaultNetwork: DEFAULT_NETWORK,
   networks: {
     hardhat: {
