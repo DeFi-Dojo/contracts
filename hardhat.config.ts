@@ -87,6 +87,7 @@ const accounts = {
 
 const config: HardhatUserConfig = {
   dodoc: {
+    include: ["contracts"],
     exclude: [
       "dummyVaults",
       "elin",
