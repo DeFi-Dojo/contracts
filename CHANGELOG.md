@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.22.0](https://github.com/DeFi-Dojo/contracts/compare/v1.21.1...v1.22.0) (2022-04-14)
+
+
+### Features
+
+* dex-512/add events to vault contracts ([#69](https://github.com/DeFi-Dojo/contracts/issues/69)) ([eff39e7](https://github.com/DeFi-Dojo/contracts/commit/eff39e76f3e667d2a7e7131a54716875ba6bdd4e))
+
 ## [1.21.1](https://github.com/DeFi-Dojo/contracts/compare/v1.21.0...v1.21.1) (2022-04-12)
 
 
