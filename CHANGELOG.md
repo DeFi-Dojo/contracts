@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.23.0](https://github.com/DeFi-Dojo/contracts/compare/v1.22.0...v1.23.0) (2022-04-14)
+
+
+### Features
+
+* DEX-245 autotasks for all vaults ([#70](https://github.com/DeFi-Dojo/contracts/issues/70)) ([d8319b0](https://github.com/DeFi-Dojo/contracts/commit/d8319b0a55bc384b21297cd687274549c8227ed6))
+
 # [1.22.0](https://github.com/DeFi-Dojo/contracts/compare/v1.21.1...v1.22.0) (2022-04-14)
 
 
