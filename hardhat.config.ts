@@ -4,6 +4,7 @@ import "@nomiclabs/hardhat-waffle";
 import "@nomiclabs/hardhat-web3";
 import "hardhat-gas-reporter";
 import "@nomiclabs/hardhat-etherscan";
+import "@primitivefi/hardhat-dodoc";
 
 import { task, HardhatUserConfig } from "hardhat/config";
 import configEnv from "./config";
