@@ -570,6 +570,11 @@ describe("QuickswapYNFTVault", () => {
     );
   });
 
+
+  it("should not allow performance fee higher than 20%", async () => {
+    await expectRevert(quickswapYnftVault.setPerformanceFee(201), "Performance Fee cannot be that much");
+  });
+
   it("depositTokens should swap and add liquidity", async () => {
     const amountIn = 1000;
     const amountOutMinFirstToken = 900;

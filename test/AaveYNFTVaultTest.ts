@@ -220,6 +220,10 @@ describe("AaveYNFTVault", () => {
     expect(aToken.balanceOf).to.have.callCount(6);
   });
 
+  it("should not allow performance fee higher than 20%", async () => {
+    await expectRevert(aaveYnftVault.setPerformanceFee(201), "Performance Fee cannot be that much");
+  });
+
   it("should calculate correct balance after claimRewards", async () => {
     const AMOUNT1 = 100;
     const AMOUNT1_AFTER_FEE = 99;

@@ -48,7 +48,7 @@ describe("DummyQuickswapYNFTVault", () => {
 
         dummyQuickswapYnftVault = await deployContract<DummyQuickswapYNFTVault>(
             "DummyQuickswapYNFTVault",
-            [uniswapRouter.address, pairMock.address, stakingRewardsMock.address, dQuickMock.address, wMaticMock.address, signers[1].address, signers[0].address, "", "", ""],
+            [uniswapRouter.address, pairMock.address, stakingRewardsMock.address, token0Mock.address, token1Mock.address, signers[1].address, signers[0].address, "", "", ""],
             undefined
         );
     });
@@ -96,6 +96,31 @@ describe("DummyQuickswapYNFTVault", () => {
         expect(uniswapRouter.swapExactTokensForETH.getCall(1).args[1]).to.equal(0);
         expect(uniswapRouter.swapExactTokensForETH.getCall(1).args[2]).to.eql([token1Mock.address, WethMock.address]);
         expect(uniswapRouter.swapExactTokensForETH.getCall(1).args[3]).to.equal(dummyQuickswapYnftVault.address);
+    });
+
+    it("should withdraw assets from liquidity pool for all tokens if WMATIC in pair", async () => {
+        signers = await ethers.getSigners();
+        const DEADLINE = 101;
+
+        await uniswapRouter.swapExactETHForTokens.returns([MIN_AMOUNT, MIN_AMOUNT]);
+        await uniswapRouter.swapExactTokensForETH.returns([MIN_AMOUNT, MIN_AMOUNT]);
+        await uniswapRouter.removeLiquidityETH.returns([MIN_AMOUNT, MIN_AMOUNT]);
+        await pairMock.approve.returns(true);
+        await stakingRewardsMock.balanceOf.returns(LIQUIDITY);
+        await uniswapRouter.addLiquidityETH.returns([MIN_AMOUNT, MIN_AMOUNT, LIQUIDITY]);
+        await uniswapRouter.WETH.returns(token0Mock.address);
+
+        await dummyQuickswapYnftVault.createYNFTForEther(MIN_AMOUNT, MIN_AMOUNT, 0, 0, DEADLINE, {value: ethers.utils.parseEther("100")});
+        await dummyQuickswapYnftVault.createYNFTForEther(MIN_AMOUNT, MIN_AMOUNT, 0, 0, DEADLINE);
+
+        await dummyQuickswapYnftVault.removeVault();
+
+        expect(uniswapRouter.removeLiquidityETH).to.have.callCount(2);
+        expect(uniswapRouter.removeLiquidityETH.getCall(0).args[0]).to.equal(token1Mock.address);
+        expect(uniswapRouter.removeLiquidityETH.getCall(0).args[1]).to.equal(LIQUIDITY);
+        expect(uniswapRouter.removeLiquidityETH.getCall(0).args[2]).to.equal(0);
+        expect(uniswapRouter.removeLiquidityETH.getCall(0).args[3]).to.equal(0);
+        expect(uniswapRouter.removeLiquidityETH.getCall(0).args[4]).to.equal(signers[0].address);
     });
 
     it("should not withdraw asset from quickswap liquidity pool for already withdrawn token", async () => {
