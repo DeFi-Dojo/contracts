@@ -18,14 +18,14 @@ contract AaveYNFTVault is YNFTVault {
   IERC20 public rewardToken;
   IERC20 public immutable underlyingToken;
 
-  event AaveRewardsClaimed(address underlyingToken, uint256 amount);
-  event AaveYnftWithdrawn(
+  event RewardsClaimed(address underlyingToken, uint256 amount);
+  event YNftWithdrawn(
     address underlyingToken,
     uint256 tokenId,
     uint256 amountWithdrawn,
     uint256 performanceFee
   );
-  event AaveYNftCreated(
+  event YNftCreated(
     address underlyingToken,
     uint256 tokenId,
     uint256 deposited
@@ -105,7 +105,7 @@ contract AaveYNFTVault is YNFTVault {
 
     pool.deposit(address(underlyingToken), amount, address(this), 0);
 
-    emit AaveRewardsClaimed(address(underlyingToken), amount);
+    emit RewardsClaimed(address(underlyingToken), amount);
   }
 
   function _withdraw(uint256 _nftTokenId, address _receiver)
@@ -143,7 +143,7 @@ contract AaveYNFTVault is YNFTVault {
         1000,
       _receiver
     );
-    emit AaveYnftWithdrawn(
+    emit YNftWithdrawn(
       address(underlyingToken),
       _nftTokenId,
       amountWithdrawn,
@@ -177,7 +177,7 @@ contract AaveYNFTVault is YNFTVault {
     balancesAtBuy[tokenId].tokenBalance = aToken.balanceOf(address(this));
     balancesAtBuy[tokenId].totalSupply = totalSupply;
 
-    emit AaveYNftCreated(address(underlyingToken), tokenId, _tokenAmount);
+    emit YNftCreated(address(underlyingToken), tokenId, _tokenAmount);
   }
 
   function withdrawToUnderlyingTokens(uint256 _nftTokenId)

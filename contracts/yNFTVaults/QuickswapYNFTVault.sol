@@ -18,15 +18,15 @@ contract QuickswapYNFTVault is YNFTVault {
   IERC20 public immutable dQuick;
   IERC20 public immutable wMatic;
 
-  event QuickswapYnftWithdrawn(
+  event YNftWithdrawn(
     address pair,
     uint256 tokenId,
     uint256 liquidityWithdrawn,
     uint256 performanceFee
   );
-  event QuickswapYnftCreated(address pair, uint256 tokenId, uint256 liquidity);
-  event QuickswapYnftAssetDeposited(address token, uint256 amount);
-  event QuickswapYnftLpMiningRewardsAccrued(
+  event YNftCreated(address pair, uint256 tokenId, uint256 liquidity);
+  event YNftAssetDeposited(address token, uint256 amount);
+  event YNftLpMiningRewardsAccrued(
     uint256 dQuickBalance,
     uint256 wMaticBalance
   );
@@ -85,7 +85,7 @@ contract QuickswapYNFTVault is YNFTVault {
     );
 
     _farmLiquidity(liquidity);
-    emit QuickswapYnftAssetDeposited(_tokenIn, liquidity);
+    emit YNftAssetDeposited(_tokenIn, liquidity);
   }
 
   function depositETH(
@@ -109,7 +109,7 @@ contract QuickswapYNFTVault is YNFTVault {
     );
 
     _farmLiquidity(liquidity);
-    emit QuickswapYnftAssetDeposited(address(0), liquidity);
+    emit YNftAssetDeposited(address(0), liquidity);
   }
 
   function getRewardLPMining() external onlyRole(HARVESTER_ROLE) whenNotPaused {
@@ -118,7 +118,7 @@ contract QuickswapYNFTVault is YNFTVault {
     dQuick.transfer(beneficiary, dQuickBalance);
     uint256 wMaticBalance = wMatic.balanceOf(address(this));
     wMatic.transfer(beneficiary, wMaticBalance);
-    emit QuickswapYnftLpMiningRewardsAccrued(dQuickBalance, wMaticBalance);
+    emit YNftLpMiningRewardsAccrued(dQuickBalance, wMaticBalance);
   }
 
   function _withrdrawFromLPMining(uint256 _balance) private {
@@ -148,7 +148,7 @@ contract QuickswapYNFTVault is YNFTVault {
       balanceOf[tokenId] = balance;
       totalSupply = totalSupply + balance;
     }
-    emit QuickswapYnftCreated(address(pair), tokenId, _liquidity);
+    emit YNftCreated(address(pair), tokenId, _liquidity);
     return tokenId;
   }
 
@@ -391,7 +391,7 @@ contract QuickswapYNFTVault is YNFTVault {
     yNFT.burn(_nftTokenId);
     uint256 performanceFeeLiquidity = (balanceToWithdraw *
       performanceFeeToWithdrawPerMille) / 1000;
-    emit QuickswapYnftWithdrawn(
+    emit YNftWithdrawn(
       address(pair),
       _nftTokenId,
       balanceToWithdraw,
@@ -472,7 +472,7 @@ contract QuickswapYNFTVault is YNFTVault {
     }
 
     yNFT.burn(_nftTokenId);
-    emit QuickswapYnftWithdrawn(
+    emit YNftWithdrawn(
       address(pair),
       _nftTokenId,
       balanceToWithdraw,
