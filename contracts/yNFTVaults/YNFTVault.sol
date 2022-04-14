@@ -31,6 +31,10 @@ abstract contract YNFTVault is AccessControl, ReentrancyGuard, Pausable {
 
   bytes32 public constant HARVESTER_ROLE = keccak256("HARVESTER_ROLE");
 
+  event FeeSet(uint256 newFee);
+  event PerformanceFeeSet(uint256 newPerformanceFee);
+  event BeneficiarySet(address newBeneficiary);
+
   modifier onlyNftOwner(uint256 _nftTokenId) {
     address owner = yNFT.ownerOf(_nftTokenId);
     require(owner == msg.sender, "Sender is not owner of the NFT");
@@ -67,6 +71,7 @@ abstract contract YNFTVault is AccessControl, ReentrancyGuard, Pausable {
   {
     require(_feePerMile <= 100, "Fee cannot be that much");
     feePerMile = _feePerMile;
+    emit FeeSet(_feePerMile);
     return feePerMile;
   }
 
@@ -80,6 +85,7 @@ abstract contract YNFTVault is AccessControl, ReentrancyGuard, Pausable {
       "Performance Fee cannot be that much"
     );
     performanceFeePerMille = _performanceFeePerMille;
+    emit PerformanceFeeSet(_performanceFeePerMille);
     return performanceFeePerMille;
   }
 
@@ -88,6 +94,7 @@ abstract contract YNFTVault is AccessControl, ReentrancyGuard, Pausable {
     onlyRole(DEFAULT_ADMIN_ROLE)
   {
     beneficiary = _beneficiary;
+    emit BeneficiarySet(_beneficiary);
   }
 
   function _calcFee(uint256 _price) internal view returns (uint256) {
