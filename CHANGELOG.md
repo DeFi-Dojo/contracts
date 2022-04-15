@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.25.0](https://github.com/DeFi-Dojo/contracts/compare/v1.24.0...v1.25.0) (2022-04-15)
+
+
+### Features
+
+* dex-298 add dodoc ([#71](https://github.com/DeFi-Dojo/contracts/issues/71)) ([2c450eb](https://github.com/DeFi-Dojo/contracts/commit/2c450eb973c6bad146e631ee387b95d7c0ca4e0a))
+
 # [1.24.0](https://github.com/DeFi-Dojo/contracts/compare/v1.23.0...v1.24.0) (2022-04-15)
 
 
