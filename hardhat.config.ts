@@ -4,6 +4,7 @@ import "@nomiclabs/hardhat-waffle";
 import "@nomiclabs/hardhat-web3";
 import "hardhat-gas-reporter";
 import "@nomiclabs/hardhat-etherscan";
+import "@primitivefi/hardhat-dodoc";
 import "solidity-coverage";
 
 import { task, HardhatUserConfig } from "hardhat/config";
@@ -86,6 +87,19 @@ const accounts = {
 };
 
 const config: HardhatUserConfig = {
+  dodoc: {
+    include: ["contracts"],
+    exclude: [
+      "dummyVaults",
+      "elin",
+      "interfaces",
+      "test",
+      "console",
+      "utils",
+      "OwnableDelegateProxy",
+    ],
+    freshOutput: true,
+  },
   defaultNetwork: DEFAULT_NETWORK,
   networks: {
     hardhat: {

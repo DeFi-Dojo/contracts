@@ -70,6 +70,7 @@
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@nomiclabs/hardhat-web3": "^2.0.0",
     "@openzeppelin/contracts": "^4.4.0",
+    "@primitivefi/hardhat-dodoc": "^0.2.3",
     "@typechain/hardhat": "^2.3.0",
     "chai": "^4.3.4",
     "defender-autotask-client": "^1.12.1",
