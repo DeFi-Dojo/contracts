@@ -215,6 +215,28 @@ function dexRouter() external view returns (contract IUniswapV2Router02)
 |---|---|---|
 | _0 | contract IUniswapV2Router02 | undefined |
 
+### estimatePerformanceFee
+
+```solidity
+function estimatePerformanceFee(uint256 tokenId) external view returns (uint256)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
+
 ### feePerMile
 
 ```solidity

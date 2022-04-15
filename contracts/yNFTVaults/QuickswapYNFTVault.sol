@@ -93,7 +93,6 @@ contract QuickswapYNFTVault is YNFTVault {
     view
     returns (uint256 token0Amount, uint256 token1Amount)
   {
-    uint256 vaultBalance = pair.balanceOf(address(this));
     uint256 pairTotalSupply = pair.totalSupply();
     (uint256 reserve0, uint256 reserve1, ) = pair.getReserves();
     token0Amount = (reserve0 * liquidity) / pairTotalSupply;
