@@ -16,5 +16,6 @@ yarn-error.log
 
 dist
 contracts-myth
+coverage
 
 .DS_Store

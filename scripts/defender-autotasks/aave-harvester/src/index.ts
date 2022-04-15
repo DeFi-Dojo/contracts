@@ -13,7 +13,7 @@ import {
   MIN_CLAIM_AMOUNT,
   PRICE_FEED_DECIMALS,
   SLIPPAGE_PERCANTAGE,
-  VAULT_ADDRESS,
+  VAULTS,
 } from "./config";
 
 export async function handler(event: AutotaskEvent) {
@@ -46,35 +46,45 @@ export async function handler(event: AutotaskEvent) {
     { speed: "fast" }
   );
 
-  const vault = AaveYNFTVault__factory.connect(VAULT_ADDRESS, signer);
+  const txs = await Promise.all(
+    VAULTS.map(async ({ vaultName, vaultAddress }) => {
+      const vault = AaveYNFTVault__factory.connect(vaultAddress, signer);
+      try {
+        const amountToClaim = await vault.getAmountToClaim();
 
-  const amountToClaim = await vault.getAmountToClaim();
+        if (amountToClaim.eq(0)) {
+          throw new Error("Nothing to claim");
+        }
 
-  if (amountToClaim.eq(0)) {
-    throw new Error("Nothing to claim");
-  }
+        if (amountToClaim.lt(MIN_CLAIM_AMOUNT)) {
+          throw new Error("Not enough to claim");
+        }
 
-  if (amountToClaim.lt(MIN_CLAIM_AMOUNT)) {
-    throw new Error("Not enough to claim");
-  }
+        const oracle = AggregatorV3Interface__factory.connect(
+          addresses.NATIVE_TOKEN_USD,
+          signer
+        );
 
-  const oracle = AggregatorV3Interface__factory.connect(
-    addresses.NATIVE_TOKEN_USD,
-    signer
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const [, price] = await oracle.latestRoundData();
+
+        const deadline = Math.round(Date.now() / 1000) + DEADLINE_SECONDS;
+
+        const amountOutMin = price
+          .mul(amountToClaim)
+          .div(10 ** PRICE_FEED_DECIMALS)
+          .mul(ALL_PERCANTAGE - SLIPPAGE_PERCANTAGE)
+          .div(ALL_PERCANTAGE);
+
+        const tx = await vault.claimRewards(amountOutMin, deadline);
+
+        return { vaultName, vaultAddress, txHash: tx.hash };
+      } catch (error) {
+        console.log(error);
+        return { vaultName, vaultAddress, error: `${error}` };
+      }
+    })
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [roundID, price] = await oracle.latestRoundData();
-
-  const deadline = Math.round(Date.now() / 1000) + DEADLINE_SECONDS;
-
-  const amountOutMin = price
-    .mul(amountToClaim)
-    .div(10 ** PRICE_FEED_DECIMALS)
-    .mul(ALL_PERCANTAGE - SLIPPAGE_PERCANTAGE)
-    .div(ALL_PERCANTAGE);
-
-  const tx = await vault.claimRewards(amountOutMin, deadline);
-
-  return { tx: tx.hash };
+  return txs;
 }

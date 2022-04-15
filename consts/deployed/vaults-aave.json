@@ -1,0 +1,14 @@
+{
+  "Kiiro": {
+    "vault": "0x4927FaE09Bf689C835A46352663C88975F78196D",
+    "ynft": "0x920a4Fd7F11E3d10b81A703714aDE3321683B146"
+  },
+  "Ao": {
+    "vault": "0xb7Cdf39188411FdD96F342eA2112177F1D5c538b",
+    "ynft": "0x6D1b90BFCf07032f674Ab9aaAc8Ea48c7175a9b7"
+  },
+  "Midori": {
+    "vault": "0x8F0E614bb82d0fbf1f217D56D7Ea545862dF1321",
+    "ynft": "0x976a7CaaE8Bf230d1245122c42Caa7a8D896a9fB"
+  }
+}

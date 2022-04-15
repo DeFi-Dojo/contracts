@@ -5,6 +5,7 @@ import "@nomiclabs/hardhat-web3";
 import "hardhat-gas-reporter";
 import "@nomiclabs/hardhat-etherscan";
 import "@primitivefi/hardhat-dodoc";
+import "solidity-coverage";
 
 import { task, HardhatUserConfig } from "hardhat/config";
 import configEnv from "./config";

@@ -1,2 +1,10 @@
-export const VAULT_ADDRESS = "0xa12f6ad67F8187ddAC8A102381A7a664F790725b";
+import { getDeployedVaultsQuickswap } from "../../../../consts/deployed";
+
 export const MATIC_CHAIN_ID = 137;
+export const VAULTS = Object.entries(getDeployedVaultsQuickswap()).map(
+  ([vaultName, vault]) => ({
+    vaultName,
+    vaultAddress: vault.vault,
+    ynftAddress: vault.ynft,
+  })
+);

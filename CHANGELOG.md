@@ -1,5 +1,26 @@
 # Changelog
 
+# [1.24.0](https://github.com/DeFi-Dojo/contracts/compare/v1.23.0...v1.24.0) (2022-04-15)
+
+
+### Features
+
+* dex-528/solidity coverage ([#72](https://github.com/DeFi-Dojo/contracts/issues/72)) ([bc75f4b](https://github.com/DeFi-Dojo/contracts/commit/bc75f4bbdedb2acccbe6f54582220b39001b5769))
+
+# [1.23.0](https://github.com/DeFi-Dojo/contracts/compare/v1.22.0...v1.23.0) (2022-04-14)
+
+
+### Features
+
+* DEX-245 autotasks for all vaults ([#70](https://github.com/DeFi-Dojo/contracts/issues/70)) ([d8319b0](https://github.com/DeFi-Dojo/contracts/commit/d8319b0a55bc384b21297cd687274549c8227ed6))
+
+# [1.22.0](https://github.com/DeFi-Dojo/contracts/compare/v1.21.1...v1.22.0) (2022-04-14)
+
+
+### Features
+
+* dex-512/add events to vault contracts ([#69](https://github.com/DeFi-Dojo/contracts/issues/69)) ([eff39e7](https://github.com/DeFi-Dojo/contracts/commit/eff39e76f3e667d2a7e7131a54716875ba6bdd4e))
+
 ## [1.21.1](https://github.com/DeFi-Dojo/contracts/compare/v1.21.0...v1.21.1) (2022-04-12)
 
 
