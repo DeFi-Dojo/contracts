@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.24.0](https://github.com/DeFi-Dojo/contracts/compare/v1.23.0...v1.24.0) (2022-04-15)
+
+
+### Features
+
+* dex-528/solidity coverage ([#72](https://github.com/DeFi-Dojo/contracts/issues/72)) ([bc75f4b](https://github.com/DeFi-Dojo/contracts/commit/bc75f4bbdedb2acccbe6f54582220b39001b5769))
+
 # [1.23.0](https://github.com/DeFi-Dojo/contracts/compare/v1.22.0...v1.23.0) (2022-04-14)
 
 
