@@ -640,6 +640,38 @@ function yNFT() external view returns (contract YNFT)
 
 ## Events
 
+### BeneficiarySet
+
+```solidity
+event BeneficiarySet(address newBeneficiary)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| newBeneficiary  | address | undefined |
+
+### FeeSet
+
+```solidity
+event FeeSet(uint256 newFee)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| newFee  | uint256 | undefined |
+
 ### Paused
 
 ```solidity
@@ -655,6 +687,39 @@ event Paused(address account)
 | Name | Type | Description |
 |---|---|---|
 | account  | address | undefined |
+
+### PerformanceFeeSet
+
+```solidity
+event PerformanceFeeSet(uint256 newPerformanceFee)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| newPerformanceFee  | uint256 | undefined |
+
+### RewardsClaimed
+
+```solidity
+event RewardsClaimed(address underlyingToken, uint256 amount)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| underlyingToken  | address | undefined |
+| amount  | uint256 | undefined |
 
 ### RoleAdminChanged
 
@@ -725,6 +790,43 @@ event Unpaused(address account)
 | Name | Type | Description |
 |---|---|---|
 | account  | address | undefined |
+
+### YNftCreated
+
+```solidity
+event YNftCreated(address underlyingToken, uint256 tokenId, uint256 deposited)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| underlyingToken  | address | undefined |
+| tokenId  | uint256 | undefined |
+| deposited  | uint256 | undefined |
+
+### YNftWithdrawn
+
+```solidity
+event YNftWithdrawn(address underlyingToken, uint256 tokenId, uint256 amountWithdrawn, uint256 performanceFee)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| underlyingToken  | address | undefined |
+| tokenId  | uint256 | undefined |
+| amountWithdrawn  | uint256 | undefined |
+| performanceFee  | uint256 | undefined |
 
 
 

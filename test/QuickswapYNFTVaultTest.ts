@@ -993,6 +993,26 @@ describe("QuickswapYNFTVault", () => {
     );
   });
 
+  it("should calculate correct performance fee on estimatePerformanceFee", async () => {
+    const TOKEN_ID = 1;
+    const LIQUIDITY_REWARDS = 111;
+    const PAIR_TOTAL_LIQUIDITY = 10000;
+    const TOKEN0_RESERVES = 200000;
+    const TOKEN1_RESERVES = 300000;
+    const EXPECTED_RESULT_STRING = "80,120";
+
+    await createTwoYNfts(LIQUIDITY_REWARDS, signers, DEADLINE);
+    uniswapPairMock.totalSupply.returns(PAIR_TOTAL_LIQUIDITY);
+    uniswapPairMock.getReserves.returns([
+      TOKEN0_RESERVES,
+      TOKEN1_RESERVES,
+      400,
+    ]);
+    expect(
+      (await quickswapYnftVault.estimatePerformanceFee(TOKEN_ID)).toString()
+    ).to.be.equal(EXPECTED_RESULT_STRING);
+  });
+
   it("should calculate correct performance fee on withdrawToUnderlyingTokens when withdrawing second yNFT", async () => {
     const EXTRACTED_TOKEN_ID = 1;
     const LIQUIDITY_REWARDS = 111;

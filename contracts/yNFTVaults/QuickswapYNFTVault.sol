@@ -88,6 +88,42 @@ contract QuickswapYNFTVault is YNFTVault {
     emit YNftAssetDeposited(_tokenIn, liquidity);
   }
 
+  function getTokenAmountsAfterRemoveLiquidity(uint256 liquidity)
+    private
+    view
+    returns (uint256 token0Amount, uint256 token1Amount)
+  {
+    uint256 vaultBalance = pair.balanceOf(address(this));
+    uint256 pairTotalSupply = pair.totalSupply();
+    (uint256 reserve0, uint256 reserve1, ) = pair.getReserves();
+    token0Amount = (reserve0 * liquidity) / pairTotalSupply;
+    token1Amount = (reserve1 * liquidity) / pairTotalSupply;
+  }
+
+  function estimatePerformanceFee(uint256 tokenId)
+    external
+    view
+    returns (uint256 token0Amount, uint256 token1Amount)
+  {
+    uint256 balance = balanceOf[tokenId];
+    uint256 currentLiquidity = stakingDualRewards.balanceOf(address(this));
+    uint256 liquidityToWithdraw = (balance * currentLiquidity) / totalSupply;
+
+    uint256 performanceFeeToWithdrawPerMille = calculatePerformanceFeeToWithdrawPerMille(
+        tokenId,
+        balance,
+        liquidityToWithdraw
+      );
+
+    uint256 liquidityToWithdrawAsPerformanceFee = (liquidityToWithdraw *
+      performanceFeeToWithdrawPerMille) / 1000;
+
+    (token0Amount, token1Amount) = getTokenAmountsAfterRemoveLiquidity(
+      liquidityToWithdrawAsPerformanceFee
+    );
+    return (token0Amount, token1Amount);
+  }
+
   function depositETH(
     uint256 _amountOutMinFirstToken,
     uint256 _amountOutMinSecondToken,
@@ -273,7 +309,7 @@ contract QuickswapYNFTVault is YNFTVault {
     uint256 _nftTokenId,
     uint256 _tokenBalance,
     uint256 _balanceToWithdraw
-  ) private returns (uint256) {
+  ) private view returns (uint256) {
     uint256 balanceToWithdrawWithoutAccruedRewards = (_tokenBalance *
       balancesAtBuy[_nftTokenId].tokenBalance) /
       balancesAtBuy[_nftTokenId].totalSupply;

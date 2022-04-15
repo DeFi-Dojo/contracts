@@ -245,6 +245,29 @@ function dexRouter() external view returns (contract IUniswapV2Router02)
 |---|---|---|
 | _0 | contract IUniswapV2Router02 | undefined |
 
+### estimatePerformanceFee
+
+```solidity
+function estimatePerformanceFee(uint256 tokenId) external view returns (uint256 token0Amount, uint256 token1Amount)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| token0Amount | uint256 | undefined |
+| token1Amount | uint256 | undefined |
+
 ### feePerMile
 
 ```solidity
@@ -686,6 +709,38 @@ function yNFT() external view returns (contract YNFT)
 
 ## Events
 
+### BeneficiarySet
+
+```solidity
+event BeneficiarySet(address newBeneficiary)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| newBeneficiary  | address | undefined |
+
+### FeeSet
+
+```solidity
+event FeeSet(uint256 newFee)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| newFee  | uint256 | undefined |
+
 ### Paused
 
 ```solidity
@@ -701,6 +756,22 @@ event Paused(address account)
 | Name | Type | Description |
 |---|---|---|
 | account  | address | undefined |
+
+### PerformanceFeeSet
+
+```solidity
+event PerformanceFeeSet(uint256 newPerformanceFee)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| newPerformanceFee  | uint256 | undefined |
 
 ### RoleAdminChanged
 
@@ -771,6 +842,77 @@ event Unpaused(address account)
 | Name | Type | Description |
 |---|---|---|
 | account  | address | undefined |
+
+### YNftAssetDeposited
+
+```solidity
+event YNftAssetDeposited(address token, uint256 amount)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| token  | address | undefined |
+| amount  | uint256 | undefined |
+
+### YNftCreated
+
+```solidity
+event YNftCreated(address pair, uint256 tokenId, uint256 liquidity)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| pair  | address | undefined |
+| tokenId  | uint256 | undefined |
+| liquidity  | uint256 | undefined |
+
+### YNftLpMiningRewardsAccrued
+
+```solidity
+event YNftLpMiningRewardsAccrued(uint256 dQuickBalance, uint256 wMaticBalance)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| dQuickBalance  | uint256 | undefined |
+| wMaticBalance  | uint256 | undefined |
+
+### YNftWithdrawn
+
+```solidity
+event YNftWithdrawn(address pair, uint256 tokenId, uint256 liquidityWithdrawn, uint256 performanceFee)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| pair  | address | undefined |
+| tokenId  | uint256 | undefined |
+| liquidityWithdrawn  | uint256 | undefined |
+| performanceFee  | uint256 | undefined |
 
 
 
