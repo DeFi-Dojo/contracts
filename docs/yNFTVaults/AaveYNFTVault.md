@@ -91,19 +91,19 @@ function balanceOfUnderlying(uint256 _nftTokenId) external view returns (uint256
 
 
 
-
+*Calculates underlying asset balance belonging to particular yNFT token id.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| _nftTokenId | uint256 | undefined |
+| _nftTokenId | uint256 | NFT token id that gives access to certain balance of underlying asset. |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | undefined |
+| _0 | uint256 | Underlying asset balance for certain NFT token id. |
 
 ### balancesAtBuy
 
@@ -153,14 +153,14 @@ function claimRewards(uint256 _amountOutMin, uint256 _deadline) external nonpaya
 
 
 
-
+*Claims AAVE rewards, swaps to underlying token, deposits to the pool.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| _amountOutMin | uint256 | undefined |
-| _deadline | uint256 | undefined |
+| _amountOutMin | uint256 | The minimum amount of output tokens that must be received for the swap transaction not to revert. |
+| _deadline | uint256 | Unix timestamp after which the transaction will revert. |
 
 ### createYNFT
 
@@ -170,16 +170,16 @@ function createYNFT(address _tokenIn, uint256 _amountIn, uint256 _amountOutMin, 
 
 
 
-
+*Deposits a certain amount of an asset into AAVE protocol pool and creates yNFT token.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| _tokenIn | address | undefined |
-| _amountIn | uint256 | undefined |
-| _amountOutMin | uint256 | undefined |
-| _deadline | uint256 | undefined |
+| _tokenIn | address | Address of ERC20 token to be deposited. |
+| _amountIn | uint256 | Amount of ERC20 tokens to be deposited. |
+| _amountOutMin | uint256 | The minimum amount of output tokens that must be received for the swap transaction not to revert. |
+| _deadline | uint256 | Unix timestamp after which the transaction will revert. |
 
 ### createYNFTForEther
 
@@ -189,14 +189,14 @@ function createYNFTForEther(uint256 _amountOutMin, uint256 _deadline) external p
 
 
 
-
+*Deposits a certain amount of Ether into AAVE protocol pool and creates yNFT token.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| _amountOutMin | uint256 | undefined |
-| _deadline | uint256 | undefined |
+| _amountOutMin | uint256 | The minimum amount of output tokens that must be received for the swap transaction not to revert. |
+| _deadline | uint256 | Unix timestamp after which the transaction will revert. |
 
 ### dexRouter
 
@@ -262,14 +262,14 @@ function getAmountToClaim() external view returns (uint256)
 
 
 
-
+*Gets amount of AAVE rewards that can be claimed*
 
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | undefined |
+| _0 | uint256 | Amount to claim |
 
 ### getRoleAdmin
 
@@ -615,15 +615,15 @@ function withdrawToEther(uint256 _nftTokenId, uint256 _amountOutMin, uint256 _de
 
 
 
-
+*Withdraws Ether to yNFT owner, burns yNFT token, transfers fee to beneficiary.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| _nftTokenId | uint256 | undefined |
-| _amountOutMin | uint256 | undefined |
-| _deadline | uint256 | undefined |
+| _nftTokenId | uint256 | NFT token id that gives access to certain balance of underlying asset. |
+| _amountOutMin | uint256 | The minimum amount of output tokens that must be received for the swap transaction not to revert. |
+| _deadline | uint256 | Unix timestamp after which the transaction will revert. |
 
 ### withdrawToUnderlyingTokens
 
@@ -633,13 +633,13 @@ function withdrawToUnderlyingTokens(uint256 _nftTokenId) external nonpayable
 
 
 
-
+*Withdraws underlying tokens to yNFT owner, burns yNFT token, transfers fee to beneficiary.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| _nftTokenId | uint256 | undefined |
+| _nftTokenId | uint256 | NFT token id that gives access to certain balance of underlying asset. |
 
 ### yNFT
 
