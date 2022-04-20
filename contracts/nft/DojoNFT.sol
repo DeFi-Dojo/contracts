@@ -80,14 +80,26 @@ contract DojoNFT is
     _initializeEIP712("DeFi DOJO Warriors");
   }
 
+  /**
+   * @dev Sets tokens metadata base URI
+   * @param _baseURI base URI
+   */
   function setBaseTokenURI(string memory _baseURI) public onlyOwner {
     baseURI = _baseURI;
   }
 
+  /**
+   * @dev Gets tokens metadata base URI
+   * @return base URI
+   */
   function baseTokenURI() public view returns (string memory) {
     return baseURI;
   }
 
+  /**
+   * @dev Checks if given NFT token id exists
+   * @return true if token exists false otherwise
+   */
   function exist(uint256 tokenId) public view returns (bool) {
     return tokenId < currentTokenId;
   }
@@ -132,6 +144,10 @@ contract DojoNFT is
     }
   }
 
+  /**
+   * @dev Checks if given NFT token id exists
+   * @return True if token exists false otherwise
+   */
   function mintTo(address _to) public onlyOwner returns (uint256) {
     // solhint-disable-next-line not-rely-on-time
     return _mintTo(_to, block.timestamp, block.difficulty);
@@ -139,7 +155,10 @@ contract DojoNFT is
 
   /**
    * @dev Mints a token to an address with a tokenURI.
-   * @param _to address of the future owner of the token
+   * @param _to Address of the future owner of the token
+   * @param _blockTimestamp Block timestamp used for random traits generation
+   * @param _blockDifficulty Block difficulty used for random traits generation
+   * @return Minted NFT token id
    */
   function _mintTo(
     address _to,
@@ -229,6 +248,11 @@ contract DojoNFT is
     return newTokenId;
   }
 
+  /**
+   * @dev Gets token metadata URI based on given token id.
+   * @param _tokenId Address of the future owner of the token
+   * @return Token metadata URI
+   */
   function tokenURI(uint256 _tokenId)
     public
     view
@@ -239,7 +263,10 @@ contract DojoNFT is
   }
 
   /**
-   * Override isApprovedForAll to whitelist user's OpenSea proxy accounts to enable gas-less listings.
+   * @dev Override isApprovedForAll to whitelist user's OpenSea proxy accounts to enable gas-less listings.
+   * @dev Tells whether an operator is approved by a given owner.
+   * @param _owner Owner
+   * @param _operator Owner
    */
   function isApprovedForAll(address _owner, address _operator)
     public
