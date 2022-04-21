@@ -58,8 +58,8 @@ contract AaveYNFTVault is YNFTVault {
   }
 
   /**
-   * @dev Gets amount of AAVE rewards that can be claimed
-   * @return Amount to claim
+   * @dev Gets amount of AAVE rewards that can be claimed.
+   * @return Amount to claim.
    */
   function getAmountToClaim() external view returns (uint256) {
     address[] memory assets = new address[](1);
@@ -75,7 +75,7 @@ contract AaveYNFTVault is YNFTVault {
 
   /**
    * @dev Claims AAVE rewards, swaps to underlying token, deposits to the pool.
-   * @param _amountOutMin The minimum amount of output tokens that must be received for the swap transaction not to revert.
+   * @param _amountOutMin The minimum amount of output tokens that must be received for the swap not to revert.
    * @param _deadline Unix timestamp after which the transaction will revert.
    */
   // front run, sandwich attack
@@ -221,9 +221,9 @@ contract AaveYNFTVault is YNFTVault {
   }
 
   /**
-   * @dev Withdraws Ether to yNFT owner, burns yNFT token, transfers fee to beneficiary.
+   * @dev Withdraws yNFT to Ether and sends to yNFT owner, burns yNFT token, transfers fee to beneficiary.
    * @param _nftTokenId NFT token id that gives access to certain balance of underlying asset.
-   * @param _amountOutMin The minimum amount of output tokens that must be received for the swap transaction not to revert.
+   * @param _amountOutMin The minimum amount of output tokens that must be received for the swap not to revert.
    * @param _deadline Unix timestamp after which the transaction will revert.
    */
   function withdrawToEther(
@@ -246,7 +246,7 @@ contract AaveYNFTVault is YNFTVault {
    * @dev Deposits a certain amount of an asset into AAVE protocol pool and creates yNFT token.
    * @param _tokenIn Address of ERC20 token to be deposited.
    * @param _amountIn Amount of ERC20 tokens to be deposited.
-   * @param _amountOutMin The minimum amount of output tokens that must be received for the swap transaction not to revert.
+   * @param _amountOutMin The minimum amount of output tokens that must be received for the swap not to revert.
    * @param _deadline Unix timestamp after which the transaction will revert.
    */
   function createYNFT(
@@ -276,7 +276,7 @@ contract AaveYNFTVault is YNFTVault {
 
   /**
    * @dev Deposits a certain amount of Ether into AAVE protocol pool and creates yNFT token.
-   * @param _amountOutMin The minimum amount of output tokens that must be received for the swap transaction not to revert.
+   * @param _amountOutMin The minimum amount of output tokens that must be received for the swap not to revert.
    * @param _deadline Unix timestamp after which the transaction will revert.
    */
   function createYNFTForEther(uint256 _amountOutMin, uint256 _deadline)

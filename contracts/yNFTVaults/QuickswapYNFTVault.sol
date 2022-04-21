@@ -61,10 +61,10 @@ contract QuickswapYNFTVault is YNFTVault {
   }
 
   /**
-   * @dev Deposits tokens and provides liquidity using ERC20 tokens
+   * @dev Deposits tokens and provides liquidity using ERC20 tokens.
    * @param _tokenIn Address of ERC20 token to be deposited.
-   * @param _amountOutMinFirstToken The minimum amount of output tokens that must be received for the swap transaction not to revert.
-   * @param _amountOutMinSecondToken The minimum amount of output tokens that must be received for the swap transaction not to revert.
+   * @param _amountOutMinFirstToken The minimum amount of output tokens that must be received for the swap not to revert.
+   * @param _amountOutMinSecondToken The minimum amount of output tokens that must be received for the swap not to revert.
    * @param _amountMinLiqudityFirstToken Bounds the extent to which the (Second token) / (First token) price can go up before the transaction reverts. Must be <= amountADesired.
    * @param _amountMinLiquditySecondToken Bounds the extent to which the (First token) / (Second token) price can go up before the transaction reverts. Must be <= amountBDesired.
    * @param _deadline Unix timestamp after which the transaction will revert.
@@ -133,9 +133,9 @@ contract QuickswapYNFTVault is YNFTVault {
   }
 
   /**
-   * @dev Deposits Ether and provides liquidity
-   * @param _amountOutMinFirstToken The minimum amount of output tokens that must be received for the swap transaction not to revert.
-   * @param _amountOutMinSecondToken The minimum amount of output tokens that must be received for the swap transaction not to revert.
+   * @dev Deposits Ether and provides liquidity.
+   * @param _amountOutMinFirstToken The minimum amount of output tokens that must be received for the swap not to revert.
+   * @param _amountOutMinSecondToken The minimum amount of output tokens that must be received for the swap not to revert.
    * @param _amountMinLiqudityFirstToken Bounds the extent to which the (Second token) / (First token) price can go up before the transaction reverts. Must be <= amountADesired.
    * @param _amountMinLiquditySecondToken Bounds the extent to which the (First token) / (Second token) price can go up before the transaction reverts. Must be <= amountBDesired.
    * @param _deadline Unix timestamp after which the transaction will revert.
@@ -165,7 +165,7 @@ contract QuickswapYNFTVault is YNFTVault {
   }
 
   /**
-   * @dev Accrue rewards from LP mining to beneficiary address
+   * @dev Accrue rewards from LP mining to beneficiary address.
    */
   function getRewardLPMining() external onlyRole(HARVESTER_ROLE) whenNotPaused {
     stakingDualRewards.getReward();
@@ -341,8 +341,8 @@ contract QuickswapYNFTVault is YNFTVault {
   /**
    * @dev Withdraw yNFT token holder balance to Ether, burn yNFT.
    * @param _nftTokenId NFT token id that gives access to certain balance of underlying asset.
-   * @param _amountOutMinFirstToken The minimum amount of output tokens that must be received for the swap transaction not to revert.
-   * @param _amountOutMinSecondToken The minimum amount of output tokens that must be received for the swap transaction not to revert.
+   * @param _amountOutMinFirstToken The minimum amount of output tokens that must be received for the swap not to revert.
+   * @param _amountOutMinSecondToken The minimum amount of output tokens that must be received for the swap not to revert.
    * @param _amountOutETH The minimum amount of ETH that must be received for the transaction not to revert.
    * @param _deadline Unix timestamp after which the transaction will revert.
    */
@@ -465,8 +465,8 @@ contract QuickswapYNFTVault is YNFTVault {
   /**
    * @dev Withdraw yNFT token holder balance to underlying tokens, burn yNFT.
    * @param _nftTokenId NFT token id that gives access to certain balance of underlying asset.
-   * @param _amountOutMinFirstToken The minimum amount of output tokens that must be received for the swap transaction not to revert.
-   * @param _amountOutMinSecondToken The minimum amount of output tokens that must be received for the swap transaction not to revert.
+   * @param _amountOutMinFirstToken The minimum amount of output tokens that must be received for the swap not to revert.
+   * @param _amountOutMinSecondToken The minimum amount of output tokens that must be received for the swap not to revert.
    * @param _deadline Unix timestamp after which the transaction will revert.
    */
   function withdrawToUnderlyingTokens(
@@ -561,8 +561,8 @@ contract QuickswapYNFTVault is YNFTVault {
    * @dev Deposits liquidity and creates yNFT token.
    * @param _tokenIn Address of ERC20 token to be deposited.
    * @param _amountIn Amount of ERC20 tokens to be deposited.
-   * @param _amountOutMinFirstToken The minimum amount of output tokens that must be received for the swap transaction not to revert.
-   * @param _amountOutMinSecondToken The minimum amount of output tokens that must be received for the swap transaction not to revert.
+   * @param _amountOutMinFirstToken The minimum amount of output tokens that must be received for the swap not to revert.
+   * @param _amountOutMinSecondToken The minimum amount of output tokens that must be received for the swap not to revert.
    * @param _amountMinLiqudityFirstToken Bounds the extent to which the (Second token) / (First token) price can go up before the transaction reverts. Must be <= amountADesired.
    * @param _amountMinLiquditySecondToken Bounds the extent to which the (First token) / (Second token) price can go up before the transaction reverts. Must be <= amountBDesired.
    * @param _deadline Unix timestamp after which the transaction will revert.
@@ -599,8 +599,8 @@ contract QuickswapYNFTVault is YNFTVault {
 
   /**
    * @dev Deposits liquidity and creates yNFT token for Ether.
-   * @param _amountOutMinFirstToken The minimum amount of output tokens that must be received for the swap transaction not to revert.
-   * @param _amountOutMinSecondToken The minimum amount of output tokens that must be received for the swap transaction not to revert.
+   * @param _amountOutMinFirstToken The minimum amount of output tokens that must be received for the swap not to revert.
+   * @param _amountOutMinSecondToken The minimum amount of output tokens that must be received for the swap not to revert.
    * @param _amountMinLiqudityFirstToken Bounds the extent to which the (Second token) / (First token) price can go up before the transaction reverts. Must be <= amountADesired.
    * @param _amountMinLiquditySecondToken Bounds the extent to which the (First token) / (Second token) price can go up before the transaction reverts. Must be <= amountBDesired.
    * @param _deadline Unix timestamp after which the transaction will revert.

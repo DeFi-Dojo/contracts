@@ -97,14 +97,14 @@ function baseTokenURI() external view returns (string)
 
 
 
-*Gets tokens metadata base URI*
+*Gets tokens metadata base URI.*
 
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | base URI |
+| _0 | string | base URI. |
 
 ### characteristics
 
@@ -208,7 +208,7 @@ function exist(uint256 tokenId) external view returns (bool)
 
 
 
-*Checks if given NFT token id exists*
+*Checks if given NFT token id exists.*
 
 #### Parameters
 
@@ -220,7 +220,7 @@ function exist(uint256 tokenId) external view returns (bool)
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | true if token exists false otherwise |
+| _0 | bool | true if token exists false otherwise. |
 
 ### getApproved
 
@@ -314,8 +314,8 @@ function isApprovedForAll(address _owner, address _operator) external view retur
 
 | Name | Type | Description |
 |---|---|---|
-| _owner | address | Owner |
-| _operator | address | Owner |
+| _owner | address | Owner. |
+| _operator | address | Opearator. |
 
 #### Returns
 
@@ -331,19 +331,19 @@ function mintTo(address _to) external nonpayable returns (uint256)
 
 
 
-*Checks if given NFT token id exists*
+*Safely mints a new token to a given address. Reverts if the given token id already exists.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| _to | address | undefined |
+| _to | address | Address of the future owner of the token. |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | True if token exists false otherwise |
+| _0 | uint256 | NFT token id. |
 
 ### name
 
@@ -496,13 +496,13 @@ function setBaseTokenURI(string _baseURI) external nonpayable
 
 
 
-*Sets tokens metadata base URI*
+*Sets tokens metadata base URI.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| _baseURI | string | base URI |
+| _baseURI | string | base URI. |
 
 ### supportsInterface
 
@@ -602,13 +602,13 @@ function tokenURI(uint256 _tokenId) external view returns (string)
 
 | Name | Type | Description |
 |---|---|---|
-| _tokenId | uint256 | Address of the future owner of the token |
+| _tokenId | uint256 | Address of the future owner of the token. |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | Token metadata URI |
+| _0 | string | Token metadata URI. |
 
 ### totalSupply
 
