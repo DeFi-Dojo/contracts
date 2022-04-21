@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.26.0](https://github.com/DeFi-Dojo/contracts/compare/v1.25.1...v1.26.0) (2022-04-21)
+
+
+### Features
+
+* DEX-522/external performance fee methods ([#73](https://github.com/DeFi-Dojo/contracts/issues/73)) ([599ff2a](https://github.com/DeFi-Dojo/contracts/commit/599ff2a952f9943f2ef66e7be2eedd19b81fb6cd))
+
 ## [1.25.1](https://github.com/DeFi-Dojo/contracts/compare/v1.25.0...v1.25.1) (2022-04-20)
 
 # [1.25.0](https://github.com/DeFi-Dojo/contracts/compare/v1.24.0...v1.25.0) (2022-04-15)
