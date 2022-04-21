@@ -108,6 +108,25 @@ contract AaveYNFTVault is YNFTVault {
     emit RewardsClaimed(address(underlyingToken), amount);
   }
 
+  function estimatePerformanceFee(uint256 tokenId)
+    external
+    view
+    returns (uint256)
+  {
+    uint256 currentAmountOfAToken = aToken.balanceOf(address(this));
+
+    uint256 amountToWithdraw = (balanceOf[tokenId] * currentAmountOfAToken) /
+      totalSupply;
+
+    uint256 amountToWithdrawWithoutAccruedRewards = (balanceOf[tokenId] *
+      balancesAtBuy[tokenId].tokenBalance) / balancesAtBuy[tokenId].totalSupply;
+
+    uint256 performanceFeeToWithdraw = (performanceFeePerMille *
+      (amountToWithdraw - amountToWithdrawWithoutAccruedRewards)) / 1000;
+
+    return performanceFeeToWithdraw;
+  }
+
   function _withdraw(uint256 _nftTokenId, address _receiver)
     private
     returns (uint256)

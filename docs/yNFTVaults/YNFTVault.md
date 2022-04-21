@@ -451,6 +451,38 @@ function yNFT() external view returns (contract YNFT)
 
 ## Events
 
+### BeneficiarySet
+
+```solidity
+event BeneficiarySet(address newBeneficiary)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| newBeneficiary  | address | undefined |
+
+### FeeSet
+
+```solidity
+event FeeSet(uint256 newFee)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| newFee  | uint256 | undefined |
+
 ### Paused
 
 ```solidity
@@ -466,6 +498,22 @@ event Paused(address account)
 | Name | Type | Description |
 |---|---|---|
 | account  | address | undefined |
+
+### PerformanceFeeSet
+
+```solidity
+event PerformanceFeeSet(uint256 newPerformanceFee)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| newPerformanceFee  | uint256 | undefined |
 
 ### RoleAdminChanged
 
