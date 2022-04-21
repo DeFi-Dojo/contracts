@@ -214,18 +214,4 @@ describe("TokenVesting - cliff, slicing & early release", function () {
     const releaseableAmount = await tokenVesting.computeReleasableAmount(beneficiary)
     expect(releaseableAmount).to.equal(vestingAmount.mul(cliff + slicingPeriod).div(duration))
   });
-
-  it("Should not be possible to end vesting from non-owner account", async function () { 
-    await expect(tokenVesting.connect(beneficiaryAccount).releaseAll(beneficiary)).to.be.revertedWith("Ownable: caller is not the owner")
-  });
-
-  it("Should be possible to end vesting owner account", async function () { 
-    expect(await erc20.balanceOf(beneficiary)).to.equal(0)
-    await tokenVesting.connect(ownerAccount).releaseAll(beneficiary)
-    expect(await erc20.balanceOf(beneficiary)).to.equal(vestingAmount)
-    await expect(tokenVesting.getVestingSchedule(beneficiary)).to.be.revertedWith("Vesting schedule does not exist")
-
-    let withdrawableAmount = await tokenVesting.getWithdrawableAmount()
-    expect(withdrawableAmount).to.equal(depositAmount.sub(vestingAmount))
-  });
 });

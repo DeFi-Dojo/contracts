@@ -133,23 +133,6 @@ contract TokenVesting is Ownable, ReentrancyGuard {
   }
 
   /**
-   * @notice Revokes the vesting schedule for given beneficiary.
-   * @param _beneficiary address of beneficiary
-   */
-  function releaseAll(address _beneficiary)
-    external
-    onlyOwner
-    vestingScheduleExists(_beneficiary)
-  {
-    VestingSchedule storage vestingSchedule = vestingSchedules[_beneficiary];
-    uint256 releasableAmount = vestingSchedule.amountTotal -
-      vestingSchedule.released;
-    vestingSchedulesTotalAmount -= releasableAmount;
-    delete vestingSchedules[_beneficiary];
-    token.safeTransfer(_beneficiary, releasableAmount);
-  }
-
-  /**
    * @notice Withdraw the specified amount if possible.
    * @param amount the amount to withdraw
    */
