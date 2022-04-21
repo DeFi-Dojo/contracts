@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.27.0](https://github.com/DeFi-Dojo/contracts/compare/v1.26.0...v1.27.0) (2022-04-21)
+
+
+### Features
+
+* dex-523 add method descriptions to vault and nft contracts ([#74](https://github.com/DeFi-Dojo/contracts/issues/74)) ([721fb12](https://github.com/DeFi-Dojo/contracts/commit/721fb1214d8b7f5f7fefc516ef3828cf1a605d5b))
+
 # [1.26.0](https://github.com/DeFi-Dojo/contracts/compare/v1.25.1...v1.26.0) (2022-04-21)
 
 
