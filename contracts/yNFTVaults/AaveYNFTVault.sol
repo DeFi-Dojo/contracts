@@ -57,6 +57,10 @@ contract AaveYNFTVault is YNFTVault {
     underlyingToken = IERC20(aToken.UNDERLYING_ASSET_ADDRESS());
   }
 
+  /**
+   * @dev Gets amount of AAVE rewards that can be claimed.
+   * @return Amount to claim.
+   */
   function getAmountToClaim() external view returns (uint256) {
     address[] memory assets = new address[](1);
     assets[0] = address(aToken);
@@ -69,6 +73,11 @@ contract AaveYNFTVault is YNFTVault {
     return amountToClaim;
   }
 
+  /**
+   * @dev Claims AAVE rewards, swaps to underlying token, deposits to the pool.
+   * @param _amountOutMin The minimum amount of output tokens that must be received for the swap not to revert.
+   * @param _deadline Unix timestamp after which the transaction will revert.
+   */
   // front run, sandwich attack
   function claimRewards(uint256 _amountOutMin, uint256 _deadline)
     external
@@ -199,6 +208,10 @@ contract AaveYNFTVault is YNFTVault {
     emit YNftCreated(address(underlyingToken), tokenId, _tokenAmount);
   }
 
+  /**
+   * @dev Withdraws underlying tokens to yNFT owner, burns yNFT token, transfers fee to beneficiary.
+   * @param _nftTokenId NFT token id that gives access to certain balance of underlying asset.
+   */
   function withdrawToUnderlyingTokens(uint256 _nftTokenId)
     external
     whenNotPaused
@@ -207,6 +220,12 @@ contract AaveYNFTVault is YNFTVault {
     _withdraw(_nftTokenId, msg.sender);
   }
 
+  /**
+   * @dev Withdraws yNFT to Ether and sends to yNFT owner, burns yNFT token, transfers fee to beneficiary.
+   * @param _nftTokenId NFT token id that gives access to certain balance of underlying asset.
+   * @param _amountOutMin The minimum amount of output tokens that must be received for the swap not to revert.
+   * @param _deadline Unix timestamp after which the transaction will revert.
+   */
   function withdrawToEther(
     uint256 _nftTokenId,
     uint256 _amountOutMin,
@@ -223,6 +242,13 @@ contract AaveYNFTVault is YNFTVault {
     );
   }
 
+  /**
+   * @dev Deposits a certain amount of an asset into AAVE protocol pool and creates yNFT token.
+   * @param _tokenIn Address of ERC20 token to be deposited.
+   * @param _amountIn Amount of ERC20 tokens to be deposited.
+   * @param _amountOutMin The minimum amount of output tokens that must be received for the swap not to revert.
+   * @param _deadline Unix timestamp after which the transaction will revert.
+   */
   function createYNFT(
     address _tokenIn,
     uint256 _amountIn,
@@ -248,6 +274,11 @@ contract AaveYNFTVault is YNFTVault {
     }
   }
 
+  /**
+   * @dev Deposits a certain amount of Ether into AAVE protocol pool and creates yNFT token.
+   * @param _amountOutMin The minimum amount of output tokens that must be received for the swap not to revert.
+   * @param _deadline Unix timestamp after which the transaction will revert.
+   */
   function createYNFTForEther(uint256 _amountOutMin, uint256 _deadline)
     external
     payable
@@ -266,10 +297,10 @@ contract AaveYNFTVault is YNFTVault {
     _deposit(amount);
   }
 
-  /*
-   * @dev Calculates underlying asset balance belonging to particular nft token id.
-   * @param (uint256 _nftTokenId) nft token id that gives access to certain balance of underlying asset.
-   * @return (uint256) underlying asset balance for certain nft token id.
+  /**
+   * @dev Calculates underlying asset balance belonging to particular yNFT token id.
+   * @param _nftTokenId NFT token id that gives access to certain balance of underlying asset.
+   * @return Underlying asset balance for certain NFT token id.
    */
   function balanceOfUnderlying(uint256 _nftTokenId)
     public

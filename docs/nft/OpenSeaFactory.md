@@ -6,7 +6,7 @@
 
 
 
-
+*Similar to https://github.com/ProjectOpenSea/opensea-creatures/blob/master/contracts/CreatureFactory.sol*
 
 ## Methods
 
@@ -55,9 +55,9 @@ function canMint(uint256 _optionId) external view returns (bool)
 function isApprovedForAll(address _owner, address _operator) external view returns (bool)
 ```
 
-Hack to get things to work automatically on OpenSea. Use isApprovedForAll so the frontend doesn&#39;t have to worry about different method names.
 
 
+*Hack to get things to work automatically on OpenSea. Use isApprovedForAll so the frontend doesn&#39;t have to worry about different method names.*
 
 #### Parameters
 
@@ -163,9 +163,9 @@ function owner() external view returns (address)
 function ownerOf(uint256 _tokenId) external view returns (address _owner)
 ```
 
-Hack to get things to work automatically on OpenSea. Use isApprovedForAll so the frontend doesn&#39;t have to worry about different method names.
 
 
+*Hack to get things to work automatically on OpenSea. Use isApprovedForAll so the frontend doesn&#39;t have to worry about different method names.*
 
 #### Parameters
 
@@ -301,9 +301,9 @@ function tokenURI(uint256 _optionId) external view returns (string)
 function transferFrom(address _from, address _to, uint256 _tokenId) external nonpayable
 ```
 
-Hack to get things to work automatically on OpenSea. Use transferFrom so the frontend doesn&#39;t have to worry about different method names.
 
 
+*Hack to get things to work automatically on OpenSea. Use transferFrom so the frontend doesn&#39;t have to worry about different method names.*
 
 #### Parameters
 

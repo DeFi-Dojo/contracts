@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "../interfaces/nft/IFactoryERC721.sol";
 import "./DojoNFT.sol";
 
+/// @dev Similar to https://github.com/ProjectOpenSea/opensea-creatures/blob/master/contracts/CreatureFactory.sol
 contract OpenSeaFactory is FactoryERC721, Ownable {
   using Strings for string;
 
@@ -20,13 +21,13 @@ contract OpenSeaFactory is FactoryERC721, Ownable {
   address public nftAddress;
   string public baseURI;
 
-  /*
-   * Enforce the existence of only 1000 OpenSea creatures.
+  /**
+   * @dev Enforce the existence of only 1000 OpenSea creatures.
    */
   uint256 private creatureSupply;
 
-  /*
-   * One option for minting.
+  /**
+   * @dev One option for minting.
    */
   uint256 private numOptions_ = 1;
   uint256 private singleCreatureOption = 0;
@@ -122,7 +123,7 @@ contract OpenSeaFactory is FactoryERC721, Ownable {
   }
 
   /**
-   * Hack to get things to work automatically on OpenSea.
+   * @dev Hack to get things to work automatically on OpenSea.
    * Use transferFrom so the frontend doesn't have to worry about different method names.
    */
   /* solhint-disable no-unused-vars */
@@ -135,7 +136,7 @@ contract OpenSeaFactory is FactoryERC721, Ownable {
   }
 
   /**
-   * Hack to get things to work automatically on OpenSea.
+   * @dev Hack to get things to work automatically on OpenSea.
    * Use isApprovedForAll so the frontend doesn't have to worry about different method names.
    */
   function isApprovedForAll(address _owner, address _operator)
@@ -158,7 +159,7 @@ contract OpenSeaFactory is FactoryERC721, Ownable {
   }
 
   /**
-   * Hack to get things to work automatically on OpenSea.
+   * @dev Hack to get things to work automatically on OpenSea.
    * Use isApprovedForAll so the frontend doesn't have to worry about different method names.
    */
   // solhint-disable-next-line no-unused-vars

@@ -74,19 +74,19 @@ function balanceOfUnderlying(uint256 _nftTokenId) external view returns (uint256
 
 
 
-
+*Calculates underlying asset balance belonging to particular nft token id.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| _nftTokenId | uint256 | undefined |
+| _nftTokenId | uint256 | NFT token id that gives access to certain balance of underlying asset. |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | undefined |
+| _0 | uint256 | Underlying asset balance for certain NFT token id. |
 
 ### balancesAtBuy
 
@@ -136,19 +136,19 @@ function createYNFT(address _tokenIn, uint256 _amountIn, uint256 _amountOutMinFi
 
 
 
-
+*Deposits liquidity and creates yNFT token.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| _tokenIn | address | undefined |
-| _amountIn | uint256 | undefined |
-| _amountOutMinFirstToken | uint256 | undefined |
-| _amountOutMinSecondToken | uint256 | undefined |
-| _amountMinLiqudityFirstToken | uint256 | undefined |
-| _amountMinLiquditySecondToken | uint256 | undefined |
-| _deadline | uint256 | undefined |
+| _tokenIn | address | Address of ERC20 token to be deposited. |
+| _amountIn | uint256 | Amount of ERC20 tokens to be deposited. |
+| _amountOutMinFirstToken | uint256 | The minimum amount of output tokens that must be received for the swap not to revert. |
+| _amountOutMinSecondToken | uint256 | The minimum amount of output tokens that must be received for the swap not to revert. |
+| _amountMinLiqudityFirstToken | uint256 | Bounds the extent to which the (Second token) / (First token) price can go up before the transaction reverts. Must be &lt;= amountADesired. |
+| _amountMinLiquditySecondToken | uint256 | Bounds the extent to which the (First token) / (Second token) price can go up before the transaction reverts. Must be &lt;= amountBDesired. |
+| _deadline | uint256 | Unix timestamp after which the transaction will revert. |
 
 ### createYNFTForEther
 
@@ -158,17 +158,17 @@ function createYNFTForEther(uint256 _amountOutMinFirstToken, uint256 _amountOutM
 
 
 
-
+*Deposits liquidity and creates yNFT token for Ether.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| _amountOutMinFirstToken | uint256 | undefined |
-| _amountOutMinSecondToken | uint256 | undefined |
-| _amountMinLiqudityFirstToken | uint256 | undefined |
-| _amountMinLiquditySecondToken | uint256 | undefined |
-| _deadline | uint256 | undefined |
+| _amountOutMinFirstToken | uint256 | The minimum amount of output tokens that must be received for the swap not to revert. |
+| _amountOutMinSecondToken | uint256 | The minimum amount of output tokens that must be received for the swap not to revert. |
+| _amountMinLiqudityFirstToken | uint256 | Bounds the extent to which the (Second token) / (First token) price can go up before the transaction reverts. Must be &lt;= amountADesired. |
+| _amountMinLiquditySecondToken | uint256 | Bounds the extent to which the (First token) / (Second token) price can go up before the transaction reverts. Must be &lt;= amountBDesired. |
+| _deadline | uint256 | Unix timestamp after which the transaction will revert. |
 
 ### dQuick
 
@@ -195,17 +195,17 @@ function depositETH(uint256 _amountOutMinFirstToken, uint256 _amountOutMinSecond
 
 
 
-
+*Deposits Ether and provides liquidity.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| _amountOutMinFirstToken | uint256 | undefined |
-| _amountOutMinSecondToken | uint256 | undefined |
-| _amountMinLiqudityFirstToken | uint256 | undefined |
-| _amountMinLiquditySecondToken | uint256 | undefined |
-| _deadline | uint256 | undefined |
+| _amountOutMinFirstToken | uint256 | The minimum amount of output tokens that must be received for the swap not to revert. |
+| _amountOutMinSecondToken | uint256 | The minimum amount of output tokens that must be received for the swap not to revert. |
+| _amountMinLiqudityFirstToken | uint256 | Bounds the extent to which the (Second token) / (First token) price can go up before the transaction reverts. Must be &lt;= amountADesired. |
+| _amountMinLiquditySecondToken | uint256 | Bounds the extent to which the (First token) / (Second token) price can go up before the transaction reverts. Must be &lt;= amountBDesired. |
+| _deadline | uint256 | Unix timestamp after which the transaction will revert. |
 
 ### depositTokens
 
@@ -215,18 +215,18 @@ function depositTokens(address _tokenIn, uint256 _amountOutMinFirstToken, uint25
 
 
 
-
+*Deposits tokens and provides liquidity using ERC20 tokens.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| _tokenIn | address | undefined |
-| _amountOutMinFirstToken | uint256 | undefined |
-| _amountOutMinSecondToken | uint256 | undefined |
-| _amountMinLiqudityFirstToken | uint256 | undefined |
-| _amountMinLiquditySecondToken | uint256 | undefined |
-| _deadline | uint256 | undefined |
+| _tokenIn | address | Address of ERC20 token to be deposited. |
+| _amountOutMinFirstToken | uint256 | The minimum amount of output tokens that must be received for the swap not to revert. |
+| _amountOutMinSecondToken | uint256 | The minimum amount of output tokens that must be received for the swap not to revert. |
+| _amountMinLiqudityFirstToken | uint256 | Bounds the extent to which the (Second token) / (First token) price can go up before the transaction reverts. Must be &lt;= amountADesired. |
+| _amountMinLiquditySecondToken | uint256 | Bounds the extent to which the (First token) / (Second token) price can go up before the transaction reverts. Must be &lt;= amountBDesired. |
+| _deadline | uint256 | Unix timestamp after which the transaction will revert. |
 
 ### dexRouter
 
@@ -310,7 +310,7 @@ function getRewardLPMining() external nonpayable
 
 
 
-
+*Accrue rewards from LP mining to beneficiary address.*
 
 
 ### getRoleAdmin
@@ -657,17 +657,17 @@ function withdrawToEther(uint256 _nftTokenId, uint256 _amountOutMinFirstToken, u
 
 
 
-
+*Withdraw yNFT token holder balance to Ether, burn yNFT.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| _nftTokenId | uint256 | undefined |
-| _amountOutMinFirstToken | uint256 | undefined |
-| _amountOutMinSecondToken | uint256 | undefined |
-| _amountOutETH | uint256 | undefined |
-| _deadline | uint256 | undefined |
+| _nftTokenId | uint256 | NFT token id that gives access to certain balance of underlying asset. |
+| _amountOutMinFirstToken | uint256 | The minimum amount of output tokens that must be received for the swap not to revert. |
+| _amountOutMinSecondToken | uint256 | The minimum amount of output tokens that must be received for the swap not to revert. |
+| _amountOutETH | uint256 | The minimum amount of ETH that must be received for the transaction not to revert. |
+| _deadline | uint256 | Unix timestamp after which the transaction will revert. |
 
 ### withdrawToUnderlyingTokens
 
@@ -677,16 +677,16 @@ function withdrawToUnderlyingTokens(uint256 _nftTokenId, uint256 _amountOutMinFi
 
 
 
-
+*Withdraw yNFT token holder balance to underlying tokens, burn yNFT.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| _nftTokenId | uint256 | undefined |
-| _amountOutMinFirstToken | uint256 | undefined |
-| _amountOutMinSecondToken | uint256 | undefined |
-| _deadline | uint256 | undefined |
+| _nftTokenId | uint256 | NFT token id that gives access to certain balance of underlying asset. |
+| _amountOutMinFirstToken | uint256 | The minimum amount of output tokens that must be received for the swap not to revert. |
+| _amountOutMinSecondToken | uint256 | The minimum amount of output tokens that must be received for the swap not to revert. |
+| _deadline | uint256 | Unix timestamp after which the transaction will revert. |
 
 ### yNFT
 
