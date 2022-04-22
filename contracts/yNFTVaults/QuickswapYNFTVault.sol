@@ -497,7 +497,10 @@ contract QuickswapYNFTVault is YNFTVault {
 
     _withrdrawFromLPMining(balanceToWithdraw);
 
-    require(pair.approve(address(dexRouter), balance), "approve failed.");
+    require(
+      pair.approve(address(dexRouter), balanceToWithdraw),
+      "approve failed."
+    );
 
     if (address(firstToken) == dexRouter.WETH()) {
       if (performanceFee > 0) {
