@@ -1,7 +1,7 @@
 import { uploadAutotaskFromFolder } from "../upload-autotask";
-import configEnv from "../../../config";
+import configEnv from "../../config";
 
-const autotaskId = configEnv.DEFENDER_QUICKSWAP_GET_REWARD_AUTOTASK_ID;
+const autotaskId = configEnv.DEFENDER_AAVE_AUTOTASK_ID;
 
 console.log("Uploading autotask script");
 uploadAutotaskFromFolder(autotaskId)(`${__dirname}/dist`)

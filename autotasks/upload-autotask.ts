@@ -1,6 +1,6 @@
 import { AutotaskClient } from "defender-autotask-client";
 import { readFileSync } from "fs";
-import configEnv from "../../config";
+import configEnv from "../config";
 
 const { DEFENDER_TEAM_API_KEY, DEFENDER_TEAM_API_SECRET } = configEnv;
 

@@ -16,7 +16,7 @@ module.exports = {
     // List here all dependencies available on the Autotask environment
     /axios/,
     /apollo-client/,
-    /defender-[^\-]+-client/,
+    /defender-[^-]+-client/,
     /ethers/,
     /web3/,
     /@ethersproject\/.*/,

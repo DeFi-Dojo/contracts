@@ -16,7 +16,7 @@
     "./utils",
     "./consts",
     "./config",
-    "scripts/defender"
+    "./autotasks"
   ],
   "files": ["./hardhat.config.ts", "./test.config.ts"],
   "exclude": ["node_modules"]

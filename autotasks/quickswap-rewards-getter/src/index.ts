@@ -4,7 +4,7 @@ import {
 } from "defender-relay-client/lib/ethers";
 import { AutotaskEvent } from "defender-autotask-utils";
 
-import { QuickswapYNFTVault__factory } from "../../../../typechain";
+import { QuickswapYNFTVault__factory } from "../../../typechain";
 
 import { MATIC_CHAIN_ID, VAULTS } from "./config";
 

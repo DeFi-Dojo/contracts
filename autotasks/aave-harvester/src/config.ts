@@ -1,4 +1,4 @@
-import { getDeployedVaultsAave } from "../../../../consts/deployed";
+import { getDeployedVaultsAave } from "../../../consts/deployed";
 
 export enum ChainIds {
   KOVAN = 42,

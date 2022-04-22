@@ -3,7 +3,7 @@ import {
   DefenderRelayProvider,
 } from "defender-relay-client/lib/ethers";
 import { AutotaskEvent } from "defender-autotask-utils";
-import { AaveYNFTVault__factory } from "../../../../typechain";
+import { AaveYNFTVault__factory } from "../../../typechain";
 
 import { AggregatorV3Interface__factory } from "./factories";
 import {
