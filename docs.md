@@ -5,20 +5,21 @@ These docs were generated using `hardhat-dodoc`
 ## Table of contents
 
 - nft
-  - [DojoNFT](nft/DojoNFT.md)
-  - [OpenSeaFactory](nft/OpenSeaFactory.md)
-  - [ProxyRegistry](nft/ProxyRegistry.md)
+  - [DojoNFT](docs/nft/DojoNFT.md)
+  - [OpenSeaFactory](docs/nft/OpenSeaFactory.md)
+  - [ProxyRegistry](docs/nft/ProxyRegistry.md)
 - vesting
-  - [DojoToken](vesting/DojoToken.md)
-  - [TeamVesting](vesting/TeamVesting.md)
-  - [Vesting](vesting/Vesting.md)
-  - [VestingFactory](vesting/VestingFactory.md)
+  - [DojoToken](docs/vesting/DojoToken.md)
+  - [TeamVesting](docs/vesting/TeamVesting.md)
+  - [Vesting](docs/vesting/Vesting.md)
+  - [VestingFactory](docs/vesting/VestingFactory.md)
 - yNFTVaults
-  - [YNFTVault](yNFTVaults/YNFTVault.md)
-  - [YNFT](yNFTVaults/YNFT.md)
-  - [AaveYNFTVault](yNFTVaults/AaveYNFTVault.md)
-  - [QuickswapYNFTVault](yNFTVaults/QuickswapYNFTVault.md)
+  - [YNFTVault](docs/yNFTVaults/YNFTVault.md)
+  - [YNFT](docs/yNFTVaults/YNFT.md)
+  - [AaveYNFTVault](docs/yNFTVaults/AaveYNFTVault.md)
+  - [QuickswapYNFTVault](docs/yNFTVaults/QuickswapYNFTVault.md)
 
 ## DOJO Use cases
 
 - yNFT AAVE Vault
+  ![aave-vault-usecases](https://user-images.githubusercontent.com/19593179/164642964-46bbbfe0-25a9-4e5e-ad9a-49102624ab61.png)
