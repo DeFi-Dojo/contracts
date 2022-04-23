@@ -176,6 +176,41 @@ contract QuickswapYNFTVault is YNFTVault {
     emit YNftLpMiningRewardsAccrued(dQuickBalance, wMaticBalance);
   }
 
+  /**
+   * @dev Accrue rewards from LP mining and put it into staking contract.
+   */
+  function claimRewards() external onlyRole(HARVESTER_ROLE) whenNotPaused {
+    stakingDualRewards.getReward();
+    uint256 dQuickBalance = dQuick.balanceOf(address(this));
+    uint256 wMaticBalance = wMatic.balanceOf(address(this));
+
+    uint256 liquidityFromDQuick = _depositLiquidityForToken(
+      address(dQuick),
+      dQuickBalance / 2,
+      0,
+      0,
+      0,
+      0,
+      block.timestamp + 1 hours
+    );
+    _farmLiquidity(liquidityFromDQuick);
+
+    uint256 liquidityFromWMatic = _depositLiquidityForToken(
+      address(wMatic),
+      wMaticBalance / 2,
+      0,
+      0,
+      0,
+      0,
+      block.timestamp + 1 hours
+    );
+    _farmLiquidity(liquidityFromWMatic);
+
+    emit YNftLpMiningRewardsAccrued(dQuickBalance, wMaticBalance);
+    emit YNftAssetDeposited(address(dQuick), liquidityFromDQuick);
+    emit YNftAssetDeposited(address(wMatic), liquidityFromWMatic);
+  }
+
   function _withrdrawFromLPMining(uint256 _balance) private {
     stakingDualRewards.withdraw(_balance);
   }
