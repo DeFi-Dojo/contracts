@@ -1,77 +1,44 @@
+import { Signer } from "ethers";
 import {
-  DefenderRelaySigner,
-  DefenderRelayProvider,
-} from "defender-relay-client/lib/ethers";
-import { AutotaskEvent } from "defender-autotask-utils";
+  QuickswapYNFTVault,
+  QuickswapYNFTVault__factory,
+} from "../../../typechain";
 
-import { QuickswapYNFTVault__factory } from "../../../typechain";
+import { DEADLINE_SECONDS, ADDRESSES, GAS_LIMIT, VAULTS } from "./config";
 
-import {
-  MATIC_CHAIN_ID,
-  DEADLINE_SECONDS,
-  ADDRESSES,
-  GAS_LIMIT,
-  VAULTS,
-} from "./config";
+const depositTokens = (vault: QuickswapYNFTVault, tokenAddress: string) => {
+  const [
+    amountOutMinFirstToken,
+    amountOutMinSecondToken,
+    amountMinLiqudityFirstToken,
+    amountMinLiquditySecondToken,
+  ] = [0, 0, 0, 0];
 
-export async function quickswapTokenDepositor({
-  credentials,
-  relayerARN,
-}: AutotaskEvent) {
-  if (!credentials || !relayerARN) {
-    throw new Error("Relayer not provided");
-  }
-
-  const provider = new DefenderRelayProvider({ credentials, relayerARN });
-  const network = await provider.detectNetwork();
-
-  if (network.chainId !== MATIC_CHAIN_ID) {
-    throw new Error(`Unsupported network ${network.chainId} - ${network.name}`);
-  }
-
-  const signer = new DefenderRelaySigner(
-    { credentials, relayerARN },
-    provider,
-    { speed: "fast" }
+  return vault.depositTokens(
+    tokenAddress,
+    amountOutMinFirstToken,
+    amountOutMinSecondToken,
+    amountMinLiqudityFirstToken,
+    amountMinLiquditySecondToken,
+    Math.round(Date.now() / 1000) + DEADLINE_SECONDS,
+    { gasLimit: GAS_LIMIT }
   );
+};
 
-  const amountOutMinFirstToken = 0;
-  const amountOutMinSecondToken = 0;
-  const amountMinLiqudityFirstToken = 0;
-  const amountMinLiquditySecondToken = 0;
+const depositQuickswapTokenPair =
+  (signer: Signer) =>
+  async ({ vaultName, vaultAddress }: typeof VAULTS[0]) => {
+    const vault = QuickswapYNFTVault__factory.connect(vaultAddress, signer);
 
-  const deadline = Math.round(Date.now() / 1000) + DEADLINE_SECONDS;
+    try {
+      const { hash: txWmatic } = await depositTokens(vault, ADDRESSES.WMATIC);
+      const { hash: txDquick } = await depositTokens(vault, ADDRESSES.DQUICK);
 
-  const txs = await Promise.all(
-    VAULTS.map(async ({ vaultName, vaultAddress }) => {
-      const vault = QuickswapYNFTVault__factory.connect(vaultAddress, signer);
+      return { vaultName, vaultAddress, txWmatic, txDquick };
+    } catch (error) {
+      return { vaultName, vaultAddress, error: `${error}` };
+    }
+  };
 
-      try {
-        const { hash: txWmatic } = await vault.depositTokens(
-          ADDRESSES.WMATIC,
-          amountOutMinFirstToken,
-          amountOutMinSecondToken,
-          amountMinLiqudityFirstToken,
-          amountMinLiquditySecondToken,
-          deadline,
-          { gasLimit: GAS_LIMIT }
-        );
-
-        const { hash: txDquick } = await vault.depositTokens(
-          ADDRESSES.DQUICK,
-          amountOutMinFirstToken,
-          amountOutMinSecondToken,
-          amountMinLiqudityFirstToken,
-          amountMinLiquditySecondToken,
-          deadline,
-          { gasLimit: GAS_LIMIT }
-        );
-        return { vaultName, vaultAddress, txWmatic, txDquick };
-      } catch (error) {
-        return { vaultName, vaultAddress, error: `${error}` };
-      }
-    })
-  );
-
-  return txs;
-}
+export const quickswapTokenDepositor = async (signer: Signer) =>
+  Promise.all(VAULTS.map(depositQuickswapTokenPair(signer)));

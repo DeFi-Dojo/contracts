@@ -5,19 +5,8 @@ export enum ChainIds {
   MATIC = 137,
 }
 
-interface Addresses {
-  NATIVE_TOKEN_USD: string;
-}
-
-type NetworksAddresses = { [k: number]: Addresses };
-
-export const ADDRESSES: NetworksAddresses = {
-  [ChainIds.KOVAN]: {
-    NATIVE_TOKEN_USD: "0x9326BFA02ADD2366b30bacB125260Af641031331",
-  },
-  [ChainIds.MATIC]: {
-    NATIVE_TOKEN_USD: "0xAB594600376Ec9fD91F8e885dADF0CE036862dE0",
-  },
+export const ADDRESSES = {
+  NATIVE_TOKEN_USD: "0xAB594600376Ec9fD91F8e885dADF0CE036862dE0",
 };
 
 export const PRICE_FEED_DECIMALS = 8;
