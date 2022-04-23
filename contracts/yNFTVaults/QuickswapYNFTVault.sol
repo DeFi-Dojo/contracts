@@ -149,27 +149,17 @@ contract QuickswapYNFTVault is YNFTVault {
     uint256 dQuickBalance = dQuick.balanceOf(address(this));
     uint256 wMaticBalance = wMatic.balanceOf(address(this));
 
-    uint256 liquidityFromDQuick = _depositLiquidityForToken(
+    uint256 liquidityFromDQuick = _depositLiquidityForTokenWithoutMinValue(
       address(dQuick),
-      dQuickBalance / 2,
-      0,
-      0,
-      0,
-      0,
-      block.timestamp + 1 hours
+      dQuickBalance / 2
     );
-    _farmLiquidity(liquidityFromDQuick);
 
-    uint256 liquidityFromWMatic = _depositLiquidityForToken(
+    uint256 liquidityFromWMatic = _depositLiquidityForTokenWithoutMinValue(
       address(wMatic),
-      wMaticBalance / 2,
-      0,
-      0,
-      0,
-      0,
-      block.timestamp + 1 hours
+      wMaticBalance / 2
     );
-    _farmLiquidity(liquidityFromWMatic);
+
+    _farmLiquidity(liquidityFromDQuick + liquidityFromWMatic);
 
     emit YNftLpMiningRewardsAccrued(dQuickBalance, wMaticBalance);
     emit YNftAssetDeposited(address(dQuick), liquidityFromDQuick);
@@ -217,22 +207,11 @@ contract QuickswapYNFTVault is YNFTVault {
     );
 
     if (address(firstToken) == dexRouter.WETH()) {
-      if (performanceFee > 0) {
-        dexRouter.removeLiquidityETH(
-          address(secondToken),
-          performanceFee,
-          _amountOutMinSecondToken,
-          _amountOutMinFirstToken,
-          beneficiary,
-          _deadline
-        );
-      }
-      dexRouter.removeLiquidityETH(
-        address(secondToken),
-        balanceToWithdraw - performanceFee,
+      removeLiquidityETHWithPerformanceFee(
+        balanceToWithdraw,
+        performanceFee,
         _amountOutMinSecondToken,
         _amountOutMinFirstToken,
-        msg.sender,
         _deadline
       );
     } else {
@@ -344,18 +323,9 @@ contract QuickswapYNFTVault is YNFTVault {
       uint256 firstTokenPerformanceFee = (amountFirstToken *
         performanceFeeToWithdrawPerMille) / 1000;
 
-      if (firstTokenPerformanceFee > 0) {
-        _swapTokenToETH(
-          beneficiary,
-          firstTokenPerformanceFee,
-          _amountOutETH / 2,
-          address(firstToken),
-          _deadline
-        );
-      }
-      _swapTokenToETH(
-        msg.sender,
-        amountFirstToken - firstTokenPerformanceFee,
+      _swapTokenToETHWithPerformanceFee(
+        amountFirstToken,
+        firstTokenPerformanceFee,
         _amountOutETH / 2,
         address(firstToken),
         _deadline
@@ -363,18 +333,10 @@ contract QuickswapYNFTVault is YNFTVault {
     }
     uint256 secondTokenPerformanceFee = (amountSecondToken *
       performanceFeeToWithdrawPerMille) / 1000;
-    if (secondTokenPerformanceFee > 0) {
-      _swapTokenToETH(
-        beneficiary,
-        secondTokenPerformanceFee,
-        _amountOutETH / 2,
-        address(secondToken),
-        _deadline
-      );
-    }
-    _swapTokenToETH(
-      msg.sender,
-      amountSecondToken - secondTokenPerformanceFee,
+
+    _swapTokenToETHWithPerformanceFee(
+      amountSecondToken,
+      secondTokenPerformanceFee,
       _amountOutETH / 2,
       address(secondToken),
       _deadline
@@ -661,6 +623,74 @@ contract QuickswapYNFTVault is YNFTVault {
     balancesAtBuy[tokenId].totalSupply = totalSupply;
     balancesAtBuy[tokenId].tokenBalance = stakingDualRewards.balanceOf(
       address(this)
+    );
+  }
+
+  function _depositLiquidityForTokenWithoutMinValue(
+    address _tokenIn,
+    uint256 _amountToBuyOneAsset
+  ) private returns (uint256) {
+    uint256 liquidity = _depositLiquidityForToken(
+      _tokenIn,
+      _amountToBuyOneAsset,
+      0,
+      0,
+      0,
+      0,
+      block.timestamp + 1 hours
+    );
+    return liquidity;
+  }
+
+  function removeLiquidityETHWithPerformanceFee(
+    uint256 liquidity,
+    uint256 performanceFee,
+    uint256 amountTokenMin,
+    uint256 amountETHMin,
+    uint256 deadline
+  ) private {
+    if (performanceFee > 0) {
+      dexRouter.removeLiquidityETH(
+        address(secondToken),
+        performanceFee,
+        amountTokenMin,
+        amountETHMin,
+        beneficiary,
+        deadline
+      );
+    }
+    dexRouter.removeLiquidityETH(
+      address(secondToken),
+      liquidity - performanceFee,
+      amountTokenMin,
+      amountETHMin,
+      msg.sender,
+      deadline
+    );
+  }
+
+  function _swapTokenToETHWithPerformanceFee(
+    uint256 _amountIn,
+    uint256 _performanceFee,
+    uint256 _amountOutETH,
+    address _tokenIn,
+    uint256 _deadline
+  ) private {
+    if (_performanceFee > 0) {
+      _swapTokenToETH(
+        beneficiary,
+        _performanceFee,
+        _amountOutETH,
+        _tokenIn,
+        _deadline
+      );
+    }
+    _swapTokenToETH(
+      msg.sender,
+      _amountIn - _performanceFee,
+      _amountOutETH,
+      _tokenIn,
+      _deadline
     );
   }
 
