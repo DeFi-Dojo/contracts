@@ -208,18 +208,20 @@ function dexRouter() external view returns (contract IUniswapV2Router02)
 function estimatePerformanceFee(uint256 tokenId) external view returns (uint256 token0Amount, uint256 token1Amount)
 ```
 
+_Calculates fee in underlying tokens that will be paid on yNFT withdrawal_
+
 #### Parameters
 
-| Name    | Type    | Description |
-| ------- | ------- | ----------- |
-| tokenId | uint256 | undefined   |
+| Name    | Type    | Description   |
+| ------- | ------- | ------------- |
+| tokenId | uint256 | yNFT token id |
 
 #### Returns
 
-| Name         | Type    | Description |
-| ------------ | ------- | ----------- |
-| token0Amount | uint256 | undefined   |
-| token1Amount | uint256 | undefined   |
+| Name         | Type    | Description                                 |
+| ------------ | ------- | ------------------------------------------- |
+| token0Amount | uint256 | Performance fee estimation for first token  |
+| token1Amount | uint256 | Performance fee estimation for second token |
 
 ### feePerMile
 

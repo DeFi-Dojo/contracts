@@ -58,22 +58,6 @@ contract AaveYNFTVault is YNFTVault {
   }
 
   /**
-   * @dev Gets amount of AAVE rewards that can be claimed.
-   * @return Amount to claim.
-   */
-  function getAmountToClaim() external view returns (uint256) {
-    address[] memory assets = new address[](1);
-    assets[0] = address(aToken);
-
-    uint256 amountToClaim = incentivesController.getRewardsBalance(
-      assets,
-      address(this)
-    );
-
-    return amountToClaim;
-  }
-
-  /**
    * @dev Claims AAVE rewards, swaps to underlying token, deposits to the pool.
    * @param _amountOutMin The minimum amount of output tokens that must be received for the swap not to revert.
    * @param _deadline Unix timestamp after which the transaction will revert.
@@ -115,97 +99,6 @@ contract AaveYNFTVault is YNFTVault {
     pool.deposit(address(underlyingToken), amount, address(this), 0);
 
     emit RewardsClaimed(address(underlyingToken), amount);
-  }
-
-  function estimatePerformanceFee(uint256 tokenId)
-    external
-    view
-    returns (uint256)
-  {
-    uint256 currentAmountOfAToken = aToken.balanceOf(address(this));
-
-    uint256 amountToWithdraw = (balanceOf[tokenId] * currentAmountOfAToken) /
-      totalSupply;
-
-    uint256 amountToWithdrawWithoutAccruedRewards = (balanceOf[tokenId] *
-      balancesAtBuy[tokenId].tokenBalance) / balancesAtBuy[tokenId].totalSupply;
-
-    uint256 performanceFeeToWithdraw = (performanceFeePerMille *
-      (amountToWithdraw - amountToWithdrawWithoutAccruedRewards)) / 1000;
-
-    return performanceFeeToWithdraw;
-  }
-
-  function _withdraw(uint256 _nftTokenId, address _receiver)
-    private
-    returns (uint256)
-  {
-    uint256 currentAmountOfAToken = aToken.balanceOf(address(this));
-    uint256 amountToWithdraw = (balanceOf[_nftTokenId] *
-      currentAmountOfAToken) / totalSupply;
-
-    uint256 amountToWithdrawWithoutAccruedRewards = (balanceOf[_nftTokenId] *
-      balancesAtBuy[_nftTokenId].tokenBalance) /
-      balancesAtBuy[_nftTokenId].totalSupply;
-
-    totalSupply = totalSupply - balanceOf[_nftTokenId];
-
-    balanceOf[_nftTokenId] = 0;
-
-    yNFT.burn(_nftTokenId);
-    uint256 performanceFee = 0;
-    if (amountToWithdraw > amountToWithdrawWithoutAccruedRewards) {
-      uint256 performanceFeeToWithdraw = (performanceFeePerMille *
-        (amountToWithdraw - amountToWithdrawWithoutAccruedRewards)) / 1000;
-      performanceFee = pool.withdraw(
-        address(underlyingToken),
-        performanceFeeToWithdraw,
-        beneficiary
-      );
-    }
-    uint256 amountWithdrawn = pool.withdraw(
-      address(underlyingToken),
-      amountToWithdrawWithoutAccruedRewards +
-        ((amountToWithdraw - amountToWithdrawWithoutAccruedRewards) *
-          (1000 - performanceFeePerMille)) /
-        1000,
-      _receiver
-    );
-    emit YNftWithdrawn(
-      address(underlyingToken),
-      _nftTokenId,
-      amountWithdrawn,
-      performanceFee
-    );
-    return amountWithdrawn - performanceFee;
-  }
-
-  function _deposit(uint256 _tokenAmount) internal virtual {
-    uint256 tokenId = yNFT.mint(msg.sender);
-
-    require(
-      underlyingToken.approve(address(pool), _tokenAmount),
-      "approve failed."
-    );
-
-    uint256 currentAmountOfAToken = aToken.balanceOf(address(this));
-
-    pool.deposit(address(underlyingToken), _tokenAmount, address(this), 0);
-
-    if (totalSupply == 0) {
-      balanceOf[tokenId] = _tokenAmount;
-      totalSupply = _tokenAmount;
-    } else {
-      uint256 balance = (_tokenAmount * totalSupply) / currentAmountOfAToken; // TODO: doesn't work if _tokenAmount * totalSupply < currentAmountOfAToken
-      balanceOf[tokenId] = balance;
-
-      totalSupply = totalSupply + balance;
-    }
-
-    balancesAtBuy[tokenId].tokenBalance = aToken.balanceOf(address(this));
-    balancesAtBuy[tokenId].totalSupply = totalSupply;
-
-    emit YNftCreated(address(underlyingToken), tokenId, _tokenAmount);
   }
 
   /**
@@ -298,6 +191,46 @@ contract AaveYNFTVault is YNFTVault {
   }
 
   /**
+   * @dev Gets amount of AAVE rewards that can be claimed.
+   * @return Amount to claim.
+   */
+  function getAmountToClaim() external view returns (uint256) {
+    address[] memory assets = new address[](1);
+    assets[0] = address(aToken);
+
+    uint256 amountToClaim = incentivesController.getRewardsBalance(
+      assets,
+      address(this)
+    );
+
+    return amountToClaim;
+  }
+
+  /**
+   * @dev Calculates fee in underlying tokens that will be paid on yNFT withdrawal
+   * @param tokenId yNFT token id
+   * @return performanceFeeToWithdraw Performance fee estimation
+   */
+  function estimatePerformanceFee(uint256 tokenId)
+    external
+    view
+    returns (uint256)
+  {
+    uint256 currentAmountOfAToken = aToken.balanceOf(address(this));
+
+    uint256 amountToWithdraw = (balanceOf[tokenId] * currentAmountOfAToken) /
+      totalSupply;
+
+    uint256 amountToWithdrawWithoutAccruedRewards = (balanceOf[tokenId] *
+      balancesAtBuy[tokenId].tokenBalance) / balancesAtBuy[tokenId].totalSupply;
+
+    uint256 performanceFeeToWithdraw = (performanceFeePerMille *
+      (amountToWithdraw - amountToWithdrawWithoutAccruedRewards)) / 1000;
+
+    return performanceFeeToWithdraw;
+  }
+
+  /**
    * @dev Calculates underlying asset balance belonging to particular yNFT token id.
    * @param _nftTokenId NFT token id that gives access to certain balance of underlying asset.
    * @return Underlying asset balance for certain NFT token id.
@@ -313,5 +246,77 @@ contract AaveYNFTVault is YNFTVault {
       totalSupply;
 
     return balance;
+  }
+
+  function _deposit(uint256 _tokenAmount) internal virtual {
+    uint256 tokenId = yNFT.mint(msg.sender);
+
+    require(
+      underlyingToken.approve(address(pool), _tokenAmount),
+      "approve failed."
+    );
+
+    uint256 currentAmountOfAToken = aToken.balanceOf(address(this));
+
+    pool.deposit(address(underlyingToken), _tokenAmount, address(this), 0);
+
+    if (totalSupply == 0) {
+      balanceOf[tokenId] = _tokenAmount;
+      totalSupply = _tokenAmount;
+    } else {
+      uint256 balance = (_tokenAmount * totalSupply) / currentAmountOfAToken; // TODO: doesn't work if _tokenAmount * totalSupply < currentAmountOfAToken
+      balanceOf[tokenId] = balance;
+
+      totalSupply = totalSupply + balance;
+    }
+
+    balancesAtBuy[tokenId].tokenBalance = aToken.balanceOf(address(this));
+    balancesAtBuy[tokenId].totalSupply = totalSupply;
+
+    emit YNftCreated(address(underlyingToken), tokenId, _tokenAmount);
+  }
+
+  function _withdraw(uint256 _nftTokenId, address _receiver)
+    private
+    returns (uint256)
+  {
+    uint256 currentAmountOfAToken = aToken.balanceOf(address(this));
+    uint256 amountToWithdraw = (balanceOf[_nftTokenId] *
+      currentAmountOfAToken) / totalSupply;
+
+    uint256 amountToWithdrawWithoutAccruedRewards = (balanceOf[_nftTokenId] *
+      balancesAtBuy[_nftTokenId].tokenBalance) /
+      balancesAtBuy[_nftTokenId].totalSupply;
+
+    totalSupply = totalSupply - balanceOf[_nftTokenId];
+
+    balanceOf[_nftTokenId] = 0;
+
+    yNFT.burn(_nftTokenId);
+    uint256 performanceFee = 0;
+    if (amountToWithdraw > amountToWithdrawWithoutAccruedRewards) {
+      uint256 performanceFeeToWithdraw = (performanceFeePerMille *
+        (amountToWithdraw - amountToWithdrawWithoutAccruedRewards)) / 1000;
+      performanceFee = pool.withdraw(
+        address(underlyingToken),
+        performanceFeeToWithdraw,
+        beneficiary
+      );
+    }
+    uint256 amountWithdrawn = pool.withdraw(
+      address(underlyingToken),
+      amountToWithdrawWithoutAccruedRewards +
+        ((amountToWithdraw - amountToWithdrawWithoutAccruedRewards) *
+          (1000 - performanceFeePerMille)) /
+        1000,
+      _receiver
+    );
+    emit YNftWithdrawn(
+      address(underlyingToken),
+      _nftTokenId,
+      amountWithdrawn,
+      performanceFee
+    );
+    return amountWithdrawn - performanceFee;
   }
 }
