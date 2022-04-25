@@ -1,14 +1,14 @@
 {
   "Ao": {
-    "vault": "0x5734C50b1d10F1e5aFa611a75b5b78065578fd7D",
-    "ynft": "0x12129C76C7018DF9F32c29c98e4E5A9d5a890AE6"
+    "vault": "0x790Ba4EC98247eA6b4e55e50c8790747276323A7",
+    "ynft": "0xc31312887D2A0747bED643D82E129daDbC9cae6a"
   },
   "Midori": {
-    "vault": "0x09a1A991967d95cc6f9b91B816108225de61F6A8",
-    "ynft": "0xD30218C99Ca00227151dE2dd9cb5c759a3eBB3a4"
+    "vault": "0x5dA5478888cA1a8fae485740F4A43cE8b5C8D03A",
+    "ynft": "0xdf1E9E563fc2Caf6f431218DAf92C3537c9CD07b"
   },
   "Kiiro": {
-    "vault": "0x3F875cdCE5Bd63f16c6bdbBD1c75c0931a038953",
-    "ynft": "0x43e33f8a0C53f6861f9b3Be6646EfbCF1C59678C"
+    "vault": "0x65ae5F1A393b0109Af85D1e6f55db6Fc09646094",
+    "ynft": "0x8a13dcbe2775da9619a254f439cc7B39B60542c0"
   }
 }
