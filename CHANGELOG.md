@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.28.0](https://github.com/DeFi-Dojo/contracts/compare/v1.27.0...v1.28.0) (2022-04-25)
+
+
+### Features
+
+* dex-337/add readme ([#76](https://github.com/DeFi-Dojo/contracts/issues/76)) ([985e135](https://github.com/DeFi-Dojo/contracts/commit/985e1358995c1a019a1f5f81e1f69f0e0cc2741b))
+
 # [1.27.0](https://github.com/DeFi-Dojo/contracts/compare/v1.26.0...v1.27.0) (2022-04-21)
 
 
