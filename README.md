@@ -1,79 +1,113 @@
-# LP <-> NFT Contracts
+# [DeFi DOJO](https://defidojo.io) Contracts 📑
 
-A hybrid LPNFT contract acts as a vault, in which an NFT token gives access to assets expressed in form of ERC20 tokens. For now two kinds of assets are supported: aTokens, issued by the Aave protocol and Sushi LP tokens (SLP in short), issued by the Sushi protocol.
+## Contracts
 
-The LPNFT contract internally holds two addresses:
+We describe a few of the core contracts in the DeFi DOJO system. More information can be found in the [contract documentation](docs.md).
 
-- of a certain ERC721 contract
-- of a certain ERC20 contract.
+- **yNFT Vaults**
 
-Because of that there is a one-to-one relationship between these two tokens inside a single LPNFT contract.
+  Vaults inherit from the `YNFTVault` contract ([docs](docs/yNFTVaults/YNFTVault.md))
+  Currently we have contracts for AAVE and QuickSwap vaults, there are multiple kinds of vaults. Every vault contract instance, has its own yNFT contract instance which works as a key to the vault.
 
-Also, notice that each pair of tokens on Sushi gives rise to a different SLP. The same way some lending pool in the Aave protocol issues its own aToken. A single LPNFT contract only knows how to operate on that one particular ERC20 token.
+  - [AAVE](https://aave.com/) yNFT Vault ([docs](docs/yNFTVaults/AaveYNFTVault.md)). We have multiple instances deployed ([addresses](consts/deployed/vaults-aave.json)).
 
-To illustrate this, think of ETH-DAI pair on Sushiswap. This pair issues its own LP tokens that represent the right to withdraw a certain amount of liquidity from that pool. Also, it is implicitly assumed that the value of these LP tokens increases with time, as the fees from swaps go to the liquidity pool itself. That ETH-DAI LP token will be joined together with some ERC721 contract to create our LPNFT contract. Tokens from the ERC721 contract will give access to the ETH-DAI SLP. The same goes for any other pair on Sushiswap, it will create a separate LPNFT contract.
+    - "Ao" - USDC,
 
-## Inside the LPNFT contract
+    - "Midori" - USDT,
 
-Inside the LPNFT contract you can also find a `mapping` that assigns a particular NFT's `id` to some balance of the ERC20 token. The amount of ERC20 tokens that one NFT holds can be increased or decreased with the functions exposed by the LPNFT contract:
+    - "Kiiro" - DAI
 
-- `addLPtoNFT` function increases the amount of ERC20 tokens assigned to a specific NFT `id`. As arguments, this function expects the NFT's `id` to add funds to and the amount of ERC20 tokens that the user approved to put in this vault. Note that this function requires the user to already posses some SLP/aTokens. In future, we might want to change this function so that the user provides some regular tokens that we ourselves will transform to SLP/aTokens.
-- `redeemLPTokens` function decreases the amount of ERC20 tokens assigned to the NFT's `id`. As arguments, this function expects a specific NFT's `id` and the amount of SLP/aTokens to withdraw. This operation will also burn that amount of SLP/aTokens and the user will be given the equivalent of their value expressed in what these tokens represented, i.e. ETH in case of aTokens or ETH _and_ DAI in case of SLP.
+  - [QuickSwap](https://quickswap.exchange/) yNFT Vault ([docs](docs/yNFTVaults/QuickswapYNFTVault.md)). We have multiple instances deployed ([addresses](consts/deployed/vaults-quickswap.json))
 
-When the user calls the function `addLPtoNFT`, the LPNFT contract calls the `safeTransferFrom` function of the appropriate token to transfer these tokens to the chosen `tokenId` of the related NFT, therefore whoever owns the NFT with that `tokenId` owns the tokens in the smart contract. Similarly, when redeeming, the contract first burns an appropriate amount of tokens (in case of Sushi we use its router's `removeLiquidity` function and in case of Aave we use aToken's `redeem` function) and then the LPNFT contract calls `safeTransfer` functions of these claimed tokens to transfer the entirety of the recovered liquidity back to the user.
+    - "Aosaki" - MATIC - USDC,
 
-# Deploy nft and opensea factory
+    - "Hayai" - MATIC - QUICK,
 
-1. Run in the terminal:
+    - "Ahegao" - MATIC - USDT,
 
-```bash
-$ yarn run:node
-```
+    - "Murasaki" - MATIC - ETH
 
-2. Open second terminal and run:
+- **yNFT token**  
+  yNFT token ([docs](docs/yNFTVaults/YNFT.md)) is used as a key to a given vault. yNFT is created along with the vault.
 
-```bash
-$ yarn deploy:nft:and:opensea:factory
-```
+- **DOJO NFT**  
+  This is DeFi Dojo ERC721 token ([docs](docs/nft/DojoNFT.md)).
 
-# Other
-Run tests
-```
-yarn test
-```
+- **Vesting**  
+  The vesting contract is to ensure that the beneficiaries receive funds in accordance with the schedule ([docs](docs/vesting))
 
-Run solhint
-```
-yarn solhint
-```
+## Auto tasks
 
-Verify Aave Vault on Polygonscan
-```
-npx hardhat --network matic polygonscan-verify-aave --address <vault-address>
-  --aaveTokenAddress <underlying-token-address> --ynft-path-uri <ipfs-uri> 
-```
+There are [autotasks](https://docs.openzeppelin.com/defender/autotasks) defined for AAVE and QuickSwap vaults. These are used for auto-staking / auto-compounding in an optimal way to maximize yield.
 
-Verify Quickswap Vault on Polygonscan
-```
-npx hardhat --network matic polygonscan-verify-quickswap --address <vault-address>
-  --quickswap-token-pair-address <underlying-pair-address>
- --ynft-path-uri <ipfs-uri>  --quickswap-staking-dual-rewards-address <dual-rewards-address-for-pair>
-```
+## Development
 
-# Prettier
-To force prettier to tidy up your solidity code using command line run following command in your terminal:
+### Local environment setup
 
-```
-yarn prettier:solidity
-```
+- Clone repository:
+  `git clone git@github.com:DeFi-Dojo/contracts.git`
 
-## VScode settings
-To enable automatic code prettifying, based on rules defined by solhint, please make sure to have below directives in your editor settings.
+- Install dependencies:
+  `cd contracts && yarn`
 
-```
+- Setup env variables:
+  `cp .env.example .env`
+
+- Build contracts and TypeScript code:
+  `yarn build`
+
+### Scripts
+
+We use [npm scripts](https://docs.npmjs.com/cli/v8/using-npm/scripts), [hardhat scripts](https://hardhat.org/guides/scripts.html) and [hardhat tasks](https://hardhat.org/guides/create-task.html) in this repository. Some script usage examples below.
+
+- Deploy DOJO NFT and Opensea factory
+
+  ```bash
+  yarn deploy:nft:and:opensea:factory
+  ```
+
+- Verify Aave Vault on Polygonscan
+
+  ```bash
+  npx hardhat --network matic polygonscan-verify-aave --address <vault-address>
+    --aaveTokenAddress <underlying-token-address> --ynft-path-uri <ipfs-uri>
+  ```
+
+- Verify Quickswap Vault on Polygonscan
+
+  ```bash
+  npx hardhat --network matic polygonscan-verify-quickswap --address <vault-address>
+    --quickswap-token-pair-address <underlying-pair-address>
+   --ynft-path-uri <ipfs-uri>  --quickswap-staking-dual-rewards-address <dual-rewards-address-for-pair>
+  ```
+
+### Code quality
+
+- Contract unit tests: `yarn:test`
+
+- [Solhint](https://protofire.github.io/solhint/) linter: `yarn solhint`
+
+- [Mythril](https://github.com/ConsenSys/mythril) code security analysis: `yarn analyze:mythril`
+
+- Code formatting with [prettier](https://github.com/prettier/prettier): `yarn prettier:solidity`
+
+### Editor settings
+
+**Visual Studio Code**
+
+To enable automatic code prettifying, based on rules defined by solhint, please make sure to have the below directives in your editor settings.
+
+```json
 "[solidity]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
 },
-
 "editor.formatOnSave": true
 ```
+
+## Security
+
+TODO: Security audits
+
+## License
+
+TODO: License
