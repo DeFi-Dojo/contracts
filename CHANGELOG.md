@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.31.0](https://github.com/DeFi-Dojo/contracts/compare/v1.30.0...v1.31.0) (2022-04-25)
+
+
+### Features
+
+* token vesting ([#66](https://github.com/DeFi-Dojo/contracts/issues/66)) ([db1d9d5](https://github.com/DeFi-Dojo/contracts/commit/db1d9d5242e43c6291784d60ea3e115bbccb2e08))
+
 # [1.30.0](https://github.com/DeFi-Dojo/contracts/compare/v1.29.0...v1.30.0) (2022-04-25)
 
 
