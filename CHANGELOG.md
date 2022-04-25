@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.29.0](https://github.com/DeFi-Dojo/contracts/compare/v1.28.0...v1.29.0) (2022-04-25)
+
+
+### Features
+
+* dex-529 vaults refactor ([#77](https://github.com/DeFi-Dojo/contracts/issues/77)) ([6266a12](https://github.com/DeFi-Dojo/contracts/commit/6266a1259fb70e7a6024f7b60933dbec4ea32bcf))
+
 # [1.28.0](https://github.com/DeFi-Dojo/contracts/compare/v1.27.0...v1.28.0) (2022-04-25)
 
 
