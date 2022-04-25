@@ -73,6 +73,7 @@
     "@openzeppelin/contracts": "^4.4.0",
     "@primitivefi/hardhat-dodoc": "^0.2.3",
     "@typechain/hardhat": "^2.3.0",
+    "axios": "^0.26.1",
     "chai": "^4.3.4",
     "defender-autotask-client": "^1.12.1",
     "defender-autotask-utils": "^1.12.1",
