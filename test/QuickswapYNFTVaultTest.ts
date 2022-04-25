@@ -1301,4 +1301,18 @@ describe("QuickswapYNFTVault", () => {
       signers[1].address
     );
   });
+
+  it("should return earned amounts from stakingDualRewards on getRewardsToClaim", async () => {
+    const EARNED_A = 1200;
+    const EARNED_B = 2700;
+    stakingDualRewardsMock.earnedA.returns(EARNED_A);
+    stakingDualRewardsMock.earnedB.returns(EARNED_B);
+    const earned = await quickswapYnftVault.getRewardsToClaim();
+    expect(earned.toString()).to.be.equal(
+      [
+        ethers.BigNumber.from(EARNED_A),
+        ethers.BigNumber.from(EARNED_B),
+      ].toString()
+    );
+  });
 });

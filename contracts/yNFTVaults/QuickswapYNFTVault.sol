@@ -455,6 +455,20 @@ contract QuickswapYNFTVault is YNFTVault {
   }
 
   /**
+   * @dev Checks amounts of reward tokens earned in staking that are available to claim
+   * @return earnedA Amount of tokenA available to claim
+   * @return earnedB Amount of tokenB available to claim
+   */
+  function getRewardsToClaim()
+    external
+    view
+    returns (uint256 earnedA, uint256 earnedB)
+  {
+    earnedA = stakingDualRewards.earnedA(address(this));
+    earnedB = stakingDualRewards.earnedB(address(this));
+  }
+
+  /**
    * @dev Calculates underlying asset balance belonging to particular nft token id.
    * @param _nftTokenId NFT token id that gives access to certain balance of underlying asset.
    * @return Underlying asset balance for certain NFT token id.

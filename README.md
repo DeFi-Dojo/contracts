@@ -2,7 +2,7 @@
 
 ## Contracts
 
-We describe a few of the core contracts in the DeFi DOJO system. More information can be found in the [contract documentation](docs/).
+We describe a few of the core contracts in the DeFi DOJO system. More information can be found in the [contract documentation](docs.md).
 
 - **yNFT Vaults**
 
