@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.30.0](https://github.com/DeFi-Dojo/contracts/compare/v1.29.0...v1.30.0) (2022-04-25)
+
+
+### Features
+
+* getRewardsToClaim function in quickswap vault ([#78](https://github.com/DeFi-Dojo/contracts/issues/78)) ([cf1ced1](https://github.com/DeFi-Dojo/contracts/commit/cf1ced1c8401d9bd9f5f5cd1029056deb0b08041))
+
 # [1.29.0](https://github.com/DeFi-Dojo/contracts/compare/v1.28.0...v1.29.0) (2022-04-25)
 
 
