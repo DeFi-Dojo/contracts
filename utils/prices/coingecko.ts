@@ -21,3 +21,8 @@ export const getTokenPriceUSD = async (
     return console.error("Could not get token price", e);
   }
 };
+
+export const getTokenPricesUSD = async (tokenAddresses: [string, string]) =>
+  Promise.all(tokenAddresses.map(getTokenPriceUSD)) as Promise<
+    [number | void, number | void]
+  >;

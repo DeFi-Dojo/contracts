@@ -1,6 +1,6 @@
 import { Signer } from "ethers";
 import { formatEther, Interface } from "ethers/lib/utils";
-import { getTokenPriceUSD } from "../../../utils/prices/coingecko";
+import { getTokenPricesUSD } from "../../../utils/prices/coingecko";
 import { QuickswapYNFTVault__factory } from "../../../typechain";
 import { ADDRESSES, MIN_NET_REWARD_USD, VAULTS } from "./config";
 
@@ -17,21 +17,20 @@ const estimateClaimRewardsTxGas = (signer: Signer, vaultAddress: string) => {
 };
 
 const calculateNetRewardUSD = async (signer: Signer, vaultAddress: string) => {
-  const vault = QuickswapYNFTVault__factory.connect(
-    vaultAddress,
-    signer
-  ) as any;
+  const vault = QuickswapYNFTVault__factory.connect(vaultAddress, signer);
 
   const [rewardAmountDquick, rewardAmountWmatic] =
     await vault.getRewardsToClaim();
 
-  const [dquickPriceUSD, wmaticPriceUSD] = await Promise.all([
-    getTokenPriceUSD(ADDRESSES.DQUICK),
-    getTokenPriceUSD(ADDRESSES.WMATIC),
+  const [dquickPriceUSD, wmaticPriceUSD] = await getTokenPricesUSD([
+    ADDRESSES.DQUICK,
+    ADDRESSES.WMATIC,
   ]);
 
-  const rewardAmountDquickUSD = rewardAmountDquick * dquickPriceUSD!;
-  const rewardAmountWmaticUSD = rewardAmountWmatic * wmaticPriceUSD!;
+  const rewardAmountDquickUSD =
+    Number(formatEther(rewardAmountDquick)) * dquickPriceUSD!;
+  const rewardAmountWmaticUSD =
+    Number(formatEther(rewardAmountWmatic)) * wmaticPriceUSD!;
 
   const rewardsAmountUSD = rewardAmountDquickUSD + rewardAmountWmaticUSD;
 
@@ -39,8 +38,8 @@ const calculateNetRewardUSD = async (signer: Signer, vaultAddress: string) => {
     estimateClaimRewardsTxGas(signer, vaultAddress),
     signer.getGasPrice(),
   ]);
-
-  const gasFeeUSD = Number(formatEther(gas.mul(gasPrice))) * wmaticPriceUSD!;
+  const gasPriceUSD = Number(formatEther(gas.mul(gasPrice)));
+  const gasFeeUSD = gasPriceUSD * wmaticPriceUSD!;
 
   return rewardsAmountUSD - gasFeeUSD;
 };
