@@ -255,6 +255,21 @@ function getRewardLPMining() external nonpayable
 
 _Accrue rewards from LP mining to beneficiary address._
 
+### getRewardsToClaim
+
+```solidity
+function getRewardsToClaim() external view returns (uint256 earnedA, uint256 earnedB)
+```
+
+_Checks amounts of reward tokens earned in staking that are available to claim_
+
+#### Returns
+
+| Name    | Type    | Description                         |
+| ------- | ------- | ----------------------------------- |
+| earnedA | uint256 | Amount of tokenA available to claim |
+| earnedB | uint256 | Amount of tokenB available to claim |
+
 ### getRoleAdmin
 
 ```solidity
