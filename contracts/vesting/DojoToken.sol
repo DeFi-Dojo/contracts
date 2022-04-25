@@ -6,9 +6,9 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 contract DojoToken is ERC20 {
   string private name_ = "$DOJO Token";
   string private symbol_ = "DOJO";
-  uint256 private supply_ = 400000000;
+  uint256 private supply_ = 400000000 ether;
 
-  constructor() ERC20(name_, symbol_) {
-    _mint(msg.sender, supply_);
+  constructor(address _mintTarget) ERC20(name_, symbol_) {
+    _mint(_mintTarget, supply_);
   }
 }
