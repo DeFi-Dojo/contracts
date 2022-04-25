@@ -293,24 +293,14 @@ contract AaveYNFTVault is YNFTVault {
     balanceOf[_nftTokenId] = 0;
 
     yNFT.burn(_nftTokenId);
-    uint256 performanceFee = 0;
-    if (amountToWithdraw > amountToWithdrawWithoutAccruedRewards) {
-      uint256 performanceFeeToWithdraw = (performanceFeePerMille *
-        (amountToWithdraw - amountToWithdrawWithoutAccruedRewards)) / 1000;
-      performanceFee = pool.withdraw(
-        address(underlyingToken),
-        performanceFeeToWithdraw,
-        beneficiary
+    (
+      uint256 amountWithdrawn,
+      uint256 performanceFee
+    ) = withdrawFromPoolWithPerformanceFee(
+        amountToWithdraw,
+        amountToWithdrawWithoutAccruedRewards,
+        _receiver
       );
-    }
-    uint256 amountWithdrawn = pool.withdraw(
-      address(underlyingToken),
-      amountToWithdrawWithoutAccruedRewards +
-        ((amountToWithdraw - amountToWithdrawWithoutAccruedRewards) *
-          (1000 - performanceFeePerMille)) /
-        1000,
-      _receiver
-    );
     emit YNftWithdrawn(
       address(underlyingToken),
       _nftTokenId,
@@ -318,5 +308,34 @@ contract AaveYNFTVault is YNFTVault {
       performanceFee
     );
     return amountWithdrawn - performanceFee;
+  }
+
+  function withdrawFromPoolWithPerformanceFee(
+    uint256 _amountToWithdraw,
+    uint256 _amountToWithdrawWithoutAccruedRewards,
+    address _receiver
+  ) private returns (uint256, uint256) {
+    uint256 performanceFee = 0;
+
+    if (_amountToWithdraw > _amountToWithdrawWithoutAccruedRewards) {
+      uint256 performanceFeeToWithdraw = (performanceFeePerMille *
+        (_amountToWithdraw - _amountToWithdrawWithoutAccruedRewards)) / 1000;
+      performanceFee = pool.withdraw(
+        address(underlyingToken),
+        performanceFeeToWithdraw,
+        beneficiary
+      );
+    }
+
+    uint256 amountWithdrawn = pool.withdraw(
+      address(underlyingToken),
+      _amountToWithdrawWithoutAccruedRewards +
+        ((_amountToWithdraw - _amountToWithdrawWithoutAccruedRewards) *
+          (1000 - performanceFeePerMille)) /
+        1000,
+      _receiver
+    );
+
+    return (amountWithdrawn, performanceFee);
   }
 }
