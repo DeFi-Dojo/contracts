@@ -56,6 +56,8 @@ abstract contract YNFTVault is AccessControl, ReentrancyGuard, Pausable {
     beneficiary = _beneficiary;
   }
 
+  receive() external payable {}
+
   function pause() external onlyRole(DEFAULT_ADMIN_ROLE) {
     _pause();
   }
@@ -97,9 +99,10 @@ abstract contract YNFTVault is AccessControl, ReentrancyGuard, Pausable {
     emit BeneficiarySet(_beneficiary);
   }
 
-  function _calcFee(uint256 _price) internal view returns (uint256) {
-    return (_price * feePerMile) / 1000;
-  }
+  function balanceOfUnderlying(uint256 _nftTokenId)
+    external
+    virtual
+    returns (uint256);
 
   function _collectFeeEther() internal nonReentrant returns (uint256) {
     uint256 fee = _calcFee(msg.value);
@@ -191,10 +194,7 @@ abstract contract YNFTVault is AccessControl, ReentrancyGuard, Pausable {
     return amounts[1];
   }
 
-  function balanceOfUnderlying(uint256 _nftTokenId)
-    external
-    virtual
-    returns (uint256);
-
-  receive() external payable {}
+  function _calcFee(uint256 _price) internal view returns (uint256) {
+    return (_price * feePerMile) / 1000;
+  }
 }
