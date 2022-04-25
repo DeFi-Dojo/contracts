@@ -44,7 +44,7 @@ const calculateNetRewardUSD = async (signer: Signer, vaultAddress: string) => {
   return rewardsAmountUSD - gasFeeUSD;
 };
 
-const getQuickswapRewards =
+const harvestQuickswapRewards =
   (signer: Signer) =>
   async ({ vaultName, vaultAddress }: typeof VAULTS[0]) => {
     const vault = QuickswapYNFTVault__factory.connect(vaultAddress, signer);
@@ -52,7 +52,7 @@ const getQuickswapRewards =
 
     const netRewardUSD = await calculateNetRewardUSD(signer, vaultAddress);
 
-    if (netRewardUSD >= minAcceptableNetRewardUSD) {
+    if (netRewardUSD < minAcceptableNetRewardUSD) {
       const error = "Transaction not profitable";
       return { vaultName, vaultAddress, error: `${error}` };
     }
@@ -65,5 +65,5 @@ const getQuickswapRewards =
     }
   };
 
-export const quickswapRewardsGetter = async (signer: Signer) =>
-  Promise.all(VAULTS.map(getQuickswapRewards(signer)));
+export const quickswapHarvester = async (signer: Signer) =>
+  Promise.all(VAULTS.map(harvestQuickswapRewards(signer)));
