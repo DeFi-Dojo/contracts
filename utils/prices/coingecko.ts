@@ -6,9 +6,9 @@ export const coingeckoApi = axios.create({
   baseURL,
 });
 
-export const getTokenPriceUSD = async (
+export const getTokenPriceUsd = async (
   tokenAddress: string
-): Promise<number | void> => {
+): Promise<number> => {
   const url = `simple/token_price/polygon-pos?contract_addresses=${tokenAddress}&vs_currencies=USD`;
   type GetResult = { [address: string]: { usd: number } };
 
@@ -18,11 +18,12 @@ export const getTokenPriceUSD = async (
 
     return priceUSD;
   } catch (e) {
-    return console.error("Could not get token price", e);
+    console.log(e);
+    throw new Error("Could not get token price");
   }
 };
 
-export const getTokenPricesUSD = async (tokenAddresses: [string, string]) =>
-  Promise.all(tokenAddresses.map(getTokenPriceUSD)) as Promise<
-    [number | void, number | void]
+export const getTokenPricesUsd = async (tokenAddresses: [string, string]) =>
+  Promise.all(tokenAddresses.map(getTokenPriceUsd)) as Promise<
+    [number, number]
   >;

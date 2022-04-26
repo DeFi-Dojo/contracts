@@ -1,4 +1,4 @@
 import { makeHandler } from "../../handler";
-import { quickswapRewardsGetter } from "./quickswap-harvester";
+import { quickswapHarvester } from "./quickswap-harvester";
 
-export const handler = makeHandler(quickswapRewardsGetter);
+export const handler = makeHandler(quickswapHarvester);
