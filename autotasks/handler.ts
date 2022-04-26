@@ -4,27 +4,20 @@ import {
 } from "defender-relay-client/lib/ethers";
 import { AutotaskEvent } from "defender-autotask-utils";
 import { Signer } from "ethers";
+import { RelayerParams } from "defender-relay-client";
 
 export const makeHandler =
   <T>(callback: (signer: Signer) => Promise<T> | T) =>
   async (event: AutotaskEvent): Promise<T> => {
-    if (event.credentials === undefined || event.relayerARN === undefined) {
+    if (!event.credentials || !event.relayerARN) {
       throw new Error("Relayer not provided");
     }
 
-    const provider = new DefenderRelayProvider({
-      credentials: event.credentials,
-      relayerARN: event.relayerARN,
+    const relayerParams = event as RelayerParams;
+    const provider = new DefenderRelayProvider(relayerParams);
+    const signer = new DefenderRelaySigner(relayerParams, provider, {
+      speed: "fast",
     });
-
-    const signer = new DefenderRelaySigner(
-      {
-        credentials: event.credentials,
-        relayerARN: event.relayerARN,
-      },
-      provider,
-      { speed: "fast" }
-    );
 
     return callback(signer);
   };
