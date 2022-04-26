@@ -1,8 +1,10 @@
 import { Signer } from "ethers";
 import { formatEther, Interface } from "ethers/lib/utils";
-import { getTokenPricesUSD } from "../../../utils/prices/coingecko";
+import { getTokenPricesUsd } from "../../../utils/prices/coingecko";
 import { QuickswapYNFTVault__factory } from "../../../typechain";
 import { ADDRESSES, MIN_NET_REWARD_USD, VAULTS } from "./config";
+
+type Prices = { wmatic: number; dquick: number };
 
 const QuickswapYNFTVaultInterface = new Interface(
   QuickswapYNFTVault__factory.abi
@@ -16,54 +18,84 @@ const estimateClaimRewardsTxGas = (signer: Signer, vaultAddress: string) => {
   return signer.estimateGas({ to: vaultAddress, data });
 };
 
-const calculateNetRewardUSD = async (signer: Signer, vaultAddress: string) => {
+const calculateNetRewardUsd = async (
+  signer: Signer,
+  vaultAddress: string,
+  pricesUsd: Prices
+) => {
   const vault = QuickswapYNFTVault__factory.connect(vaultAddress, signer);
 
   const [rewardAmountDquick, rewardAmountWmatic] =
     await vault.getRewardsToClaim();
+  console.log({ rewardAmountDquick, rewardAmountWmatic });
 
-  const [dquickPriceUSD, wmaticPriceUSD] = await getTokenPricesUSD([
-    ADDRESSES.DQUICK,
-    ADDRESSES.WMATIC,
-  ]);
+  const rewardAmountDquickUsd =
+    Number(formatEther(rewardAmountDquick)) * pricesUsd.dquick;
+  const rewardAmountWmaticUsd =
+    Number(formatEther(rewardAmountWmatic)) * pricesUsd.wmatic;
 
-  const rewardAmountDquickUSD =
-    Number(formatEther(rewardAmountDquick)) * dquickPriceUSD!;
-  const rewardAmountWmaticUSD =
-    Number(formatEther(rewardAmountWmatic)) * wmaticPriceUSD!;
+  const rewardsAmountUsd = rewardAmountDquickUsd + rewardAmountWmaticUsd;
 
-  const rewardsAmountUSD = rewardAmountDquickUSD + rewardAmountWmaticUSD;
-
-  const [gas, gasPrice] = await Promise.all([
-    estimateClaimRewardsTxGas(signer, vaultAddress),
+  const [gasPrice, gas] = await Promise.all([
     signer.getGasPrice(),
+    estimateClaimRewardsTxGas(signer, vaultAddress),
   ]);
-  const gasPriceUSD = Number(formatEther(gas.mul(gasPrice)));
-  const gasFeeUSD = gasPriceUSD * wmaticPriceUSD!;
+  console.log({ gas, gasPrice });
 
-  return rewardsAmountUSD - gasFeeUSD;
+  const gasFeeMatic = Number(formatEther(gas.mul(gasPrice)));
+  const gasFeeUsd = gasFeeMatic * pricesUsd.wmatic;
+
+  console.log({ gasFeeUsd });
+
+  return rewardsAmountUsd - gasFeeUsd;
 };
 
 const harvestQuickswapRewards =
-  (signer: Signer) =>
+  (signer: Signer, prices: Prices) =>
   async ({ vaultName, vaultAddress }: typeof VAULTS[0]) => {
     const vault = QuickswapYNFTVault__factory.connect(vaultAddress, signer);
-    const minAcceptableNetRewardUSD = MIN_NET_REWARD_USD;
-
-    const netRewardUSD = await calculateNetRewardUSD(signer, vaultAddress);
-
-    if (netRewardUSD < minAcceptableNetRewardUSD) {
-      const error = "Transaction not profitable";
-      return { vaultName, vaultAddress, error: `${error}` };
-    }
+    console.log({ vaultName, vaultAddress });
 
     try {
-      const tx = await (vault as any).claimRewards();
+      const netRewardUsd = await calculateNetRewardUsd(
+        signer,
+        vaultAddress,
+        prices
+      );
+      console.log({ netRewardUsd });
+
+      if (netRewardUsd < MIN_NET_REWARD_USD) {
+        const error = "Transaction not profitable";
+        return {
+          vaultName,
+          vaultAddress,
+          error: `${error}`,
+          netRewardUsd,
+          minNetRewardUsd: MIN_NET_REWARD_USD,
+        };
+      }
+
+      const tx = await vault.claimRewards();
       return { vaultName, vaultAddress, txHash: tx.hash };
     } catch (error) {
       return { vaultName, vaultAddress, error: `${error}` };
     }
   };
 
-export const quickswapHarvester = async (signer: Signer) =>
-  Promise.all(VAULTS.map(harvestQuickswapRewards(signer)));
+const getRewardTokenPrices = async (): Promise<Prices> => {
+  const [dquickPriceUsd, wmaticPriceUsd] = await getTokenPricesUsd([
+    ADDRESSES.DQUICK,
+    ADDRESSES.WMATIC,
+  ]);
+  console.log({ dquickPriceUsd, wmaticPriceUsd });
+
+  return {
+    dquick: dquickPriceUsd,
+    wmatic: wmaticPriceUsd,
+  };
+};
+
+export const quickswapHarvester = async (signer: Signer) => {
+  const pricesUsd = await getRewardTokenPrices();
+  return Promise.all(VAULTS.map(harvestQuickswapRewards(signer, pricesUsd)));
+};
