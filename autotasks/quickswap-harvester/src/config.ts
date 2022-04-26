@@ -1,6 +1,7 @@
 import { NETWORK_ADDRESSES } from "../../../consts";
 import { getDeployedVaultsQuickswap } from "../../../consts/deployed";
 
+export const GAS_LIMIT = 1000000;
 export const MATIC_CHAIN_ID = 137;
 export const ADDRESSES = NETWORK_ADDRESSES.MATIC;
 export const MIN_NET_REWARD_USD = 0.01;
