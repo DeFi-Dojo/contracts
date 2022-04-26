@@ -73,6 +73,7 @@ task(
         taskArgs.quickswapTokenPairAddress,
         taskArgs.quickswapStakingDualRewardsAddress,
         ADDRESSES.DQUICK,
+        ADDRESSES.WMATIC,
         HARVESTER_ADDRESS,
         BENEFICIARY_ADDRESS,
         "Dojo yNFT",
