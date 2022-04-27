@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.33.1](https://github.com/DeFi-Dojo/contracts/compare/v1.33.0...v1.33.1) (2022-04-27)
+
+
+### Bug Fixes
+
+* error 1 on withdraw to ether in aave vaults ([#83](https://github.com/DeFi-Dojo/contracts/issues/83)) ([cfa8248](https://github.com/DeFi-Dojo/contracts/commit/cfa8248962747cb7703dfc7e2cfac734e098f258))
+
 # [1.33.0](https://github.com/DeFi-Dojo/contracts/compare/v1.32.0...v1.33.0) (2022-04-27)
 
 
