@@ -1308,6 +1308,11 @@ describe("QuickswapYNFTVault", () => {
     stakingDualRewardsMock.earnedA.returns(EARNED_A);
     stakingDualRewardsMock.earnedB.returns(EARNED_B);
     const earned = await quickswapYnftVault.getRewardsToClaim();
-    expect(earned.toString()).to.be.equal([ethers.BigNumber.from(EARNED_A), ethers.BigNumber.from(EARNED_B)].toString());
+    expect(earned.toString()).to.be.equal(
+      [
+        ethers.BigNumber.from(EARNED_A),
+        ethers.BigNumber.from(EARNED_B),
+      ].toString()
+    );
   });
 });

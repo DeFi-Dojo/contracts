@@ -1,21 +1,16 @@
 node_modules
-
-#Hardhat files
+dist
+autotasks/*/dist
 cache
 artifacts
 typechain
-
+contracts-myth
+coverage
+.eslintcache
 .history
-
 .env
-
 yarn-error.log
 
 .vscode
 .idea
-
-dist
-contracts-myth
-coverage
-
 .DS_Store
