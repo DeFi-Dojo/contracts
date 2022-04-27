@@ -316,23 +316,25 @@ contract AaveYNFTVault is YNFTVault {
     address _receiver
   ) private returns (uint256, uint256) {
     uint256 performanceFee = 0;
+    uint256 performanceFeeToWithdraw = 0;
 
     if (_amountToWithdraw > _amountToWithdrawWithoutAccruedRewards) {
-      uint256 performanceFeeToWithdraw = (performanceFeePerMille *
-        (_amountToWithdraw - _amountToWithdrawWithoutAccruedRewards)) / 1000;
-      performanceFee = pool.withdraw(
-        address(underlyingToken),
-        performanceFeeToWithdraw,
-        beneficiary
-      );
+      performanceFeeToWithdraw =
+        (performanceFeePerMille *
+          (_amountToWithdraw - _amountToWithdrawWithoutAccruedRewards)) /
+        1000;
+      if (performanceFeeToWithdraw > 0) {
+        performanceFee = pool.withdraw(
+          address(underlyingToken),
+          performanceFeeToWithdraw,
+          beneficiary
+        );
+      }
     }
 
     uint256 amountWithdrawn = pool.withdraw(
       address(underlyingToken),
-      _amountToWithdrawWithoutAccruedRewards +
-        ((_amountToWithdraw - _amountToWithdrawWithoutAccruedRewards) *
-          (1000 - performanceFeePerMille)) /
-        1000,
+      _amountToWithdraw - performanceFeeToWithdraw,
       _receiver
     );
 
