@@ -195,15 +195,7 @@ contract AaveYNFTVault is YNFTVault {
    * @return Amount to claim.
    */
   function getAmountToClaim() external view returns (uint256) {
-    address[] memory assets = new address[](1);
-    assets[0] = address(aToken);
-
-    uint256 amountToClaim = incentivesController.getRewardsBalance(
-      assets,
-      address(this)
-    );
-
-    return amountToClaim;
+    return incentivesController.getUserUnclaimedRewards(address(this));
   }
 
   /**
