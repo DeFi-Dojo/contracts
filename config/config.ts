@@ -27,6 +27,7 @@ const {
   MORALIS_MASTER_KEY,
   MORALIS_IPFS_URL,
   ETHERSCAN_API_KEY,
+  DEFAULT_ADMIN_ROLE_ADDRESS,
 } = process.env;
 
 if (
@@ -51,7 +52,8 @@ if (
   MORALIS_SERVER_URL === undefined ||
   MORALIS_APP_ID === undefined ||
   MORALIS_MASTER_KEY === undefined ||
-  MORALIS_IPFS_URL === undefined
+  MORALIS_IPFS_URL === undefined ||
+  DEFAULT_ADMIN_ROLE_ADDRESS === undefined
 ) {
   throw new Error("ENV not valid");
 }
@@ -81,4 +83,5 @@ export default {
   MORALIS_MASTER_KEY,
   MORALIS_IPFS_URL,
   ETHERSCAN_API_KEY,
+  DEFAULT_ADMIN_ROLE_ADDRESS,
 };

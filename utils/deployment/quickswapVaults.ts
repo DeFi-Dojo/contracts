@@ -1,3 +1,4 @@
+import { ethers } from "hardhat";
 import {
   DummyQuickswapYNFTVault,
   DummyQuickswapYNFTVault__factory,
@@ -15,8 +16,13 @@ import { resultToPromiseFn, sequence, wait } from "../promises";
 import { uploadYnftMetadata } from "../ynft-metadata";
 import { createDeployContract } from "./deployment";
 
-const { ADDRESSES, HARVESTER_ADDRESS, BENEFICIARY_ADDRESS, MORALIS_IPFS_URL } =
-  configEnv;
+const {
+  ADDRESSES,
+  HARVESTER_ADDRESS,
+  BENEFICIARY_ADDRESS,
+  MORALIS_IPFS_URL,
+  DEFAULT_ADMIN_ROLE_ADDRESS,
+} = configEnv;
 
 type Config = {
   isDummyVault?: boolean;
@@ -49,8 +55,20 @@ const deployQuickswapYnftVault =
     ).then((v) => v as DummyQuickswapYNFTVault | QuickswapYNFTVault);
 
     const ynftAddress = await contract.yNFT();
-    console.log(`Deployed vault yNFT address: ${ynftAddress}\n`);
+    console.log(`Deployed vault yNFT address: ${ynftAddress}`);
     await wait(100);
+    await contract.grantRole(
+      await contract.DEFAULT_ADMIN_ROLE(),
+      DEFAULT_ADMIN_ROLE_ADDRESS
+    );
+    const [defaultAdmin] = await ethers.getSigners();
+    await contract.renounceRole(
+      await contract.DEFAULT_ADMIN_ROLE(),
+      defaultAdmin.address
+    );
+    console.log(
+      `DEFAULT_ADMIN_ROLE granted to: ${DEFAULT_ADMIN_ROLE_ADDRESS}\n`
+    );
   };
 
 const deployQuickswapVaultWithMetadata =
