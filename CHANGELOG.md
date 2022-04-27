@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.32.0](https://github.com/DeFi-Dojo/contracts/compare/v1.31.1...v1.32.0) (2022-04-27)
+
+
+### Features
+
+* transfer admin role to address from env and revoke for deployer on vault deployment ([#81](https://github.com/DeFi-Dojo/contracts/issues/81)) ([789d26e](https://github.com/DeFi-Dojo/contracts/commit/789d26e2f8bbc5b47f5f419bf2c656c2816d2291))
+
 ## [1.31.1](https://github.com/DeFi-Dojo/contracts/compare/v1.31.0...v1.31.1) (2022-04-25)
 
 # [1.31.0](https://github.com/DeFi-Dojo/contracts/compare/v1.30.0...v1.31.0) (2022-04-25)
