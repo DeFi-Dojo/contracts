@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.33.0](https://github.com/DeFi-Dojo/contracts/compare/v1.32.0...v1.33.0) (2022-04-27)
+
+
+### Features
+
+* dex-245 quickswap autotask sending tx rules ([#79](https://github.com/DeFi-Dojo/contracts/issues/79)) ([2a6b167](https://github.com/DeFi-Dojo/contracts/commit/2a6b1674c568cfb0476c3228a87c39c5d1ab3a32))
+
 # [1.32.0](https://github.com/DeFi-Dojo/contracts/compare/v1.31.1...v1.32.0) (2022-04-27)
 
 
