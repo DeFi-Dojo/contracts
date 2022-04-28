@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.34.0](https://github.com/DeFi-Dojo/contracts/compare/v1.33.1...v1.34.0) (2022-04-28)
+
+
+### Features
+
+* fix aave get amount to claim ([#82](https://github.com/DeFi-Dojo/contracts/issues/82)) ([e9ce4d4](https://github.com/DeFi-Dojo/contracts/commit/e9ce4d4bd84b7e8ec72579f2ed150f35fc50c6b8))
+
 ## [1.33.1](https://github.com/DeFi-Dojo/contracts/compare/v1.33.0...v1.33.1) (2022-04-27)
 
 
