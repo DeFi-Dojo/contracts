@@ -4,22 +4,6 @@ import { getTokenPricesUsd } from "../../../utils/prices/coingecko";
 import { QuickswapYNFTVault__factory } from "../../../typechain";
 import { ADDRESSES, GAS_LIMIT, VAULTS } from "./config";
 
-type Prices = { wmatic: number; dquick: number };
-
-type VaultConfig = typeof VAULTS[0];
-
-type SuccessResult = {
-  vault: VaultConfig;
-  txHash: string;
-};
-
-type FailureResult = {
-  vault: VaultConfig;
-  error: string;
-};
-
-type Result = SuccessResult | FailureResult;
-
 export const quickswapHarvester = async (
   signer: Signer
 ): Promise<Array<SuccessResult | FailureResult>> => {
@@ -40,21 +24,31 @@ const getRewardTokenPrices = async (): Promise<Prices> => {
   };
 };
 
+const roundToCents = (value: number) =>
+  Number(parseFloat(`${value}`).toFixed(2));
+
 const harvestQuickswapRewards =
   (signer: Signer, prices: Prices) =>
   async (vaultConfig: VaultConfig): Promise<Result> => {
     const { vaultName, vaultAddress, minNetRewardUsd } = vaultConfig;
     const vault = QuickswapYNFTVault__factory.connect(vaultAddress, signer);
-    console.log(vaultName, { vaultName, vaultAddress });
+    console.log(vaultName, { vaultName, vaultAddress, minNetRewardUsd });
 
     try {
-      const netRewardUsd = await calculateNetRewardUsd(
+      const grossRewardUsd = await getGrossRewardUsd(
         signer,
         vaultConfig,
         prices
       );
-      console.log(vaultName, { netRewardUsd, minNetRewardUsd });
+      console.log(vaultName, { grossRewardUsd });
+      if (roundToCents(grossRewardUsd) === 0) {
+        throw new Error("Nothing to claim");
+      }
 
+      const gasFeeUsd = await getGasFeeUsd(signer, vaultConfig, prices);
+
+      const netRewardUsd = grossRewardUsd - gasFeeUsd;
+      console.log(vaultName, { gasFeeUsd, netRewardUsd });
       if (netRewardUsd < minNetRewardUsd) {
         throw new Error("Not enough to claim");
       }
@@ -67,7 +61,7 @@ const harvestQuickswapRewards =
     }
   };
 
-const calculateNetRewardUsd = async (
+const getGrossRewardUsd = async (
   signer: Signer,
   vaultConfig: VaultConfig,
   pricesUsd: Prices
@@ -85,18 +79,7 @@ const calculateNetRewardUsd = async (
   const rewardAmountWmaticUsd =
     Number(formatEther(rewardAmountWmatic)) * pricesUsd.wmatic;
 
-  const rewardsAmountUsd = rewardAmountDquickUsd + rewardAmountWmaticUsd;
-
-  try {
-    const gasFeeUsd = await getGasFeeUsd(signer, vaultConfig, pricesUsd);
-
-    console.log({ gasFeeUsd, rewardsAmountUsd });
-    return rewardsAmountUsd - gasFeeUsd;
-  } catch (e) {
-    console.log(vaultConfig.vaultName, e);
-
-    throw new Error("Could not get gasPrice and gas estimation");
-  }
+  return rewardAmountDquickUsd + rewardAmountWmaticUsd;
 };
 
 const getGasFeeUsd = async (
@@ -119,3 +102,15 @@ const estimateClaimRewardsTxGas = (signer: Signer, vaultAddress: string) => {
   ).encodeFunctionData("claimRewards", []);
   return signer.estimateGas({ to: vaultAddress, data });
 };
+
+type Result = SuccessResult | FailureResult;
+type SuccessResult = {
+  vault: VaultConfig;
+  txHash: string;
+};
+type FailureResult = {
+  vault: VaultConfig;
+  error: string;
+};
+type VaultConfig = typeof VAULTS[0];
+type Prices = { wmatic: number; dquick: number };
