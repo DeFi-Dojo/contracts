@@ -1,5 +1,7 @@
 # Changelog
 
+## [1.34.1](https://github.com/DeFi-Dojo/contracts/compare/v1.34.0...v1.34.1) (2022-04-28)
+
 # [1.34.0](https://github.com/DeFi-Dojo/contracts/compare/v1.33.1...v1.34.0) (2022-04-28)
 
 
