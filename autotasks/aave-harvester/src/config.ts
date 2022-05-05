@@ -12,16 +12,15 @@ export const ADDRESSES = {
 };
 
 const minNetRewardUsdPerVault: { [k in AaveVaultName]: number } = {
-  [AaveVaultName.dai]: 0.01,
-  [AaveVaultName.usdc]: 0.01,
-  [AaveVaultName.usdt]: 0.01,
+  [AaveVaultName.dai]: 0.1,
+  [AaveVaultName.usdc]: 0.1,
+  [AaveVaultName.usdt]: 0.1,
 };
 
 export const PRICE_FEED_DECIMALS = 8;
 export const SLIPPAGE_PERCANTAGE = 3;
 export const ALL_PERCANTAGE = 100;
 export const DEADLINE_SECONDS = 60;
-export const MIN_CLAIM_AMOUNT = 500000000000000000; // 0.5 MATIC
 export const VAULTS = Object.entries(getDeployedVaultsAave()).map(
   ([vaultName, vault]) => ({
     vaultName,

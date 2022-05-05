@@ -1,10 +1,10 @@
 import { BigNumber, Signer } from "ethers";
 import { formatEther, Interface } from "ethers/lib/utils";
 
-import { AaveYNFTVault__factory } from "../../typechain";
-import { getTokenPriceUsd } from "../../utils/prices/coingecko";
+import { AaveYNFTVault__factory } from "../../../typechain";
+import { getTokenPriceUsd } from "../../../utils/prices/coingecko";
 
-import { AggregatorV3Interface__factory } from "./src/factories";
+import { AggregatorV3Interface__factory } from "./factories";
 import {
   ADDRESSES,
   ALL_PERCANTAGE,
@@ -12,7 +12,7 @@ import {
   PRICE_FEED_DECIMALS,
   SLIPPAGE_PERCANTAGE,
   VAULTS,
-} from "./src/config";
+} from "./config";
 
 export const aaveHarvester = async (signer: Signer) => {
   const prices = await getRewardTokenPrices();

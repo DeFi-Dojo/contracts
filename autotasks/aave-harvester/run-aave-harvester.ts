@@ -1,5 +1,5 @@
 import { ethers } from "hardhat";
-import { aaveHarvester } from "./aave-harvester";
+import { aaveHarvester } from "./src/aave-harvester";
 
 const runAaveHarvester = async () => {
   const [signer] = await ethers.getSigners();
