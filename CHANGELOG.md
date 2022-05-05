@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.35.0](https://github.com/DeFi-Dojo/contracts/compare/v1.34.1...v1.35.0) (2022-05-05)
+
+
+### Features
+
+* dex-559 adjust aave autotask ([#85](https://github.com/DeFi-Dojo/contracts/issues/85)) ([6740c89](https://github.com/DeFi-Dojo/contracts/commit/6740c896e4494f99fb9cb20230fd95175b6d5d9d))
+
 ## [1.34.1](https://github.com/DeFi-Dojo/contracts/compare/v1.34.0...v1.34.1) (2022-04-28)
 
 # [1.34.0](https://github.com/DeFi-Dojo/contracts/compare/v1.33.1...v1.34.0) (2022-04-28)
