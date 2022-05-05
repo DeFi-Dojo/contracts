@@ -11,6 +11,7 @@
   "plugins": ["@typescript-eslint"],
   "rules": {
     "no-console": "off",
+    "@typescript-eslint/no-use-before-define": "off",
     "@typescript-eslint/quotes": ["warn", "double"],
     "import/prefer-default-export": "off"
   }

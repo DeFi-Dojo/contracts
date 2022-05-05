@@ -2,15 +2,11 @@ import { Signer } from "ethers";
 import { formatEther, Interface } from "ethers/lib/utils";
 import { getTokenPricesUsd } from "../../../utils/prices/coingecko";
 import { QuickswapYNFTVault__factory } from "../../../typechain";
-import { ADDRESSES, GAS_LIMIT, MIN_NET_REWARD_USD, VAULTS } from "./config";
+import { ADDRESSES, GAS_LIMIT, VAULTS } from "./config";
 
-type Prices = { wmatic: number; dquick: number };
-
-const QuickswapYNFTVaultInterface = new Interface(
-  QuickswapYNFTVault__factory.abi
-);
-
-export const quickswapHarvester = async (signer: Signer) => {
+export const quickswapHarvester = async (
+  signer: Signer
+): Promise<Array<SuccessResult | FailureResult>> => {
   const pricesUsd = await getRewardTokenPrices();
   return Promise.all(VAULTS.map(harvestQuickswapRewards(signer, pricesUsd)));
 };
@@ -28,51 +24,52 @@ const getRewardTokenPrices = async (): Promise<Prices> => {
   };
 };
 
+const roundToCents = (value: number) =>
+  Number(parseFloat(`${value}`).toFixed(2));
+
 const harvestQuickswapRewards =
   (signer: Signer, prices: Prices) =>
-  async ({ vaultName, vaultAddress }: typeof VAULTS[0]) => {
+  async (vaultConfig: VaultConfig): Promise<Result> => {
+    const { vaultName, vaultAddress, minNetRewardUsd } = vaultConfig;
     const vault = QuickswapYNFTVault__factory.connect(vaultAddress, signer);
-    console.log(vaultName, { vaultName, vaultAddress });
+    console.log(vaultName, { vaultName, vaultAddress, minNetRewardUsd });
 
     try {
-      const minNetRewardUsd = MIN_NET_REWARD_USD;
-      const netRewardUsd = await calculateNetRewardUsd(
+      const grossRewardUsd = await getGrossRewardUsd(
         signer,
-        vaultAddress,
+        vaultConfig,
         prices
       );
-      console.log(vaultName, { netRewardUsd, minNetRewardUsd });
+      console.log(vaultName, { grossRewardUsd });
+      if (roundToCents(grossRewardUsd) === 0) {
+        throw new Error("Nothing to claim");
+      }
 
-      if (netRewardUsd < MIN_NET_REWARD_USD) {
-        const error = "Transaction not profitable";
-        return {
-          vaultName,
-          vaultAddress,
-          error: `${error}`,
-          netRewardUsd,
-          minNetRewardUsd,
-        };
+      const gasFeeUsd = await getGasFeeUsd(signer, vaultConfig, prices);
+
+      const netRewardUsd = grossRewardUsd - gasFeeUsd;
+      console.log(vaultName, { gasFeeUsd, netRewardUsd });
+      if (netRewardUsd < minNetRewardUsd) {
+        throw new Error("Not enough to claim");
       }
 
       const tx = await vault.claimRewards({ gasLimit: GAS_LIMIT });
-      return {
-        vaultName,
-        vaultAddress,
-        txHash: tx.hash,
-        netRewardUsd,
-        minNetRewardUsd,
-      };
+
+      return { vault: vaultConfig, txHash: tx.hash };
     } catch (error) {
-      return { vaultName, vaultAddress, error: `${error}` };
+      return { vault: vaultConfig, error: `${error}` };
     }
   };
 
-const calculateNetRewardUsd = async (
+const getGrossRewardUsd = async (
   signer: Signer,
-  vaultAddress: string,
+  vaultConfig: VaultConfig,
   pricesUsd: Prices
 ) => {
-  const vault = QuickswapYNFTVault__factory.connect(vaultAddress, signer);
+  const vault = QuickswapYNFTVault__factory.connect(
+    vaultConfig.vaultAddress,
+    signer
+  );
 
   const [rewardAmountDquick, rewardAmountWmatic] =
     await vault.getRewardsToClaim();
@@ -82,30 +79,38 @@ const calculateNetRewardUsd = async (
   const rewardAmountWmaticUsd =
     Number(formatEther(rewardAmountWmatic)) * pricesUsd.wmatic;
 
-  const rewardsAmountUsd = rewardAmountDquickUsd + rewardAmountWmaticUsd;
+  return rewardAmountDquickUsd + rewardAmountWmaticUsd;
+};
 
-  try {
-    const [gasPrice, gas] = await Promise.all([
-      signer.getGasPrice(),
-      estimateClaimRewardsTxGas(signer, vaultAddress).catch(),
-    ]);
+const getGasFeeUsd = async (
+  signer: Signer,
+  { vaultAddress }: VaultConfig,
+  pricesUsd: Prices
+) => {
+  const [gasPrice, gas] = await Promise.all([
+    signer.getGasPrice(),
+    estimateClaimRewardsTxGas(signer, vaultAddress).catch(),
+  ]);
 
-    const gasFeeMatic = Number(formatEther(gas.mul(gasPrice)));
-    const gasFeeUsd = gasFeeMatic * pricesUsd.wmatic;
-
-    console.log({ gasFeeUsd, rewardsAmountUsd });
-    return rewardsAmountUsd - gasFeeUsd;
-  } catch (e) {
-    console.log({ vaultAddress }, e);
-
-    throw new Error("Could not get gasPrice and gas estimation");
-  }
+  const gasFeeMatic = Number(formatEther(gas.mul(gasPrice)));
+  return gasFeeMatic * pricesUsd.wmatic;
 };
 
 const estimateClaimRewardsTxGas = (signer: Signer, vaultAddress: string) => {
-  const data = QuickswapYNFTVaultInterface.encodeFunctionData(
-    "claimRewards",
-    []
-  );
+  const data = new Interface(
+    QuickswapYNFTVault__factory.abi
+  ).encodeFunctionData("claimRewards", []);
   return signer.estimateGas({ to: vaultAddress, data });
 };
+
+type Result = SuccessResult | FailureResult;
+type SuccessResult = {
+  vault: VaultConfig;
+  txHash: string;
+};
+type FailureResult = {
+  vault: VaultConfig;
+  error: string;
+};
+type VaultConfig = typeof VAULTS[0];
+type Prices = { wmatic: number; dquick: number };
