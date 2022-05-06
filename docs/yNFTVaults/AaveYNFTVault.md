@@ -1,13 +1,5 @@
 # AaveYNFTVault
 
-
-
-
-
-
-
-
-
 ## Methods
 
 ### DEFAULT_ADMIN_ROLE
@@ -16,16 +8,11 @@
 function DEFAULT_ADMIN_ROLE() external view returns (bytes32)
 ```
 
-
-
-
-
-
 #### Returns
 
-| Name | Type | Description |
-|---|---|---|
-| _0 | bytes32 | undefined |
+| Name | Type    | Description |
+| ---- | ------- | ----------- |
+| \_0  | bytes32 | undefined   |
 
 ### HARVESTER_ROLE
 
@@ -33,16 +20,11 @@ function DEFAULT_ADMIN_ROLE() external view returns (bytes32)
 function HARVESTER_ROLE() external view returns (bytes32)
 ```
 
-
-
-
-
-
 #### Returns
 
-| Name | Type | Description |
-|---|---|---|
-| _0 | bytes32 | undefined |
+| Name | Type    | Description |
+| ---- | ------- | ----------- |
+| \_0  | bytes32 | undefined   |
 
 ### aToken
 
@@ -50,16 +32,11 @@ function HARVESTER_ROLE() external view returns (bytes32)
 function aToken() external view returns (contract IAToken)
 ```
 
-
-
-
-
-
 #### Returns
 
-| Name | Type | Description |
-|---|---|---|
-| _0 | contract IAToken | undefined |
+| Name | Type             | Description |
+| ---- | ---------------- | ----------- |
+| \_0  | contract IAToken | undefined   |
 
 ### balanceOf
 
@@ -67,21 +44,17 @@ function aToken() external view returns (contract IAToken)
 function balanceOf(uint256) external view returns (uint256)
 ```
 
-
-
-
-
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint256 | undefined |
+| Name | Type    | Description |
+| ---- | ------- | ----------- |
+| \_0  | uint256 | undefined   |
 
 #### Returns
 
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint256 | undefined |
+| Name | Type    | Description |
+| ---- | ------- | ----------- |
+| \_0  | uint256 | undefined   |
 
 ### balanceOfUnderlying
 
@@ -89,21 +62,39 @@ function balanceOf(uint256) external view returns (uint256)
 function balanceOfUnderlying(uint256 _nftTokenId) external view returns (uint256)
 ```
 
-
-
-*Calculates underlying asset balance belonging to particular yNFT token id.*
+_Calculates underlying asset balance belonging to particular yNFT token id._
 
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| _nftTokenId | uint256 | NFT token id that gives access to certain balance of underlying asset. |
+| Name         | Type    | Description                                                            |
+| ------------ | ------- | ---------------------------------------------------------------------- |
+| \_nftTokenId | uint256 | NFT token id that gives access to certain balance of underlying asset. |
 
 #### Returns
 
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint256 | Underlying asset balance for certain NFT token id. |
+| Name | Type    | Description                                        |
+| ---- | ------- | -------------------------------------------------- |
+| \_0  | uint256 | Underlying asset balance for certain NFT token id. |
+
+### balanceOfUnderlyingAtBuy
+
+```solidity
+function balanceOfUnderlyingAtBuy(uint256 _nftTokenId) external view returns (uint256)
+```
+
+_Returns underlying asset balance at the moment of yNft purchase._
+
+#### Parameters
+
+| Name         | Type    | Description                                                            |
+| ------------ | ------- | ---------------------------------------------------------------------- |
+| \_nftTokenId | uint256 | NFT token id that gives access to certain balance of underlying asset. |
+
+#### Returns
+
+| Name | Type    | Description                                                    |
+| ---- | ------- | -------------------------------------------------------------- |
+| \_0  | uint256 | Underlying asset balance at purchase for certain NFT token id. |
 
 ### balancesAtBuy
 
@@ -111,22 +102,18 @@ function balanceOfUnderlying(uint256 _nftTokenId) external view returns (uint256
 function balancesAtBuy(uint256) external view returns (uint256 tokenBalance, uint256 totalSupply)
 ```
 
-
-
-
-
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint256 | undefined |
+| Name | Type    | Description |
+| ---- | ------- | ----------- |
+| \_0  | uint256 | undefined   |
 
 #### Returns
 
-| Name | Type | Description |
-|---|---|---|
-| tokenBalance | uint256 | undefined |
-| totalSupply | uint256 | undefined |
+| Name         | Type    | Description |
+| ------------ | ------- | ----------- |
+| tokenBalance | uint256 | undefined   |
+| totalSupply  | uint256 | undefined   |
 
 ### beneficiary
 
@@ -134,16 +121,11 @@ function balancesAtBuy(uint256) external view returns (uint256 tokenBalance, uin
 function beneficiary() external view returns (address)
 ```
 
-
-
-
-
-
 #### Returns
 
-| Name | Type | Description |
-|---|---|---|
-| _0 | address | undefined |
+| Name | Type    | Description |
+| ---- | ------- | ----------- |
+| \_0  | address | undefined   |
 
 ### claimRewards
 
@@ -151,16 +133,14 @@ function beneficiary() external view returns (address)
 function claimRewards(uint256 _amountOutMin, uint256 _deadline) external nonpayable
 ```
 
-
-
-*Claims AAVE rewards, swaps to underlying token, deposits to the pool.*
+_Claims AAVE rewards, swaps to underlying token, deposits to the pool._
 
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| _amountOutMin | uint256 | The minimum amount of output tokens that must be received for the swap not to revert. |
-| _deadline | uint256 | Unix timestamp after which the transaction will revert. |
+| Name           | Type    | Description                                                                           |
+| -------------- | ------- | ------------------------------------------------------------------------------------- |
+| \_amountOutMin | uint256 | The minimum amount of output tokens that must be received for the swap not to revert. |
+| \_deadline     | uint256 | Unix timestamp after which the transaction will revert.                               |
 
 ### createYNFT
 
@@ -168,18 +148,16 @@ function claimRewards(uint256 _amountOutMin, uint256 _deadline) external nonpaya
 function createYNFT(address _tokenIn, uint256 _amountIn, uint256 _amountOutMin, uint256 _deadline) external nonpayable
 ```
 
-
-
-*Deposits a certain amount of an asset into AAVE protocol pool and creates yNFT token.*
+_Deposits a certain amount of an asset into AAVE protocol pool and creates yNFT token._
 
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| _tokenIn | address | Address of ERC20 token to be deposited. |
-| _amountIn | uint256 | Amount of ERC20 tokens to be deposited. |
-| _amountOutMin | uint256 | The minimum amount of output tokens that must be received for the swap not to revert. |
-| _deadline | uint256 | Unix timestamp after which the transaction will revert. |
+| Name           | Type    | Description                                                                           |
+| -------------- | ------- | ------------------------------------------------------------------------------------- |
+| \_tokenIn      | address | Address of ERC20 token to be deposited.                                               |
+| \_amountIn     | uint256 | Amount of ERC20 tokens to be deposited.                                               |
+| \_amountOutMin | uint256 | The minimum amount of output tokens that must be received for the swap not to revert. |
+| \_deadline     | uint256 | Unix timestamp after which the transaction will revert.                               |
 
 ### createYNFTForEther
 
@@ -187,16 +165,14 @@ function createYNFT(address _tokenIn, uint256 _amountIn, uint256 _amountOutMin, 
 function createYNFTForEther(uint256 _amountOutMin, uint256 _deadline) external payable
 ```
 
-
-
-*Deposits a certain amount of Ether into AAVE protocol pool and creates yNFT token.*
+_Deposits a certain amount of Ether into AAVE protocol pool and creates yNFT token._
 
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| _amountOutMin | uint256 | The minimum amount of output tokens that must be received for the swap not to revert. |
-| _deadline | uint256 | Unix timestamp after which the transaction will revert. |
+| Name           | Type    | Description                                                                           |
+| -------------- | ------- | ------------------------------------------------------------------------------------- |
+| \_amountOutMin | uint256 | The minimum amount of output tokens that must be received for the swap not to revert. |
+| \_deadline     | uint256 | Unix timestamp after which the transaction will revert.                               |
 
 ### dexRouter
 
@@ -204,16 +180,11 @@ function createYNFTForEther(uint256 _amountOutMin, uint256 _deadline) external p
 function dexRouter() external view returns (contract IUniswapV2Router02)
 ```
 
-
-
-
-
-
 #### Returns
 
-| Name | Type | Description |
-|---|---|---|
-| _0 | contract IUniswapV2Router02 | undefined |
+| Name | Type                        | Description |
+| ---- | --------------------------- | ----------- |
+| \_0  | contract IUniswapV2Router02 | undefined   |
 
 ### estimatePerformanceFee
 
@@ -221,21 +192,19 @@ function dexRouter() external view returns (contract IUniswapV2Router02)
 function estimatePerformanceFee(uint256 tokenId) external view returns (uint256)
 ```
 
-
-
-*Calculates fee in underlying tokens that will be paid on yNFT withdrawal*
+_Calculates fee in underlying tokens that will be paid on yNFT withdrawal_
 
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
+| Name    | Type    | Description   |
+| ------- | ------- | ------------- |
 | tokenId | uint256 | yNFT token id |
 
 #### Returns
 
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint256 | performanceFeeToWithdraw Performance fee estimation |
+| Name | Type    | Description                                         |
+| ---- | ------- | --------------------------------------------------- |
+| \_0  | uint256 | performanceFeeToWithdraw Performance fee estimation |
 
 ### feePerMile
 
@@ -243,16 +212,11 @@ function estimatePerformanceFee(uint256 tokenId) external view returns (uint256)
 function feePerMile() external view returns (uint256)
 ```
 
-
-
-
-
-
 #### Returns
 
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint256 | undefined |
+| Name | Type    | Description |
+| ---- | ------- | ----------- |
+| \_0  | uint256 | undefined   |
 
 ### getAmountToClaim
 
@@ -260,16 +224,13 @@ function feePerMile() external view returns (uint256)
 function getAmountToClaim() external view returns (uint256)
 ```
 
-
-
-*Gets amount of AAVE rewards that can be claimed.*
-
+_Gets amount of AAVE rewards that can be claimed._
 
 #### Returns
 
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint256 | Amount to claim. |
+| Name | Type    | Description      |
+| ---- | ------- | ---------------- |
+| \_0  | uint256 | Amount to claim. |
 
 ### getRoleAdmin
 
@@ -277,21 +238,19 @@ function getAmountToClaim() external view returns (uint256)
 function getRoleAdmin(bytes32 role) external view returns (bytes32)
 ```
 
-
-
-*Returns the admin role that controls `role`. See {grantRole} and {revokeRole}. To change a role&#39;s admin, use {_setRoleAdmin}.*
+_Returns the admin role that controls `role`. See {grantRole} and {revokeRole}. To change a role&#39;s admin, use {\_setRoleAdmin}._
 
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| role | bytes32 | undefined |
+| Name | Type    | Description |
+| ---- | ------- | ----------- |
+| role | bytes32 | undefined   |
 
 #### Returns
 
-| Name | Type | Description |
-|---|---|---|
-| _0 | bytes32 | undefined |
+| Name | Type    | Description |
+| ---- | ------- | ----------- |
+| \_0  | bytes32 | undefined   |
 
 ### grantRole
 
@@ -299,16 +258,14 @@ function getRoleAdmin(bytes32 role) external view returns (bytes32)
 function grantRole(bytes32 role, address account) external nonpayable
 ```
 
-
-
-*Grants `role` to `account`. If `account` had not been already granted `role`, emits a {RoleGranted} event. Requirements: - the caller must have ``role``&#39;s admin role.*
+_Grants `role` to `account`. If `account` had not been already granted `role`, emits a {RoleGranted} event. Requirements: - the caller must have `role`&#39;s admin role._
 
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| role | bytes32 | undefined |
-| account | address | undefined |
+| Name    | Type    | Description |
+| ------- | ------- | ----------- |
+| role    | bytes32 | undefined   |
+| account | address | undefined   |
 
 ### hasRole
 
@@ -316,22 +273,20 @@ function grantRole(bytes32 role, address account) external nonpayable
 function hasRole(bytes32 role, address account) external view returns (bool)
 ```
 
-
-
-*Returns `true` if `account` has been granted `role`.*
+_Returns `true` if `account` has been granted `role`._
 
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| role | bytes32 | undefined |
-| account | address | undefined |
+| Name    | Type    | Description |
+| ------- | ------- | ----------- |
+| role    | bytes32 | undefined   |
+| account | address | undefined   |
 
 #### Returns
 
 | Name | Type | Description |
-|---|---|---|
-| _0 | bool | undefined |
+| ---- | ---- | ----------- |
+| \_0  | bool | undefined   |
 
 ### incentivesController
 
@@ -339,16 +294,11 @@ function hasRole(bytes32 role, address account) external view returns (bool)
 function incentivesController() external view returns (contract IAaveIncentivesController)
 ```
 
-
-
-
-
-
 #### Returns
 
-| Name | Type | Description |
-|---|---|---|
-| _0 | contract IAaveIncentivesController | undefined |
+| Name | Type                               | Description |
+| ---- | ---------------------------------- | ----------- |
+| \_0  | contract IAaveIncentivesController | undefined   |
 
 ### nftToken
 
@@ -356,16 +306,11 @@ function incentivesController() external view returns (contract IAaveIncentivesC
 function nftToken() external view returns (contract IERC721)
 ```
 
-
-
-
-
-
 #### Returns
 
-| Name | Type | Description |
-|---|---|---|
-| _0 | contract IERC721 | undefined |
+| Name | Type             | Description |
+| ---- | ---------------- | ----------- |
+| \_0  | contract IERC721 | undefined   |
 
 ### pause
 
@@ -373,27 +318,19 @@ function nftToken() external view returns (contract IERC721)
 function pause() external nonpayable
 ```
 
-
-
-
-
-
 ### paused
 
 ```solidity
 function paused() external view returns (bool)
 ```
 
-
-
-*Returns true if the contract is paused, and false otherwise.*
-
+_Returns true if the contract is paused, and false otherwise._
 
 #### Returns
 
 | Name | Type | Description |
-|---|---|---|
-| _0 | bool | undefined |
+| ---- | ---- | ----------- |
+| \_0  | bool | undefined   |
 
 ### performanceFeePerMille
 
@@ -401,16 +338,11 @@ function paused() external view returns (bool)
 function performanceFeePerMille() external view returns (uint256)
 ```
 
-
-
-
-
-
 #### Returns
 
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint256 | undefined |
+| Name | Type    | Description |
+| ---- | ------- | ----------- |
+| \_0  | uint256 | undefined   |
 
 ### pool
 
@@ -418,16 +350,11 @@ function performanceFeePerMille() external view returns (uint256)
 function pool() external view returns (contract ILendingPool)
 ```
 
-
-
-
-
-
 #### Returns
 
-| Name | Type | Description |
-|---|---|---|
-| _0 | contract ILendingPool | undefined |
+| Name | Type                  | Description |
+| ---- | --------------------- | ----------- |
+| \_0  | contract ILendingPool | undefined   |
 
 ### renounceRole
 
@@ -435,16 +362,14 @@ function pool() external view returns (contract ILendingPool)
 function renounceRole(bytes32 role, address account) external nonpayable
 ```
 
-
-
-*Revokes `role` from the calling account. Roles are often managed via {grantRole} and {revokeRole}: this function&#39;s purpose is to provide a mechanism for accounts to lose their privileges if they are compromised (such as when a trusted device is misplaced). If the calling account had been revoked `role`, emits a {RoleRevoked} event. Requirements: - the caller must be `account`.*
+_Revokes `role` from the calling account. Roles are often managed via {grantRole} and {revokeRole}: this function&#39;s purpose is to provide a mechanism for accounts to lose their privileges if they are compromised (such as when a trusted device is misplaced). If the calling account had been revoked `role`, emits a {RoleRevoked} event. Requirements: - the caller must be `account`._
 
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| role | bytes32 | undefined |
-| account | address | undefined |
+| Name    | Type    | Description |
+| ------- | ------- | ----------- |
+| role    | bytes32 | undefined   |
+| account | address | undefined   |
 
 ### revokeRole
 
@@ -452,16 +377,14 @@ function renounceRole(bytes32 role, address account) external nonpayable
 function revokeRole(bytes32 role, address account) external nonpayable
 ```
 
-
-
-*Revokes `role` from `account`. If `account` had been granted `role`, emits a {RoleRevoked} event. Requirements: - the caller must have ``role``&#39;s admin role.*
+_Revokes `role` from `account`. If `account` had been granted `role`, emits a {RoleRevoked} event. Requirements: - the caller must have `role`&#39;s admin role._
 
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| role | bytes32 | undefined |
-| account | address | undefined |
+| Name    | Type    | Description |
+| ------- | ------- | ----------- |
+| role    | bytes32 | undefined   |
+| account | address | undefined   |
 
 ### rewardToken
 
@@ -469,16 +392,11 @@ function revokeRole(bytes32 role, address account) external nonpayable
 function rewardToken() external view returns (contract IERC20)
 ```
 
-
-
-
-
-
 #### Returns
 
-| Name | Type | Description |
-|---|---|---|
-| _0 | contract IERC20 | undefined |
+| Name | Type            | Description |
+| ---- | --------------- | ----------- |
+| \_0  | contract IERC20 | undefined   |
 
 ### setBeneficiary
 
@@ -486,15 +404,11 @@ function rewardToken() external view returns (contract IERC20)
 function setBeneficiary(address _beneficiary) external nonpayable
 ```
 
-
-
-
-
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| _beneficiary | address | undefined |
+| Name          | Type    | Description |
+| ------------- | ------- | ----------- |
+| \_beneficiary | address | undefined   |
 
 ### setFee
 
@@ -502,21 +416,17 @@ function setBeneficiary(address _beneficiary) external nonpayable
 function setFee(uint256 _feePerMile) external nonpayable returns (uint256)
 ```
 
-
-
-
-
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| _feePerMile | uint256 | undefined |
+| Name         | Type    | Description |
+| ------------ | ------- | ----------- |
+| \_feePerMile | uint256 | undefined   |
 
 #### Returns
 
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint256 | undefined |
+| Name | Type    | Description |
+| ---- | ------- | ----------- |
+| \_0  | uint256 | undefined   |
 
 ### setPerformanceFee
 
@@ -524,21 +434,17 @@ function setFee(uint256 _feePerMile) external nonpayable returns (uint256)
 function setPerformanceFee(uint256 _performanceFeePerMille) external nonpayable returns (uint256)
 ```
 
-
-
-
-
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| _performanceFeePerMille | uint256 | undefined |
+| Name                     | Type    | Description |
+| ------------------------ | ------- | ----------- |
+| \_performanceFeePerMille | uint256 | undefined   |
 
 #### Returns
 
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint256 | undefined |
+| Name | Type    | Description |
+| ---- | ------- | ----------- |
+| \_0  | uint256 | undefined   |
 
 ### supportsInterface
 
@@ -546,21 +452,19 @@ function setPerformanceFee(uint256 _performanceFeePerMille) external nonpayable 
 function supportsInterface(bytes4 interfaceId) external view returns (bool)
 ```
 
-
-
-*See {IERC165-supportsInterface}.*
+_See {IERC165-supportsInterface}._
 
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| interfaceId | bytes4 | undefined |
+| Name        | Type   | Description |
+| ----------- | ------ | ----------- |
+| interfaceId | bytes4 | undefined   |
 
 #### Returns
 
 | Name | Type | Description |
-|---|---|---|
-| _0 | bool | undefined |
+| ---- | ---- | ----------- |
+| \_0  | bool | undefined   |
 
 ### totalSupply
 
@@ -568,16 +472,11 @@ function supportsInterface(bytes4 interfaceId) external view returns (bool)
 function totalSupply() external view returns (uint256)
 ```
 
-
-
-
-
-
 #### Returns
 
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint256 | undefined |
+| Name | Type    | Description |
+| ---- | ------- | ----------- |
+| \_0  | uint256 | undefined   |
 
 ### underlyingToken
 
@@ -585,16 +484,11 @@ function totalSupply() external view returns (uint256)
 function underlyingToken() external view returns (contract IERC20)
 ```
 
-
-
-
-
-
 #### Returns
 
-| Name | Type | Description |
-|---|---|---|
-| _0 | contract IERC20 | undefined |
+| Name | Type            | Description |
+| ---- | --------------- | ----------- |
+| \_0  | contract IERC20 | undefined   |
 
 ### unpause
 
@@ -602,28 +496,21 @@ function underlyingToken() external view returns (contract IERC20)
 function unpause() external nonpayable
 ```
 
-
-
-
-
-
 ### withdrawToEther
 
 ```solidity
 function withdrawToEther(uint256 _nftTokenId, uint256 _amountOutMin, uint256 _deadline) external nonpayable
 ```
 
-
-
-*Withdraws yNFT to Ether and sends to yNFT owner, burns yNFT token, transfers fee to beneficiary.*
+_Withdraws yNFT to Ether and sends to yNFT owner, burns yNFT token, transfers fee to beneficiary._
 
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| _nftTokenId | uint256 | NFT token id that gives access to certain balance of underlying asset. |
-| _amountOutMin | uint256 | The minimum amount of output tokens that must be received for the swap not to revert. |
-| _deadline | uint256 | Unix timestamp after which the transaction will revert. |
+| Name           | Type    | Description                                                                           |
+| -------------- | ------- | ------------------------------------------------------------------------------------- |
+| \_nftTokenId   | uint256 | NFT token id that gives access to certain balance of underlying asset.                |
+| \_amountOutMin | uint256 | The minimum amount of output tokens that must be received for the swap not to revert. |
+| \_deadline     | uint256 | Unix timestamp after which the transaction will revert.                               |
 
 ### withdrawToUnderlyingTokens
 
@@ -631,15 +518,13 @@ function withdrawToEther(uint256 _nftTokenId, uint256 _amountOutMin, uint256 _de
 function withdrawToUnderlyingTokens(uint256 _nftTokenId) external nonpayable
 ```
 
-
-
-*Withdraws underlying tokens to yNFT owner, burns yNFT token, transfers fee to beneficiary.*
+_Withdraws underlying tokens to yNFT owner, burns yNFT token, transfers fee to beneficiary._
 
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| _nftTokenId | uint256 | NFT token id that gives access to certain balance of underlying asset. |
+| Name         | Type    | Description                                                            |
+| ------------ | ------- | ---------------------------------------------------------------------- |
+| \_nftTokenId | uint256 | NFT token id that gives access to certain balance of underlying asset. |
 
 ### yNFT
 
@@ -647,18 +532,11 @@ function withdrawToUnderlyingTokens(uint256 _nftTokenId) external nonpayable
 function yNFT() external view returns (contract YNFT)
 ```
 
-
-
-
-
-
 #### Returns
 
-| Name | Type | Description |
-|---|---|---|
-| _0 | contract YNFT | undefined |
-
-
+| Name | Type          | Description |
+| ---- | ------------- | ----------- |
+| \_0  | contract YNFT | undefined   |
 
 ## Events
 
@@ -668,15 +546,11 @@ function yNFT() external view returns (contract YNFT)
 event BeneficiarySet(address newBeneficiary)
 ```
 
-
-
-
-
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| newBeneficiary  | address | undefined |
+| Name           | Type    | Description |
+| -------------- | ------- | ----------- |
+| newBeneficiary | address | undefined   |
 
 ### FeeSet
 
@@ -684,15 +558,11 @@ event BeneficiarySet(address newBeneficiary)
 event FeeSet(uint256 newFee)
 ```
 
-
-
-
-
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| newFee  | uint256 | undefined |
+| Name   | Type    | Description |
+| ------ | ------- | ----------- |
+| newFee | uint256 | undefined   |
 
 ### Paused
 
@@ -700,15 +570,11 @@ event FeeSet(uint256 newFee)
 event Paused(address account)
 ```
 
-
-
-
-
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| account  | address | undefined |
+| Name    | Type    | Description |
+| ------- | ------- | ----------- |
+| account | address | undefined   |
 
 ### PerformanceFeeSet
 
@@ -716,15 +582,11 @@ event Paused(address account)
 event PerformanceFeeSet(uint256 newPerformanceFee)
 ```
 
-
-
-
-
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| newPerformanceFee  | uint256 | undefined |
+| Name              | Type    | Description |
+| ----------------- | ------- | ----------- |
+| newPerformanceFee | uint256 | undefined   |
 
 ### RewardsClaimed
 
@@ -732,16 +594,12 @@ event PerformanceFeeSet(uint256 newPerformanceFee)
 event RewardsClaimed(address underlyingToken, uint256 amount)
 ```
 
-
-
-
-
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| underlyingToken  | address | undefined |
-| amount  | uint256 | undefined |
+| Name            | Type    | Description |
+| --------------- | ------- | ----------- |
+| underlyingToken | address | undefined   |
+| amount          | uint256 | undefined   |
 
 ### RoleAdminChanged
 
@@ -749,17 +607,13 @@ event RewardsClaimed(address underlyingToken, uint256 amount)
 event RoleAdminChanged(bytes32 indexed role, bytes32 indexed previousAdminRole, bytes32 indexed newAdminRole)
 ```
 
-
-
-
-
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| role `indexed` | bytes32 | undefined |
-| previousAdminRole `indexed` | bytes32 | undefined |
-| newAdminRole `indexed` | bytes32 | undefined |
+| Name                        | Type    | Description |
+| --------------------------- | ------- | ----------- |
+| role `indexed`              | bytes32 | undefined   |
+| previousAdminRole `indexed` | bytes32 | undefined   |
+| newAdminRole `indexed`      | bytes32 | undefined   |
 
 ### RoleGranted
 
@@ -767,17 +621,13 @@ event RoleAdminChanged(bytes32 indexed role, bytes32 indexed previousAdminRole, 
 event RoleGranted(bytes32 indexed role, address indexed account, address indexed sender)
 ```
 
-
-
-
-
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| role `indexed` | bytes32 | undefined |
-| account `indexed` | address | undefined |
-| sender `indexed` | address | undefined |
+| Name              | Type    | Description |
+| ----------------- | ------- | ----------- |
+| role `indexed`    | bytes32 | undefined   |
+| account `indexed` | address | undefined   |
+| sender `indexed`  | address | undefined   |
 
 ### RoleRevoked
 
@@ -785,17 +635,13 @@ event RoleGranted(bytes32 indexed role, address indexed account, address indexed
 event RoleRevoked(bytes32 indexed role, address indexed account, address indexed sender)
 ```
 
-
-
-
-
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| role `indexed` | bytes32 | undefined |
-| account `indexed` | address | undefined |
-| sender `indexed` | address | undefined |
+| Name              | Type    | Description |
+| ----------------- | ------- | ----------- |
+| role `indexed`    | bytes32 | undefined   |
+| account `indexed` | address | undefined   |
+| sender `indexed`  | address | undefined   |
 
 ### Unpaused
 
@@ -803,15 +649,11 @@ event RoleRevoked(bytes32 indexed role, address indexed account, address indexed
 event Unpaused(address account)
 ```
 
-
-
-
-
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| account  | address | undefined |
+| Name    | Type    | Description |
+| ------- | ------- | ----------- |
+| account | address | undefined   |
 
 ### YNftCreated
 
@@ -819,17 +661,13 @@ event Unpaused(address account)
 event YNftCreated(address underlyingToken, uint256 tokenId, uint256 deposited)
 ```
 
-
-
-
-
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| underlyingToken  | address | undefined |
-| tokenId  | uint256 | undefined |
-| deposited  | uint256 | undefined |
+| Name            | Type    | Description |
+| --------------- | ------- | ----------- |
+| underlyingToken | address | undefined   |
+| tokenId         | uint256 | undefined   |
+| deposited       | uint256 | undefined   |
 
 ### YNftWithdrawn
 
@@ -837,18 +675,11 @@ event YNftCreated(address underlyingToken, uint256 tokenId, uint256 deposited)
 event YNftWithdrawn(address underlyingToken, uint256 tokenId, uint256 amountWithdrawn, uint256 performanceFee)
 ```
 
-
-
-
-
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| underlyingToken  | address | undefined |
-| tokenId  | uint256 | undefined |
-| amountWithdrawn  | uint256 | undefined |
-| performanceFee  | uint256 | undefined |
-
-
-
+| Name            | Type    | Description |
+| --------------- | ------- | ----------- |
+| underlyingToken | address | undefined   |
+| tokenId         | uint256 | undefined   |
+| amountWithdrawn | uint256 | undefined   |
+| performanceFee  | uint256 | undefined   |

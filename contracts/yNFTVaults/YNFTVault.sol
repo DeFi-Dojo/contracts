@@ -104,6 +104,11 @@ abstract contract YNFTVault is AccessControl, ReentrancyGuard, Pausable {
     virtual
     returns (uint256);
 
+  function balanceOfUnderlyingAtBuy(uint256 _nftTokenId)
+    external
+    virtual
+    returns (uint256);
+
   function _collectFeeEther() internal nonReentrant returns (uint256) {
     uint256 fee = _calcFee(msg.value);
     //solhint-disable-next-line avoid-low-level-calls

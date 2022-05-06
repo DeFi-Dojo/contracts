@@ -485,6 +485,22 @@ contract QuickswapYNFTVault is YNFTVault {
     return (balance * currentLiquidity) / totalSupply;
   }
 
+  /**
+   * @dev Returns underlying asset balance at the moment of yNft purchase.
+   * @param _nftTokenId NFT token id that gives access to certain balance of underlying asset.
+   * @return Underlying asset balance at purchase for certain NFT token id.
+   */
+  function balanceOfUnderlyingAtBuy(uint256 _nftTokenId)
+    public
+    view
+    override
+    returns (uint256)
+  {
+    return
+      (balanceOf[_nftTokenId] * balancesAtBuy[_nftTokenId].tokenBalance) /
+      balancesAtBuy[_nftTokenId].totalSupply;
+  }
+
   function _mintYNFTForLiquidity(uint256 _liquidity)
     internal
     virtual

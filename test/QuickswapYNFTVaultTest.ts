@@ -1315,4 +1315,20 @@ describe("QuickswapYNFTVault", () => {
       ].toString()
     );
   });
+
+  it("should not change balanceOfUnderlyingAtBuy after more yNft bought", async () => {
+    const TOKEN_ID = 1;
+    const LIQUIDITY_REWARDS = 111;
+    const EXPECTED_BALANCE_AT_BUY_STRING = "332";
+    const EXPECTED_BALANCE_STRING = "379";
+
+    await createTwoYNfts(LIQUIDITY_REWARDS);
+
+    expect(
+      (await quickswapYnftVault.balanceOfUnderlyingAtBuy(TOKEN_ID)).toString()
+    ).to.be.equal(EXPECTED_BALANCE_AT_BUY_STRING);
+    expect(
+      (await quickswapYnftVault.balanceOfUnderlying(TOKEN_ID)).toString()
+    ).to.be.equal(EXPECTED_BALANCE_STRING);
+  });
 });
