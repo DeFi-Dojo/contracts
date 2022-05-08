@@ -1,8 +1,6 @@
 import { deployVesting } from "../../utils/deployment/token";
 
-const main = async () => {
-  await deployVesting();
-};
+const main = deployVesting;
 
 main()
   .then(() => process.exit(0))

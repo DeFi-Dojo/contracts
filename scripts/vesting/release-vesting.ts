@@ -1,9 +1,10 @@
 import { releaseVesting } from "../../utils/deployment/token";
+import configEnv from "../../config/config";
 
-const BENEFICIARY = "0x7b5de8815b0026f6e0196b83f401d3e30bebac82";
+const { BENEFICIARY_ADDRESS } = configEnv;
 
 const main = async () => {
-  await releaseVesting(BENEFICIARY);
+  await releaseVesting(BENEFICIARY_ADDRESS);
 };
 
 main()
