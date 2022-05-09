@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.37.1](https://github.com/DeFi-Dojo/contracts/compare/v1.37.0...v1.37.1) (2022-05-09)
+
+
+### Bug Fixes
+
+* dex-560 revert "feat: fix aave get amount to claim" ([#88](https://github.com/DeFi-Dojo/contracts/issues/88)) ([7f3664e](https://github.com/DeFi-Dojo/contracts/commit/7f3664ef3f745810c0ef37f11cfde4ecffacaf93)), closes [#82](https://github.com/DeFi-Dojo/contracts/issues/82)
+
 # [1.37.0](https://github.com/DeFi-Dojo/contracts/compare/v1.36.0...v1.37.0) (2022-05-09)
 
 
