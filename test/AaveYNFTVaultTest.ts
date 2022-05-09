@@ -61,8 +61,8 @@ describe("AaveYNFTVault", () => {
 
   it("should return value from aave incentives controller on getAmountToClaim", async () => {
     const EXPECTED_AMOUNT = 200;
-    aaveIncentivesController.getUserUnclaimedRewards
-      .whenCalledWith(aaveYnftVault.address)
+    aaveIncentivesController.getRewardsBalance
+      .whenCalledWith([aToken.address], aaveYnftVault.address)
       .returns(EXPECTED_AMOUNT);
     expect(await aaveYnftVault.getAmountToClaim()).to.equal(EXPECTED_AMOUNT);
   });
