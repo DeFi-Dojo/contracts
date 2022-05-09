@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.37.0](https://github.com/DeFi-Dojo/contracts/compare/v1.36.0...v1.37.0) (2022-05-09)
+
+
+### Features
+
+* balanceOfUnderlyingAtBuy methods for Aave and Quickswap vaults ([#87](https://github.com/DeFi-Dojo/contracts/issues/87)) ([1ff64a3](https://github.com/DeFi-Dojo/contracts/commit/1ff64a3a3211c59df2a58a9ca3d74f32e37412da))
+
 # [1.36.0](https://github.com/DeFi-Dojo/contracts/compare/v1.35.0...v1.36.0) (2022-05-08)
 
 
