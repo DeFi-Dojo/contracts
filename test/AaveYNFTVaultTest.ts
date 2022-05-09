@@ -1,6 +1,6 @@
 import chai, { expect } from "chai";
 import { ethers } from "hardhat";
-import { Contract, BigNumber } from "ethers";
+import { Contract} from "ethers";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 // @ts-ignore
 import { expectRevert } from "@openzeppelin/test-helpers";
@@ -867,5 +867,48 @@ describe("AaveYNFTVault", () => {
     );
 
     expect(underlyingAssetBalance).to.equal(expectedResultForTokenId2);
+  });
+
+  it("should return correct underlying asset at buy value", async () => {
+    const MIN_AMOUNT = 0;
+    const amount = 123000;
+    const DEADLINE = 101;
+    const expectedResultForTokenId0 = 12000;
+    const expectedResultForTokenId0AfterClaim = 12200;
+    const AMOUNT_TO_CLAIM = 200;
+
+    await init_createYNFT_mocks(underlyingToken);
+    aToken.balanceOf.reset();
+    aToken.balanceOf.returnsAtCall(0, 0);
+    aToken.balanceOf.returnsAtCall(1, ATOKEN_BALANCE);
+    aToken.balanceOf.returnsAtCall(2, ATOKEN_BALANCE + AMOUNT_TO_CLAIM);
+
+    await aaveYnftVault.createYNFT(
+      underlyingToken.address,
+      amount,
+      MIN_AMOUNT,
+      DEADLINE
+    );
+
+    const nftTokenId = 0;
+    let underlyingAssetBalanceAtBuy =
+      await aaveYnftVault.balanceOfUnderlyingAtBuy(nftTokenId);
+    expect(underlyingAssetBalanceAtBuy).to.equal(expectedResultForTokenId0);
+
+    // claimed rewards
+
+    const underlyingAssetBalance = await aaveYnftVault.balanceOfUnderlying(
+      nftTokenId
+    );
+    expect(underlyingAssetBalance).to.equal(
+      expectedResultForTokenId0AfterClaim
+    );
+
+    underlyingAssetBalanceAtBuy = await aaveYnftVault.balanceOfUnderlyingAtBuy(
+      nftTokenId
+    );
+    expect(underlyingAssetBalanceAtBuy).to.equal(expectedResultForTokenId0);
+
+    expect(aToken.balanceOf).to.have.callCount(3);
   });
 });
