@@ -1,4 +1,7 @@
 import { ethers } from "hardhat";
+import path from "path";
+import { readFile, writeFile } from "fs/promises";
+
 import {
   DummyQuickswapYNFTVault,
   DummyQuickswapYNFTVault__factory,
@@ -31,10 +34,11 @@ type Config = {
 const deployQuickswapYnftVault =
   (config?: Config) =>
   async (
-    quickswapTokenPairAddress: string,
+    vaultName: QuickswapVaultName,
     stakingDualRewards: string,
     ynftPathUri: string
   ) => {
+    const tokenPairAddress = getQuickswapTokenPairAddress(ADDRESSES, vaultName);
     const deploy = config?.isDummyVault
       ? createDeployContract<DummyQuickswapYNFTVault__factory>(
           "DummyQuickswapYNFTVault"
@@ -43,7 +47,7 @@ const deployQuickswapYnftVault =
 
     const contract = await deploy(
       ADDRESSES.ROUTER_02_QUICKSWAP,
-      quickswapTokenPairAddress,
+      tokenPairAddress,
       stakingDualRewards,
       ADDRESSES.DQUICK,
       ADDRESSES.WMATIC,
@@ -56,6 +60,20 @@ const deployQuickswapYnftVault =
 
     const ynftAddress = await contract.yNFT();
     console.log(`Deployed vault yNFT address: ${ynftAddress}`);
+
+    const projectDir = path.join(__dirname, "../../");
+    const savePath = path.join(
+      projectDir,
+      "consts/deployed/vaults-quickswap.json"
+    );
+    const file = JSON.parse(await readFile(savePath, { encoding: "utf-8" }));
+    file[vaultName] = {
+      vault: contract.address,
+      ynft: ynftAddress,
+      ynftMetaDataUrl: MORALIS_IPFS_URL + ynftPathUri,
+    };
+    await writeFile(savePath, JSON.stringify(file, null, 2));
+
     await wait(100);
     await contract.grantRole(
       await contract.DEFAULT_ADMIN_ROLE(),
@@ -75,7 +93,7 @@ const deployQuickswapVaultWithMetadata =
   (config?: Config) => async (vaultName: QuickswapVaultName) => {
     const ynftPathUri = await uploadYnftMetadata(vaultName);
     await deployQuickswapYnftVault(config)(
-      getQuickswapTokenPairAddress(ADDRESSES, vaultName),
+      vaultName,
       getQuickswapStakingDualRewardsAddress(ADDRESSES, vaultName),
       ynftPathUri
     );
