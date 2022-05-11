@@ -1,18 +1,22 @@
 {
   "Aosaki": {
-    "vault": "0x7B02344cE02d4204a1BC67eF10E3CB7a2DBA2FC2",
-    "ynft": "0x4432AdA93Aff97ecAa8fa92c72109bbA3c456b49"
+    "vault": "0x4BB5D67CF53D49ED43BF0ddaf17F6D7544717071",
+    "ynft": "0xB698B6961aAfe2D4CD0b0d02cDFF7173189Ffc1C",
+    "ynftMetaDataUrl": "https://ipfs.moralis.io:2053/ipfs/QmQHuDij8J7R7Dd2U1Bq1HdKAZu1useZK8tjdT4ahLRJJF"
   },
   "Hayai": {
-    "vault": "0xB77e7b70e6C464ca8e0A0970dCd45858a47Fdafe",
-    "ynft": "0xe4fb1ea2311520E42bC4B8CFE39A72b7FE5f860b"
+    "vault": "0xc5a6b4133a2C1f7E92D74216799d14a769a7dd2A",
+    "ynft": "0x2316272CF0261b704977FA2EeFceb162A8442C18",
+    "ynftMetaDataUrl": "https://ipfs.moralis.io:2053/ipfs/QmS1z3J5Ah87nrtNx8TeTJxnUvbnLGftDdW3ZLgbW6GiSP"
   },
   "Ahegao": {
-    "vault": "0x56Eb11034859Ed803Da8d89C4990e6929c8fF059",
-    "ynft": "0x5F5237D25D1C2460c63D1A694592f916B95D0c10"
+    "vault": "0xD8A9df1E6C3aeA0deD03b6e2Eb2b02E392CEd89b",
+    "ynft": "0xFf9e6f928c04a6A2c7d6490c62ab2Dbf00f1E78D",
+    "ynftMetaDataUrl": "https://ipfs.moralis.io:2053/ipfs/QmVUzAyyGbhFZrZrqRcYMHkHPe5BaMp95MCQ35eCvkJTGp"
   },
   "Murasaki": {
-    "vault": "0xB0cE2E774cDB37b055471D6E2f5d9f0Ee15739FA",
-    "ynft": "0x499853aE992d5670534a5a4f51c481BE76abE362"
+    "vault": "0x2e58c6fB6c295C9c24e5611a069E8B0BDF9Db828",
+    "ynft": "0x95630f85dBCedc034F7599d23c28860A9f9ff015",
+    "ynftMetaDataUrl": "https://ipfs.moralis.io:2053/ipfs/QmeSUyraYQxQh6SiH9x2N8YnpXsY57ALkJp78gjbMYKgC2"
   }
 }

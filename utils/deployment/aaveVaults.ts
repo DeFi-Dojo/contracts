@@ -1,4 +1,7 @@
 import { ethers } from "hardhat";
+import { readFile, writeFile } from "fs/promises";
+import path from "path";
+
 import {
   AaveYNFTVault,
   AaveYNFTVault__factory,
@@ -27,7 +30,8 @@ type Config = { isDummyVault?: boolean };
 
 const deployAaveYnftVault =
   (config?: Config) =>
-  async (aaveTokenAddress: string, ynftPathUri: string) => {
+  async (vaultName: AaveVaultName, ynftPathUri: string) => {
+    const aaveTokenAddress = getAaveTokenAddress(ADDRESSES, vaultName);
     const deploy = config?.isDummyVault
       ? createDeployContract<DummyAaveYNFTVault__factory>("DummyAaveYNFTVault")
       : createDeployContract<AaveYNFTVault__factory>("AaveYNFTVault");
@@ -45,6 +49,17 @@ const deployAaveYnftVault =
 
     const ynftAddress = await contract.yNFT().catch(() => "");
     console.log(`Deployed vault yNFT address: ${ynftAddress}\n`);
+
+    const projectDir = path.join(__dirname, "../../");
+    const savePath = path.join(projectDir, "consts/deployed/vaults-aave.json");
+    const file = JSON.parse(await readFile(savePath, { encoding: "utf-8" }));
+    file[vaultName] = {
+      vault: contract.address,
+      ynft: ynftAddress,
+      ynftMetaDataUrl: MORALIS_IPFS_URL + ynftPathUri,
+    };
+    await writeFile(savePath, JSON.stringify(file, null, 2));
+
     await wait(100);
     await contract.grantRole(
       await contract.DEFAULT_ADMIN_ROLE(),
@@ -63,10 +78,7 @@ const deployAaveYnftVault =
 const deployAaveVaultWithMetadata =
   (config?: Config) => async (vaultName: AaveVaultName) => {
     const ynftPathUri = await uploadYnftMetadata(vaultName);
-    await deployAaveYnftVault(config)(
-      getAaveTokenAddress(ADDRESSES, vaultName),
-      ynftPathUri
-    );
+    await deployAaveYnftVault(config)(vaultName, ynftPathUri);
   };
 
 export const deployAaveVaultsWithMetadata = (config?: Config) =>
