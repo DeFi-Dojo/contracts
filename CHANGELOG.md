@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.38.0](https://github.com/DeFi-Dojo/contracts/compare/v1.37.2...v1.38.0) (2022-05-16)
+
+
+### Features
+
+* dex-456 checkpoint nft offering ([#90](https://github.com/DeFi-Dojo/contracts/issues/90)) ([19e6330](https://github.com/DeFi-Dojo/contracts/commit/19e6330d573125b5e5dac8930c8d53643efdf2f5))
+
 ## [1.37.2](https://github.com/DeFi-Dojo/contracts/compare/v1.37.1...v1.37.2) (2022-05-11)
 
 ## [1.37.1](https://github.com/DeFi-Dojo/contracts/compare/v1.37.0...v1.37.1) (2022-05-09)
