@@ -1,4 +1,4 @@
-import { AaveVaultName, QuickswapVaultName, VaultName } from "./consts";
+import { AaveVaultName, QuickswapVaultName } from "./consts";
 
 interface Addresses {
   INCENTIVES_CONTROLLER: string;
@@ -129,7 +129,7 @@ const RINKEBY: Addresses = {
   DAI: "0xFf795577d9AC8bD7D90Ee22b6C1703490b6512FD",
   USDT: "0x07de306FF27a2B630B1141956844eB1552B956B5",
   USDC: "0xb7a4F3E9097C08dA09517b5aB877F7a917224ede",
-  PROXY_REGISTRY_OPENSEA: "0xf57b2c51ded3a29e6891aba85459d600256cf317",
+  PROXY_REGISTRY_OPENSEA: "0x1E525EEAF261cA41b809884CBDE9DD9E1619573A",
 };
 
 export const NETWORK_ADDRESSES: AddressesPerNetwork = {
