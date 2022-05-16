@@ -62,6 +62,10 @@ if (
   throw new Error("ENV not valid");
 }
 
+const HARDHAT_NETWORK =
+  (process.env.HARDHAT_NETWORK?.toUpperCase() as Network) ||
+  DEFAULT_NETWORK.toUpperCase();
+
 export default {
   RINKEBY_API_URL,
   DEFAULT_NETWORK,
@@ -71,7 +75,7 @@ export default {
   NFT_FACTORY_BASE_URI,
   KOVAN_API_URL,
   POLYGON_MAINNET_API_URL,
-  ADDRESSES: NETWORK_ADDRESSES[DEFAULT_NETWORK.toUpperCase() as Network],
+  ADDRESSES: NETWORK_ADDRESSES[HARDHAT_NETWORK],
   VAULT_ADDRESS,
   DEFENDER_TEAM_API_KEY,
   DEFENDER_TEAM_API_SECRET,
