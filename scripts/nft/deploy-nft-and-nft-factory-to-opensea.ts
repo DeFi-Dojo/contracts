@@ -1,7 +1,7 @@
 import { ethers } from "hardhat";
 
-import { DojoNFT, OpenSeaFactory } from "../../typechain";
-import { deployContract, waitForReceipt } from "../../utils/deployment";
+import { DojoNFT__factory, OpenSeaFactory__factory } from "../../typechain";
+import { createDeployContract, waitForReceipt } from "../../utils/deployment";
 import { MAX_SUPPLY_OF_NFT } from "../../consts";
 import configEnv from "../../config";
 
@@ -13,23 +13,24 @@ const {
 } = configEnv;
 
 async function main() {
+  const deployDojoNFT = createDeployContract<DojoNFT__factory>("DojoNFT");
+  const deployOpenseaFactory =
+    createDeployContract<OpenSeaFactory__factory>("OpenSeaFactory");
+
   const [owner] = await ethers.getSigners();
 
   console.log(`Deploying contracts using address: ${owner.address}`);
 
-  const dojoNFT = await deployContract<DojoNFT>("DojoNFT", [
+  const dojoNFT = await deployDojoNFT(
     NFT_BASE_URI,
-    ADDRESSES.PROXY_REGISTRY_OPENSEA,
-  ]);
+    ADDRESSES.PROXY_REGISTRY_OPENSEA
+  );
 
-  const openSeaFactory = await deployContract<OpenSeaFactory>(
-    "OpenSeaFactory",
-    [
-      ADDRESSES.PROXY_REGISTRY_OPENSEA,
-      dojoNFT.address,
-      MAX_SUPPLY_OF_NFT,
-      NFT_FACTORY_BASE_URI,
-    ]
+  const openSeaFactory = await deployOpenseaFactory(
+    ADDRESSES.PROXY_REGISTRY_OPENSEA,
+    dojoNFT.address,
+    MAX_SUPPLY_OF_NFT,
+    NFT_FACTORY_BASE_URI
   );
 
   await dojoNFT.transferOwnership(openSeaFactory.address).then(waitForReceipt);
