@@ -6,7 +6,7 @@ import { deployContract } from "../utils";
 import { TerminableVestingWallet } from "../typechain";
 import IERC20 from "../artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json";
 
-const { time } = require("@openzeppelin/test-helpers");
+const { time, expectRevert } = require("@openzeppelin/test-helpers");
 
 chai.use(smock.matchers);
 
@@ -112,11 +112,33 @@ describe("TerminableVestingWallet", () => {
       undefined
     );
 
+    expect(await terminableVestingWallet.isTerminated()).to.equal(false);
     await terminableVestingWallet.terminateVesting();
     expect(await terminableVestingWallet.isTerminated()).to.equal(true);
     expect(await terminableVestingWallet.terminationTimestamp()).to.equal(
       START_TIME
     );
+  });
+
+  it("Should not let to terminate vesting for non-owner", async () => {
+    const signers = await ethers.getSigners();
+    const LAST_MINED_TIMESTAMP: number = await time.latest();
+    const BENEFICIARY = signers[9].address;
+    const START_TIME: number = +LAST_MINED_TIMESTAMP + 100;
+    const DURATION = 240;
+
+    terminableVestingWallet = await deployContract<TerminableVestingWallet>(
+      "TerminableVestingWallet",
+      [BENEFICIARY, START_TIME, DURATION],
+      undefined
+    );
+
+    await expectRevert(
+      terminableVestingWallet.connect(signers[1]).terminateVesting(),
+      "Ownable: caller is not the owner"
+    );
+    expect(await terminableVestingWallet.isTerminated()).to.equal(false);
+    expect(await terminableVestingWallet.terminationTimestamp()).to.equal(0);
   });
 
   it("Should vest zero tokens if terminated before start", async () => {
@@ -163,6 +185,7 @@ describe("TerminableVestingWallet", () => {
     await time.increaseTo(nextBlockTimestamp);
 
     await terminableVestingWallet.terminateVesting();
+    expect(await terminableVestingWallet.isTerminated()).to.equal(true);
     expect(
       await terminableVestingWallet["vestedAmount(address,uint64)"](
         vestedToken.address,

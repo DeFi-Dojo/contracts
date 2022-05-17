@@ -16,7 +16,7 @@ contract TerminableVestingWallet is VestingWallet, Ownable {
     Ownable()
   {}
 
-  function terminateVesting() external {
+  function terminateVesting() external onlyOwner {
     require(
       block.timestamp < start() + duration(),
       "Vesting is already finished"
