@@ -1,5 +1,5 @@
 import { ethers } from "hardhat";
-import { expect } from "chai";
+import chai, { expect } from "chai";
 import { FakeContract } from "@defi-wonderland/smock/dist/src/types";
 import { smock } from "@defi-wonderland/smock";
 import { VestingManagement } from "../typechain";
@@ -7,6 +7,8 @@ import { deployContract } from "../utils";
 import IERC20 from "../artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json";
 
 const { time } = require("@openzeppelin/test-helpers");
+
+chai.use(smock.matchers);
 
 describe("VestingManagement", () => {
   let vestingManagement: VestingManagement;
@@ -170,5 +172,137 @@ describe("VestingManagement", () => {
         BENEFICIARY
       )
     ).to.equal(expectedTokensVested);
+  });
+
+  it("Should release tokens from two fixed contracts on releaseFixed", async () => {
+    const TOKEN_BALANCE = 100000;
+    const DURATION1 = 200;
+    const DURATION2 = 400;
+    await vestingManagement.addNewFixedVesting(
+      BENEFICIARY,
+      START_TIME,
+      DURATION1
+    );
+    await vestingManagement.addNewFixedVesting(
+      BENEFICIARY,
+      START_TIME,
+      DURATION2
+    );
+    const nextBlockTimestamp = +(await time.latest()) + +200;
+    const expectedTokenTransfer1 = 2 * TOKEN_BALANCE * (104 / 400);
+    const expectedTokenTransfer2 = TOKEN_BALANCE * (104 / 400);
+    await time.increaseTo(nextBlockTimestamp);
+    await vestedToken.balanceOf.returns(TOKEN_BALANCE);
+    await vestedToken.transfer.returns(true);
+    await vestingManagement.releaseFixed(vestedToken.address, BENEFICIARY);
+    expect(vestedToken.transfer).to.have.been.calledWith(
+      BENEFICIARY,
+      expectedTokenTransfer1
+    );
+    expect(vestedToken.transfer).to.have.been.calledWith(
+      BENEFICIARY,
+      expectedTokenTransfer2
+    );
+  });
+
+  it("Should release tokens from two fixed contracts on releaseTerminable", async () => {
+    const TOKEN_BALANCE = 100000;
+    const DURATION1 = 200;
+    const DURATION2 = 400;
+    await vestingManagement.addNewTerminableVesting(
+      BENEFICIARY,
+      START_TIME,
+      DURATION1
+    );
+    await vestingManagement.addNewTerminableVesting(
+      BENEFICIARY,
+      START_TIME,
+      DURATION2
+    );
+    const nextBlockTimestamp = +(await time.latest()) + +200;
+    const expectedTokenTransfer1 = 2 * TOKEN_BALANCE * (104 / 400);
+    const expectedTokenTransfer2 = TOKEN_BALANCE * (104 / 400);
+    await time.increaseTo(nextBlockTimestamp);
+    await vestedToken.balanceOf.returns(TOKEN_BALANCE);
+    await vestedToken.transfer.returns(true);
+    await vestingManagement.releaseTerminable(vestedToken.address, BENEFICIARY);
+    expect(vestedToken.transfer).to.have.been.calledWith(
+      BENEFICIARY,
+      expectedTokenTransfer1
+    );
+    expect(vestedToken.transfer).to.have.been.calledWith(
+      BENEFICIARY,
+      expectedTokenTransfer2
+    );
+  });
+
+  it("Should not release fixed vesting before releaseFixed if releaseTerminable called", async () => {
+    const TOKEN_BALANCE = 100000;
+    const DURATION1 = 200;
+    const DURATION2 = 400;
+    await vestingManagement.addNewTerminableVesting(
+      BENEFICIARY,
+      START_TIME,
+      DURATION1
+    );
+    await vestingManagement.addNewFixedVesting(
+      BENEFICIARY,
+      START_TIME,
+      DURATION2
+    );
+    const nextBlockTimestamp = +(await time.latest()) + +200;
+    const expectedTokenTransfer1 = 2 * TOKEN_BALANCE * (104 / 400);
+    const expectedTokenTransfer2 = TOKEN_BALANCE * (106 / 400);
+    await time.increaseTo(nextBlockTimestamp);
+    await vestedToken.balanceOf.returns(TOKEN_BALANCE);
+    await vestedToken.transfer.returns(true);
+    await vestingManagement.releaseTerminable(vestedToken.address, BENEFICIARY);
+    await time.increaseTo(nextBlockTimestamp + 1);
+    expect(vestedToken.transfer).to.have.been.calledWith(
+      BENEFICIARY,
+      expectedTokenTransfer1
+    );
+    expect(vestedToken.transfer).to.have.callCount(1);
+    await vestingManagement.releaseFixed(vestedToken.address, BENEFICIARY);
+    expect(vestedToken.transfer).to.have.been.calledWith(
+      BENEFICIARY,
+      expectedTokenTransfer2
+    );
+    expect(vestedToken.transfer).to.have.callCount(2);
+  });
+
+  it("Should not release terminable vesting before releaseTerminable if releaseFixed called", async () => {
+    const TOKEN_BALANCE = 100000;
+    const DURATION1 = 200;
+    const DURATION2 = 400;
+    await vestingManagement.addNewTerminableVesting(
+      BENEFICIARY,
+      START_TIME,
+      DURATION1
+    );
+    await vestingManagement.addNewFixedVesting(
+      BENEFICIARY,
+      START_TIME,
+      DURATION2
+    );
+    const nextBlockTimestamp = +(await time.latest()) + +200;
+    const expectedTokenTransfer1 = 2 * TOKEN_BALANCE * (106 / 400);
+    const expectedTokenTransfer2 = TOKEN_BALANCE * (104 / 400);
+    await time.increaseTo(nextBlockTimestamp);
+    await vestedToken.balanceOf.returns(TOKEN_BALANCE);
+    await vestedToken.transfer.returns(true);
+    await vestingManagement.releaseFixed(vestedToken.address, BENEFICIARY);
+    await time.increaseTo(nextBlockTimestamp + 1);
+    expect(vestedToken.transfer).to.have.been.calledWith(
+      BENEFICIARY,
+      expectedTokenTransfer2
+    );
+    expect(vestedToken.transfer).to.have.callCount(1);
+    await vestingManagement.releaseTerminable(vestedToken.address, BENEFICIARY);
+    expect(vestedToken.transfer).to.have.been.calledWith(
+      BENEFICIARY,
+      expectedTokenTransfer1
+    );
+    expect(vestedToken.transfer).to.have.callCount(2);
   });
 });

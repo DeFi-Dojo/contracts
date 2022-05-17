@@ -73,6 +73,15 @@ contract VestingManagement {
     return totalReleasable;
   }
 
+  function releaseFixed(address token, address beneficiary) external {
+    for (uint256 i = 0; i < vestingWallets[beneficiary].length; i++) {
+      VestingWallet wallet = vestingWallets[beneficiary][i];
+      if (wallet.vestedAmount(token, uint64(block.timestamp)) > 0) {
+        wallet.release(token);
+      }
+    }
+  }
+
   function totalReleasableFromTerminable(address token, address beneficiary)
     external
     view
@@ -88,5 +97,14 @@ contract VestingManagement {
         terminableVestingWallets[beneficiary][i].released(token);
     }
     return totalReleasable;
+  }
+
+  function releaseTerminable(address token, address beneficiary) external {
+    for (uint256 i = 0; i < terminableVestingWallets[beneficiary].length; i++) {
+      VestingWallet wallet = terminableVestingWallets[beneficiary][i];
+      if (wallet.vestedAmount(token, uint64(block.timestamp)) > 0) {
+        wallet.release(token);
+      }
+    }
   }
 }
