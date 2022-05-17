@@ -2,7 +2,6 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/finance/VestingWallet.sol";
 import "./TerminableVestingWallet.sol";
-import "hardhat/console.sol";
 
 contract VestingManagement {
   mapping(address => VestingWallet[]) public vestingWallets;
@@ -55,5 +54,39 @@ contract VestingManagement {
   function terminateVesting(address beneficiaryAddress, uint256 id) external {
     terminableVestingWallets[beneficiaryAddress][id].terminateVesting();
     delete terminableVestingWallets[beneficiaryAddress][id];
+  }
+
+  function totalReleasableFromFixed(address token, address beneficiary)
+    external
+    view
+    returns (uint256)
+  {
+    uint256 totalReleasable = 0;
+    for (uint256 i = 0; i < vestingWallets[beneficiary].length; i++) {
+      totalReleasable +=
+        vestingWallets[beneficiary][i].vestedAmount(
+          token,
+          uint64(block.timestamp)
+        ) -
+        vestingWallets[beneficiary][i].released(token);
+    }
+    return totalReleasable;
+  }
+
+  function totalReleasableFromTerminable(address token, address beneficiary)
+    external
+    view
+    returns (uint256)
+  {
+    uint256 totalReleasable = 0;
+    for (uint256 i = 0; i < terminableVestingWallets[beneficiary].length; i++) {
+      totalReleasable +=
+        terminableVestingWallets[beneficiary][i].vestedAmount(
+          token,
+          uint64(block.timestamp)
+        ) -
+        terminableVestingWallets[beneficiary][i].released(token);
+    }
+    return totalReleasable;
   }
 }

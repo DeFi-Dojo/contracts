@@ -1,7 +1,10 @@
 import { ethers } from "hardhat";
 import { expect } from "chai";
+import { FakeContract } from "@defi-wonderland/smock/dist/src/types";
+import { smock } from "@defi-wonderland/smock";
 import { VestingManagement } from "../typechain";
 import { deployContract } from "../utils";
+import IERC20 from "../artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json";
 
 const { time } = require("@openzeppelin/test-helpers");
 
@@ -10,9 +13,11 @@ describe("VestingManagement", () => {
   let BENEFICIARY: string;
   let START_TIME: number;
   let DURATION: number;
+  let vestedToken: FakeContract;
 
   beforeEach(async () => {
     const signers = await ethers.getSigners();
+    vestedToken = await smock.fake(IERC20.abi);
     BENEFICIARY = signers[9].address;
     const LAST_MINED_TIMESTAMP: number = await time.latest();
     START_TIME = +LAST_MINED_TIMESTAMP + 100;
@@ -58,7 +63,7 @@ describe("VestingManagement", () => {
     ).to.equal("0x0000000000000000000000000000000000000000");
   });
 
-  it("Should terminate vesting and not change latter after terminateVesting called", async () => {
+  it("Should terminate vesting without latter after terminateVesting called", async () => {
     await vestingManagement.addNewTerminableVesting(
       BENEFICIARY,
       START_TIME,
@@ -89,5 +94,81 @@ describe("VestingManagement", () => {
       addrOfVestingNotTerminated
     );
     expect(await vestingNotTerminated.isTerminated()).to.equal(false);
+  });
+
+  it("Should count releasable amount in totalReleasableFromFixed", async () => {
+    const TOKEN_BALANCE = 100000;
+    await vestingManagement.addNewFixedVesting(
+      BENEFICIARY,
+      START_TIME,
+      DURATION
+    );
+    const nextBlockTimestamp = +(await time.latest()) + +120;
+    const expectedTokensVested = Math.floor((22 * TOKEN_BALANCE) / 240);
+    await time.increaseTo(nextBlockTimestamp);
+    await vestedToken.balanceOf.returns(TOKEN_BALANCE);
+    expect(
+      await vestingManagement.totalReleasableFromFixed(
+        vestedToken.address,
+        BENEFICIARY
+      )
+    ).to.equal(expectedTokensVested);
+  });
+
+  it("Should count releasable amount in totalReleasableFromTerminable", async () => {
+    const TOKEN_BALANCE = 100000;
+    await vestingManagement.addNewTerminableVesting(
+      BENEFICIARY,
+      START_TIME,
+      DURATION
+    );
+    const nextBlockTimestamp = +(await time.latest()) + +120;
+    const expectedTokensVested = Math.floor((22 * TOKEN_BALANCE) / 240);
+    await time.increaseTo(nextBlockTimestamp);
+    await vestedToken.balanceOf.returns(TOKEN_BALANCE);
+    expect(
+      await vestingManagement.totalReleasableFromTerminable(
+        vestedToken.address,
+        BENEFICIARY
+      )
+    ).to.equal(expectedTokensVested);
+  });
+
+  it("Should not change totalReleasableFromTerminable if fixed vesting added and vested", async () => {
+    const TOKEN_BALANCE = 100000;
+    await vestingManagement.addNewFixedVesting(
+      BENEFICIARY,
+      START_TIME,
+      DURATION
+    );
+    const nextBlockTimestamp = +(await time.latest()) + +120;
+    const expectedTokensVested = 0;
+    await time.increaseTo(nextBlockTimestamp);
+    await vestedToken.balanceOf.returns(TOKEN_BALANCE);
+    expect(
+      await vestingManagement.totalReleasableFromTerminable(
+        vestedToken.address,
+        BENEFICIARY
+      )
+    ).to.equal(expectedTokensVested);
+  });
+
+  it("Should not change totalReleasableFromFixed if terminable vesting added and vested", async () => {
+    const TOKEN_BALANCE = 100000;
+    await vestingManagement.addNewTerminableVesting(
+      BENEFICIARY,
+      START_TIME,
+      DURATION
+    );
+    const nextBlockTimestamp = +(await time.latest()) + +120;
+    const expectedTokensVested = 0;
+    await time.increaseTo(nextBlockTimestamp);
+    await vestedToken.balanceOf.returns(TOKEN_BALANCE);
+    expect(
+      await vestingManagement.totalReleasableFromFixed(
+        vestedToken.address,
+        BENEFICIARY
+      )
+    ).to.equal(expectedTokensVested);
   });
 });
