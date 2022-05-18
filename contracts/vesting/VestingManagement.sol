@@ -1,9 +1,10 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/finance/VestingWallet.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "./TerminableVestingWallet.sol";
 
-contract VestingManagement {
+contract VestingManagement is Ownable {
   mapping(address => VestingWallet[]) public fixedVestingWallets;
   mapping(address => TerminableVestingWallet[]) public terminableVestingWallets;
 
@@ -47,13 +48,15 @@ contract VestingManagement {
     fixedVestingWallets[beneficiaryAddress].push(newVesting);
   }
 
-  // TODO: restrict vesting termination to owner
   /**
    * @dev Terminates terminable vesting
    * @param beneficiaryAddress Address which will have one of vestings terminated
    * @param id Number of vesting contract for specific beneficiary that will be terminated
    */
-  function terminateVesting(address beneficiaryAddress, uint256 id) external {
+  function terminateVesting(address beneficiaryAddress, uint256 id)
+    external
+    onlyOwner
+  {
     require(
       terminableVestingWallets[beneficiaryAddress].length > id,
       "id higher than terminable vestings count"

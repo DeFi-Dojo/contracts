@@ -2,11 +2,12 @@ import { ethers } from "hardhat";
 import chai, { expect } from "chai";
 import { FakeContract } from "@defi-wonderland/smock/dist/src/types";
 import { smock } from "@defi-wonderland/smock";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { VestingManagement } from "../typechain";
 import { deployContract } from "../utils";
 import IERC20 from "../artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json";
 
-const { time } = require("@openzeppelin/test-helpers");
+const { time, expectRevert } = require("@openzeppelin/test-helpers");
 
 chai.use(smock.matchers);
 
@@ -16,9 +17,10 @@ describe("VestingManagement", () => {
   let START_TIME: number;
   let DURATION: number;
   let vestedToken: FakeContract;
+  let signers: SignerWithAddress[];
 
   beforeEach(async () => {
-    const signers = await ethers.getSigners();
+    signers = await ethers.getSigners();
     vestedToken = await smock.fake(IERC20.abi);
     BENEFICIARY = signers[9].address;
     const LAST_MINED_TIMESTAMP: number = await time.latest();
@@ -70,6 +72,18 @@ describe("VestingManagement", () => {
     await vestingManagement.terminateVesting(BENEFICIARY, 0);
 
     expect(await vestingToTerminate.isTerminated()).to.equal(true);
+  });
+
+  it("Should revert terminateVesting if called not by owner", async () => {
+    await vestingManagement.addNewTerminableVesting(
+      BENEFICIARY,
+      START_TIME,
+      DURATION
+    );
+    expectRevert(
+      vestingManagement.connect(signers[1]).terminateVesting(BENEFICIARY, 0),
+      "Ownable: caller is not the owner"
+    );
   });
 
   it("Should terminate vesting without latter after terminateVesting called", async () => {
