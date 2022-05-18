@@ -36,8 +36,11 @@ contract VestingManagement {
   }
 
   function terminateVesting(address beneficiaryAddress, uint256 id) external {
+    require(
+      terminableVestingWallets[beneficiaryAddress].length > id,
+      "id higher than terminable vestings count"
+    );
     terminableVestingWallets[beneficiaryAddress][id].terminateVesting();
-    delete terminableVestingWallets[beneficiaryAddress][id];
   }
 
   function releaseTerminable(address token, address beneficiary) external {

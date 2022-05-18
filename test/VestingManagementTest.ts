@@ -61,10 +61,15 @@ describe("VestingManagement", () => {
       START_TIME,
       DURATION
     );
+    const addrOfVestingToTerminate =
+      await vestingManagement.terminableVestingWallets(BENEFICIARY, 0);
+    const contractFactory = await ethers.getContractFactory(
+      "TerminableVestingWallet"
+    );
+    const vestingToTerminate = contractFactory.attach(addrOfVestingToTerminate);
     await vestingManagement.terminateVesting(BENEFICIARY, 0);
-    expect(
-      await vestingManagement.terminableVestingWallets(BENEFICIARY, 0)
-    ).to.equal("0x0000000000000000000000000000000000000000");
+
+    expect(await vestingToTerminate.isTerminated()).to.equal(true);
   });
 
   it("Should terminate vesting without latter after terminateVesting called", async () => {
@@ -78,26 +83,22 @@ describe("VestingManagement", () => {
       START_TIME,
       DURATION
     );
-    const addrOfVestingToTerminate =
+    const addrOfVestingToTerminate1 =
       await vestingManagement.terminableVestingWallets(BENEFICIARY, 0);
+    const addrOfVestingToTerminate2 =
+      await vestingManagement.terminableVestingWallets(BENEFICIARY, 1);
     const contractFactory = await ethers.getContractFactory(
       "TerminableVestingWallet"
     );
-    const vestingToTerminate = contractFactory.attach(addrOfVestingToTerminate);
-    await vestingManagement.terminateVesting(BENEFICIARY, 0);
-    expect(
-      await vestingManagement.terminableVestingWallets(BENEFICIARY, 0)
-    ).to.equal("0x0000000000000000000000000000000000000000");
-    expect(await vestingToTerminate.isTerminated()).to.equal(true);
-    expect(
-      await vestingManagement.terminableVestingWallets(BENEFICIARY, 1)
-    ).to.not.equal("0x0000000000000000000000000000000000000000");
-    const addrOfVestingNotTerminated =
-      await vestingManagement.terminableVestingWallets(BENEFICIARY, 1);
-    const vestingNotTerminated = contractFactory.attach(
-      addrOfVestingNotTerminated
+    const vestingToTerminate1 = contractFactory.attach(
+      addrOfVestingToTerminate1
     );
-    expect(await vestingNotTerminated.isTerminated()).to.equal(false);
+    const vestingToTerminate2 = contractFactory.attach(
+      addrOfVestingToTerminate2
+    );
+    await vestingManagement.terminateVesting(BENEFICIARY, 0);
+    expect(await vestingToTerminate1.isTerminated()).to.equal(true);
+    expect(await vestingToTerminate2.isTerminated()).to.equal(false);
   });
 
   it("Should count releasable amount in totalReleasableFromFixed", async () => {
@@ -309,4 +310,37 @@ describe("VestingManagement", () => {
   });
 
   // TODO: "Should not count terminated vesting" UT
+  it("Should not count terminated vesting", async () => {
+    const TOKEN_BALANCE = 100000;
+    const DURATION1 = 400;
+    const DURATION2 = 200;
+    await vestingManagement.addNewTerminableVesting(
+      BENEFICIARY,
+      START_TIME,
+      DURATION1
+    );
+    await vestingManagement.addNewTerminableVesting(
+      BENEFICIARY,
+      START_TIME,
+      DURATION2
+    );
+
+    const nextBlockTimestamp = +(await time.latest()) + +200;
+    const expectedTokenTransfer1 = TOKEN_BALANCE * (104 / 400);
+    const expectedTokenTransfer2 = TOKEN_BALANCE;
+    await time.increaseTo(nextBlockTimestamp);
+    await vestingManagement.terminateVesting(BENEFICIARY, 0);
+    await time.increaseTo(nextBlockTimestamp + +100);
+    await vestedToken.balanceOf.returns(TOKEN_BALANCE);
+    await vestedToken.transfer.returns(true);
+    await vestingManagement.releaseTerminable(vestedToken.address, BENEFICIARY);
+    expect(vestedToken.transfer).to.have.been.calledWith(
+      BENEFICIARY,
+      expectedTokenTransfer2
+    );
+    expect(vestedToken.transfer).to.have.been.calledWith(
+      BENEFICIARY,
+      expectedTokenTransfer1
+    );
+  });
 });
