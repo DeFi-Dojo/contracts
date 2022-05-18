@@ -9,6 +9,12 @@ contract VestingManagement {
 
   constructor() {}
 
+  /**
+   * @dev Adds new vesting schedule for beneficiary. Vesting may be terminated by admin.
+   * @param beneficiaryAddress Address to which payout may be done
+   * @param startTimestamp Timestamp at which accruing value begins
+   * @param durationSeconds Duration of linear vesting after which all value will be claimable or claimed
+   */
   function addNewTerminableVesting(
     address beneficiaryAddress,
     uint64 startTimestamp,
@@ -22,6 +28,12 @@ contract VestingManagement {
     terminableVestingWallets[beneficiaryAddress].push(newVesting);
   }
 
+  /**
+   * @dev Adds new vesting schedule for beneficiary. Vesting may not be terminated.
+   * @param beneficiaryAddress Address to which payout may be done
+   * @param startTimestamp Timestamp at which accruing value begins
+   * @param durationSeconds Duration of linear vesting after which all value will be claimable or claimed
+   */
   function addNewFixedVesting(
     address beneficiaryAddress,
     uint64 startTimestamp,
@@ -35,6 +47,12 @@ contract VestingManagement {
     fixedVestingWallets[beneficiaryAddress].push(newVesting);
   }
 
+  // TODO: restrict vesting termination to owner
+  /**
+   * @dev Terminates terminable vesting
+   * @param beneficiaryAddress Address which will have one of vestings terminated
+   * @param id Number of vesting contract for specific beneficiary that will be terminated
+   */
   function terminateVesting(address beneficiaryAddress, uint256 id) external {
     require(
       terminableVestingWallets[beneficiaryAddress].length > id,
@@ -43,6 +61,11 @@ contract VestingManagement {
     terminableVestingWallets[beneficiaryAddress][id].terminateVesting();
   }
 
+  /**
+   * @dev Releases all vested value of all terminable vestings of specific token for beneficiary
+   * @param token Address of token which will be released
+   * @param beneficiary Vesting receiver
+   */
   function releaseTerminable(address token, address beneficiary) external {
     for (uint256 i = 0; i < terminableVestingWallets[beneficiary].length; i++) {
       VestingWallet wallet = terminableVestingWallets[beneficiary][i];
@@ -52,6 +75,11 @@ contract VestingManagement {
     }
   }
 
+  /**
+   * @dev Releases all vested value of all fixed (non-terminable) vestings of specific token for beneficiary
+   * @param token Address of token which will be released
+   * @param beneficiary Vesting receiver
+   */
   function releaseFixed(address token, address beneficiary) external {
     for (uint256 i = 0; i < fixedVestingWallets[beneficiary].length; i++) {
       VestingWallet wallet = fixedVestingWallets[beneficiary][i];
@@ -61,6 +89,10 @@ contract VestingManagement {
     }
   }
 
+  /**
+   * @dev Returns number of different terminable vesting schedules for beneficiary
+   * @param beneficiary Vesting receiver
+   */
   function getTerminableVestingsCount(address beneficiary)
     external
     view
@@ -69,6 +101,10 @@ contract VestingManagement {
     return terminableVestingWallets[beneficiary].length;
   }
 
+  /**
+   * @dev Returns number of different fixed (non-terminable) vesting schedules for beneficiary
+   * @param beneficiary Vesting receiver
+   */
   function getFixedVestingsCount(address beneficiary)
     external
     view
@@ -77,6 +113,11 @@ contract VestingManagement {
     return fixedVestingWallets[beneficiary].length;
   }
 
+  /**
+   * @dev Returns releasable value from all terminable vestings of specific token for beneficiary
+   * @param token Address of token which will be released
+   * @param beneficiary Vesting receiver
+   */
   function totalReleasableFromTerminable(address token, address beneficiary)
     external
     view
@@ -94,6 +135,11 @@ contract VestingManagement {
     return totalReleasable;
   }
 
+  /**
+   * @dev Returns releasable value from all fixed (non-terminable) vestings of specific token for beneficiary
+   * @param token Address of token which will be released
+   * @param beneficiary Vesting receiver
+   */
   function totalReleasableFromFixed(address token, address beneficiary)
     external
     view

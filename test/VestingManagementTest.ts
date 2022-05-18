@@ -309,7 +309,6 @@ describe("VestingManagement", () => {
     expect(vestedToken.transfer).to.have.callCount(2);
   });
 
-  // TODO: "Should not count terminated vesting" UT
   it("Should not count terminated vesting", async () => {
     const TOKEN_BALANCE = 100000;
     const DURATION1 = 400;

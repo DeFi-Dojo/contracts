@@ -16,6 +16,9 @@ contract TerminableVestingWallet is VestingWallet, Ownable {
     Ownable()
   {}
 
+  /**
+   * @dev Terminates vesting - stops accruing further assets.
+   */
   function terminateVesting() external onlyOwner {
     require(
       block.timestamp < start() + duration(),
