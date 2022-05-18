@@ -37,8 +37,10 @@ describe("VestingManagement", () => {
       START_TIME,
       DURATION
     );
-    expect(await vestingManagement.getVestingsCount(BENEFICIARY)).to.equal(1);
-    await vestingManagement.vestingWallets(BENEFICIARY, 0); // should not revert
+    expect(await vestingManagement.getFixedVestingsCount(BENEFICIARY)).to.equal(
+      1
+    );
+    await vestingManagement.fixedVestingWallets(BENEFICIARY, 0); // should not revert
   });
 
   it("Should add new terminable vesting on addNewTerminableVesting", async () => {
@@ -251,13 +253,13 @@ describe("VestingManagement", () => {
       DURATION2
     );
     const nextBlockTimestamp = +(await time.latest()) + +200;
-    const expectedTokenTransfer1 = 2 * TOKEN_BALANCE * (104 / 400);
-    const expectedTokenTransfer2 = TOKEN_BALANCE * (106 / 400);
+    const expectedTokenTransfer1 = Math.ceil(2 * TOKEN_BALANCE * (104 / 400));
+    const expectedTokenTransfer2 = Math.ceil(TOKEN_BALANCE * (114 / 400));
     await time.increaseTo(nextBlockTimestamp);
     await vestedToken.balanceOf.returns(TOKEN_BALANCE);
     await vestedToken.transfer.returns(true);
     await vestingManagement.releaseTerminable(vestedToken.address, BENEFICIARY);
-    await time.increaseTo(nextBlockTimestamp + 1);
+    await time.increaseTo(nextBlockTimestamp + 10);
     expect(vestedToken.transfer).to.have.been.calledWith(
       BENEFICIARY,
       expectedTokenTransfer1
@@ -286,18 +288,18 @@ describe("VestingManagement", () => {
       DURATION2
     );
     const nextBlockTimestamp = +(await time.latest()) + +200;
-    const expectedTokenTransfer1 = 2 * TOKEN_BALANCE * (106 / 400);
-    const expectedTokenTransfer2 = TOKEN_BALANCE * (104 / 400);
+    const expectedTokenTransfer1 = Math.ceil(2 * TOKEN_BALANCE * (114 / 400));
+    const expectedTokenTransfer2 = Math.ceil(TOKEN_BALANCE * (104 / 400));
     await time.increaseTo(nextBlockTimestamp);
     await vestedToken.balanceOf.returns(TOKEN_BALANCE);
     await vestedToken.transfer.returns(true);
     await vestingManagement.releaseFixed(vestedToken.address, BENEFICIARY);
-    await time.increaseTo(nextBlockTimestamp + 1);
     expect(vestedToken.transfer).to.have.been.calledWith(
       BENEFICIARY,
       expectedTokenTransfer2
     );
     expect(vestedToken.transfer).to.have.callCount(1);
+    await time.increaseTo(nextBlockTimestamp + 10);
     await vestingManagement.releaseTerminable(vestedToken.address, BENEFICIARY);
     expect(vestedToken.transfer).to.have.been.calledWith(
       BENEFICIARY,
@@ -305,4 +307,6 @@ describe("VestingManagement", () => {
     );
     expect(vestedToken.transfer).to.have.callCount(2);
   });
+
+  // TODO: "Should not count terminated vesting" UT
 });
