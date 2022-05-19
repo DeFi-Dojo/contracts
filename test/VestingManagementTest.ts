@@ -23,8 +23,8 @@ describe("VestingManagement", () => {
     signers = await ethers.getSigners();
     vestedToken = await smock.fake(IERC20.abi);
     BENEFICIARY = signers[9].address;
-    const LAST_MINED_TIMESTAMP: number = await time.latest();
-    START_TIME = +LAST_MINED_TIMESTAMP + 100;
+    const FIRST_MINED_TIMESTAMP: number = await time.latest();
+    START_TIME = +FIRST_MINED_TIMESTAMP + 100;
     DURATION = 240;
     vestingManagement = await deployContract<VestingManagement>(
       "VestingManagement",
@@ -123,15 +123,17 @@ describe("VestingManagement", () => {
       DURATION
     );
     const nextBlockTimestamp = +(await time.latest()) + +120;
-    const expectedTokensVested = Math.floor((22 * TOKEN_BALANCE) / 240);
     await time.increaseTo(nextBlockTimestamp);
     await vestedToken.balanceOf.returns(TOKEN_BALANCE);
-    expect(
-      await vestingManagement.totalReleasableFromFixed(
-        vestedToken.address,
-        BENEFICIARY
-      )
-    ).to.equal(expectedTokensVested);
+    const tokensVested = await vestingManagement.totalReleasableFromFixed(
+      vestedToken.address,
+      BENEFICIARY
+    );
+    const actualNextBlockTimestamp = await time.latest();
+    const expectedTokensVested = Math.floor(
+      (TOKEN_BALANCE * (actualNextBlockTimestamp - START_TIME)) / 240
+    );
+    expect(tokensVested).to.equal(expectedTokensVested);
   });
 
   it("Should count releasable amount in totalReleasableFromTerminable", async () => {
@@ -142,15 +144,17 @@ describe("VestingManagement", () => {
       DURATION
     );
     const nextBlockTimestamp = +(await time.latest()) + +120;
-    const expectedTokensVested = Math.floor((22 * TOKEN_BALANCE) / 240);
     await time.increaseTo(nextBlockTimestamp);
     await vestedToken.balanceOf.returns(TOKEN_BALANCE);
-    expect(
-      await vestingManagement.totalReleasableFromTerminable(
-        vestedToken.address,
-        BENEFICIARY
-      )
-    ).to.equal(expectedTokensVested);
+    const tokensVested = await vestingManagement.totalReleasableFromTerminable(
+      vestedToken.address,
+      BENEFICIARY
+    );
+    const actualNextBlockTimestamp = await time.latest();
+    const expectedTokensVested = Math.floor(
+      (TOKEN_BALANCE * (actualNextBlockTimestamp - START_TIME)) / 240
+    );
+    expect(tokensVested).to.equal(expectedTokensVested);
   });
 
   it("Should not change totalReleasableFromTerminable if fixed vesting added and vested", async () => {
@@ -206,12 +210,17 @@ describe("VestingManagement", () => {
       DURATION2
     );
     const nextBlockTimestamp = +(await time.latest()) + +200;
-    const expectedTokenTransfer1 = 2 * TOKEN_BALANCE * (104 / 400);
-    const expectedTokenTransfer2 = TOKEN_BALANCE * (104 / 400);
     await time.increaseTo(nextBlockTimestamp);
     await vestedToken.balanceOf.returns(TOKEN_BALANCE);
     await vestedToken.transfer.returns(true);
     await vestingManagement.releaseFixed(vestedToken.address, BENEFICIARY);
+    const actualNextBlockTimestamp = await time.latest();
+    const expectedTokenTransfer1 = Math.floor(
+      (2 * TOKEN_BALANCE * (actualNextBlockTimestamp - START_TIME)) / 400
+    );
+    const expectedTokenTransfer2 = Math.floor(
+      (TOKEN_BALANCE * (actualNextBlockTimestamp - START_TIME)) / 400
+    );
     expect(vestedToken.transfer).to.have.been.calledWith(
       BENEFICIARY,
       expectedTokenTransfer1
@@ -237,12 +246,17 @@ describe("VestingManagement", () => {
       DURATION2
     );
     const nextBlockTimestamp = +(await time.latest()) + +200;
-    const expectedTokenTransfer1 = 2 * TOKEN_BALANCE * (104 / 400);
-    const expectedTokenTransfer2 = TOKEN_BALANCE * (104 / 400);
     await time.increaseTo(nextBlockTimestamp);
     await vestedToken.balanceOf.returns(TOKEN_BALANCE);
     await vestedToken.transfer.returns(true);
     await vestingManagement.releaseTerminable(vestedToken.address, BENEFICIARY);
+    const actualNextBlockTimestamp = await time.latest();
+    const expectedTokenTransfer1 = Math.floor(
+      (2 * TOKEN_BALANCE * (actualNextBlockTimestamp - START_TIME)) / 400
+    );
+    const expectedTokenTransfer2 = Math.floor(
+      (TOKEN_BALANCE * (actualNextBlockTimestamp - START_TIME)) / 400
+    );
     expect(vestedToken.transfer).to.have.been.calledWith(
       BENEFICIARY,
       expectedTokenTransfer1
@@ -268,19 +282,25 @@ describe("VestingManagement", () => {
       DURATION2
     );
     const nextBlockTimestamp = +(await time.latest()) + +200;
-    const expectedTokenTransfer1 = Math.ceil(2 * TOKEN_BALANCE * (104 / 400));
-    const expectedTokenTransfer2 = Math.ceil(TOKEN_BALANCE * (114 / 400));
     await time.increaseTo(nextBlockTimestamp);
     await vestedToken.balanceOf.returns(TOKEN_BALANCE);
     await vestedToken.transfer.returns(true);
     await vestingManagement.releaseTerminable(vestedToken.address, BENEFICIARY);
-    await time.increaseTo(nextBlockTimestamp + 10);
+    let actualNextBlockTimestamp = await time.latest();
+    const expectedTokenTransfer1 = Math.floor(
+      (2 * TOKEN_BALANCE * (actualNextBlockTimestamp - START_TIME)) / 400
+    );
     expect(vestedToken.transfer).to.have.been.calledWith(
       BENEFICIARY,
       expectedTokenTransfer1
     );
     expect(vestedToken.transfer).to.have.callCount(1);
+    await time.increaseTo(nextBlockTimestamp + 10);
     await vestingManagement.releaseFixed(vestedToken.address, BENEFICIARY);
+    actualNextBlockTimestamp = await time.latest();
+    const expectedTokenTransfer2 = Math.floor(
+      (TOKEN_BALANCE * (actualNextBlockTimestamp - START_TIME)) / 400
+    );
     expect(vestedToken.transfer).to.have.been.calledWith(
       BENEFICIARY,
       expectedTokenTransfer2
@@ -303,22 +323,30 @@ describe("VestingManagement", () => {
       DURATION2
     );
     const nextBlockTimestamp = +(await time.latest()) + +200;
-    const expectedTokenTransfer1 = Math.ceil(2 * TOKEN_BALANCE * (114 / 400));
-    const expectedTokenTransfer2 = Math.ceil(TOKEN_BALANCE * (104 / 400));
+    // const expectedTokenTransfer1 = Math.ceil(2 * TOKEN_BALANCE * (114 / 400));
+    // const expectedTokenTransfer2 = Math.ceil(TOKEN_BALANCE * (104 / 400));
     await time.increaseTo(nextBlockTimestamp);
     await vestedToken.balanceOf.returns(TOKEN_BALANCE);
     await vestedToken.transfer.returns(true);
     await vestingManagement.releaseFixed(vestedToken.address, BENEFICIARY);
+    let actualNextBlockTimestamp = await time.latest();
+    const expectedTokenTransfer1 = Math.floor(
+      (TOKEN_BALANCE * (actualNextBlockTimestamp - START_TIME)) / 400
+    );
     expect(vestedToken.transfer).to.have.been.calledWith(
       BENEFICIARY,
-      expectedTokenTransfer2
+      expectedTokenTransfer1
     );
     expect(vestedToken.transfer).to.have.callCount(1);
     await time.increaseTo(nextBlockTimestamp + 10);
     await vestingManagement.releaseTerminable(vestedToken.address, BENEFICIARY);
+    actualNextBlockTimestamp = await time.latest();
+    const expectedTokenTransfer2 = Math.floor(
+      (2 * TOKEN_BALANCE * (actualNextBlockTimestamp - START_TIME)) / 400
+    );
     expect(vestedToken.transfer).to.have.been.calledWith(
       BENEFICIARY,
-      expectedTokenTransfer1
+      expectedTokenTransfer2
     );
     expect(vestedToken.transfer).to.have.callCount(2);
   });
@@ -339,21 +367,24 @@ describe("VestingManagement", () => {
     );
 
     const nextBlockTimestamp = +(await time.latest()) + +200;
-    const expectedTokenTransfer1 = TOKEN_BALANCE * (104 / 400);
-    const expectedTokenTransfer2 = TOKEN_BALANCE;
     await time.increaseTo(nextBlockTimestamp);
     await vestingManagement.terminateVesting(BENEFICIARY, 0);
+    const terminateVestingTimestamp = await time.latest();
     await time.increaseTo(nextBlockTimestamp + +100);
     await vestedToken.balanceOf.returns(TOKEN_BALANCE);
     await vestedToken.transfer.returns(true);
     await vestingManagement.releaseTerminable(vestedToken.address, BENEFICIARY);
-    expect(vestedToken.transfer).to.have.been.calledWith(
-      BENEFICIARY,
-      expectedTokenTransfer2
+    const expectedTokenTransfer1 = TOKEN_BALANCE;
+    const expectedTokenTransfer2 = Math.floor(
+      (TOKEN_BALANCE * (terminateVestingTimestamp - START_TIME)) / 400
     );
     expect(vestedToken.transfer).to.have.been.calledWith(
       BENEFICIARY,
       expectedTokenTransfer1
+    );
+    expect(vestedToken.transfer).to.have.been.calledWith(
+      BENEFICIARY,
+      expectedTokenTransfer2
     );
   });
 });
