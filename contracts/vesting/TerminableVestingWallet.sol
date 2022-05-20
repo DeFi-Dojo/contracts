@@ -4,7 +4,6 @@ import "@openzeppelin/contracts/finance/VestingWallet.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract TerminableVestingWallet is VestingWallet, Ownable {
-  bool public isTerminated;
   uint256 public terminationTimestamp;
 
   constructor(
@@ -24,12 +23,15 @@ contract TerminableVestingWallet is VestingWallet, Ownable {
       block.timestamp < start() + duration(),
       "Vesting is already finished"
     );
-    isTerminated = true;
     if (block.timestamp < start()) {
       terminationTimestamp = start();
     } else {
       terminationTimestamp = block.timestamp;
     }
+  }
+
+  function isTerminated() public view returns (bool) {
+    return terminationTimestamp != 0;
   }
 
   function _vestingSchedule(uint256 totalAllocation, uint64 timestamp)
@@ -40,9 +42,9 @@ contract TerminableVestingWallet is VestingWallet, Ownable {
   {
     if (timestamp < start()) {
       return 0;
-    } else if (timestamp > start() + duration() && isTerminated == false) {
+    } else if (timestamp > start() + duration() && isTerminated() == false) {
       return totalAllocation;
-    } else if (isTerminated == true && timestamp > terminationTimestamp) {
+    } else if (isTerminated() == true && timestamp > terminationTimestamp) {
       return (totalAllocation * (terminationTimestamp - start())) / duration();
     } else {
       return (totalAllocation * (timestamp - start())) / duration();
