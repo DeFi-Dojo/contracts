@@ -95,6 +95,7 @@ contract VestingManagement is Ownable {
   /**
    * @dev Returns number of different terminable vesting schedules for beneficiary
    * @param beneficiary Vesting receiver
+   * @return number of terminable vesting contracts
    */
   function getTerminableVestingsCount(address beneficiary)
     external
@@ -107,6 +108,7 @@ contract VestingManagement is Ownable {
   /**
    * @dev Returns number of different fixed (non-terminable) vesting schedules for beneficiary
    * @param beneficiary Vesting receiver
+   * @return number of fixed vesting contracts
    */
   function getFixedVestingsCount(address beneficiary)
     external
@@ -120,6 +122,7 @@ contract VestingManagement is Ownable {
    * @dev Returns releasable value from all terminable vestings of specific token for beneficiary
    * @param token Address of token which will be released
    * @param beneficiary Vesting receiver
+   * @return total releasable value from terminable contracts
    */
   function totalReleasableFromTerminable(address token, address beneficiary)
     external
@@ -142,6 +145,7 @@ contract VestingManagement is Ownable {
    * @dev Returns releasable value from all fixed (non-terminable) vestings of specific token for beneficiary
    * @param token Address of token which will be released
    * @param beneficiary Vesting receiver
+   * @return total releasable value from fixed contracts
    */
   function totalReleasableFromFixed(address token, address beneficiary)
     external

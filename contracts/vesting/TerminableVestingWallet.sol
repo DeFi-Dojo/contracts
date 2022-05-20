@@ -30,6 +30,10 @@ contract TerminableVestingWallet is VestingWallet, Ownable {
     }
   }
 
+  /**
+   * @dev Indicates if current vesting is terminated
+   * @return true if vesting is terminated
+   */
   function isTerminated() public view returns (bool) {
     return terminationTimestamp != 0;
   }
