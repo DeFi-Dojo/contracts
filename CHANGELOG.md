@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.39.0](https://github.com/DeFi-Dojo/contracts/compare/v1.38.0...v1.39.0) (2022-05-23)
+
+
+### Features
+
+* dex-581 vesting final version ([#91](https://github.com/DeFi-Dojo/contracts/issues/91)) ([44e1293](https://github.com/DeFi-Dojo/contracts/commit/44e1293acfc71a2eaf0c1f4b932d0f93445bdea0))
+
 # [1.38.0](https://github.com/DeFi-Dojo/contracts/compare/v1.37.2...v1.38.0) (2022-05-16)
 
 
