@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.40.0](https://github.com/DeFi-Dojo/contracts/compare/v1.39.0...v1.40.0) (2022-05-24)
+
+
+### Features
+
+* alignment of vesting scripts after new implementation ([#92](https://github.com/DeFi-Dojo/contracts/issues/92)) ([de52d64](https://github.com/DeFi-Dojo/contracts/commit/de52d64839f0e63b3834fe2c4459a2a481c3b844))
+
 # [1.39.0](https://github.com/DeFi-Dojo/contracts/compare/v1.38.0...v1.39.0) (2022-05-23)
 
 
