@@ -1,12 +1,13 @@
 import { ethers } from "hardhat";
 import assert from "assert";
+import { BigNumber } from "ethers";
 import {
   createDeployContract,
   waitForReceipt,
 } from "../../../utils/deployment";
 import * as consts from "../../../consts";
 import { QuickswapVaultName } from "../../../consts";
-import { QuickswapYNFTVault__factory, YNFT } from "../../../typechain";
+import { IERC20, QuickswapYNFTVault__factory, YNFT } from "../../../typechain";
 import configEnv from "../../../config";
 import { uploadYnftMetadata } from "../../../utils";
 
@@ -46,14 +47,32 @@ async function main() {
       amountOutMin,
       deadline,
       {
-        value: ethers.utils.parseEther("0.1"),
+        value: ethers.utils.parseEther("1"),
+      }
+    )
+    .then(waitForReceipt);
+
+  await yNFTVault
+    .createYNFTForEther(
+      amountOutMin,
+      amountOutMin,
+      amountOutMin,
+      amountOutMin,
+      deadline,
+      {
+        value: ethers.utils.parseEther("1"),
       }
     )
     .then(waitForReceipt);
 
   console.log("created");
+  const provider = ethers.getDefaultProvider("http://127.0.0.1:8545/");
 
   const yNft = await ethers.getContractAt<YNFT>("YNFT", await yNFTVault.yNFT());
+  const underlyingToken = await ethers.getContractAt<IERC20>(
+    "IERC20",
+    ADDRESSES.USDC
+  );
 
   assert.equal(
     await yNft.ownerOf(0),
@@ -65,9 +84,30 @@ async function main() {
     .transferFrom(owner.address, signers[1].address, 0)
     .then(waitForReceipt);
   assert.equal(await yNft.ownerOf(0), signers[1].address, "test assert");
-  await yNFTVault
+  const underlyingTokenBalanceBefore: BigNumber =
+    await underlyingToken.balanceOf(signers[1].address);
+  const balanceBefore: BigNumber = await provider.getBalance(
+    signers[1].address
+  );
+  const tx = await yNFTVault
     .connect(signers[1])
     .withdrawToUnderlyingTokens(0, amountOutMin, amountOutMin, deadline);
+  await tx.wait();
+  const underlyingTokenBalanceAfter: BigNumber =
+    await underlyingToken.balanceOf(signers[1].address);
+  const balanceAfter: BigNumber = await provider.getBalance(signers[1].address);
+  console.log(
+    `underlyingTokenBalanceBefore: ${underlyingTokenBalanceBefore}, underlyingTokenBalanceAfter: ${underlyingTokenBalanceAfter}`
+  );
+  console.log(`balanceBefore: ${balanceBefore}, balanceAfter: ${balanceAfter}`);
+  assert(
+    underlyingTokenBalanceAfter.gt(underlyingTokenBalanceBefore),
+    "Underlying token balance did not increase after yNFT withdrawal"
+  );
+  assert(
+    balanceAfter.gt(balanceBefore),
+    "Selling accountalance did not increase after yNFT withdrawal"
+  );
 }
 
 main()
