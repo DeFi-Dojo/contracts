@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.41.0](https://github.com/DeFi-Dojo/contracts/compare/v1.40.0...v1.41.0) (2022-05-24)
+
+
+### Features
+
+* update nft rarity ([#93](https://github.com/DeFi-Dojo/contracts/issues/93)) ([ac7a1e9](https://github.com/DeFi-Dojo/contracts/commit/ac7a1e93595433db083b015a33fd5f2d07c303d5))
+
 # [1.40.0](https://github.com/DeFi-Dojo/contracts/compare/v1.39.0...v1.40.0) (2022-05-24)
 
 
