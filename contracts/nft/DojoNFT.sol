@@ -33,7 +33,6 @@ contract DojoNFT is
   struct Characteristics {
     uint8 faceMask;
     uint8 eyes;
-    uint8 symbol;
     uint8 horn;
     uint8 weapon;
     uint8 helmet;
@@ -44,18 +43,12 @@ contract DojoNFT is
 
   mapping(uint256 => uint256) public rarityIndex;
 
-  uint8[][] public equipmentDistributionMatrix = [
-    [50, 70, 85, 95, 100], // faceMask
-    [50, 70, 85, 95, 100], // eyes
-    [50, 70, 85, 95, 100], // symbol
-    [50, 70, 85, 95, 100], // horn
-    [50, 70, 85, 95, 100] // weapon
-  ];
-
-  uint8[][] public armorDistributionMatrix = [
-    [75, 95, 100], // helmet
-    [75, 95, 100] // bust
-  ];
+  uint8[] public faceMaskDistribution = [40, 25, 20, 10, 4, 1];
+  uint8[] public eyesDistribution = [50, 20, 15, 10, 5];
+  uint8[] public hornDistribution = [25, 20, 12, 8, 4, 1];
+  uint8[] public weaponDistribution = [50, 20, 15, 10, 5];
+  uint8[] public helmetDistribution = [75, 20, 5];
+  uint8[] public bustDistribution = [75, 20, 5];
 
   struct RarityOption {
     uint8 optionId;
@@ -65,7 +58,6 @@ contract DojoNFT is
   struct RarityInfo {
     RarityOption faceMask;
     RarityOption eyes;
-    RarityOption symbol;
     RarityOption horn;
     RarityOption weapon;
     RarityOption helmet;
@@ -129,19 +121,18 @@ contract DojoNFT is
     pure
     returns (RarityOption memory rarityOption)
   {
-    uint256 arrayLength = _distribution.length;
-    for (uint8 i = 0; i < arrayLength; i++) {
-      if (_distribution[i] >= _rarity) {
-        if (i == 0) {
-          return RarityOption({optionId: i, rarity: _distribution[i]});
-        }
-        return
-          RarityOption({
-            optionId: i,
-            rarity: _distribution[i] - _distribution[i - 1]
-          });
+    uint8 distributionLength = uint8(_distribution.length);
+    uint8 distributionSum = 0;
+
+    for (uint8 i = distributionLength - 1; i > 0; i--) {
+      distributionSum += _distribution[i];
+
+      if (_rarity < distributionSum) {
+        return RarityOption({optionId: i, rarity: _distribution[i]});
       }
     }
+
+    return RarityOption({optionId: 0, rarity: _distribution[0]});
   }
 
   /**
@@ -178,24 +169,15 @@ contract DojoNFT is
           _blockTimestamp,
           _blockDifficulty
         ),
-        equipmentDistributionMatrix[0]
+        faceMaskDistribution
       ),
       eyes: _getOption(
         _randPercentage(newTokenId, "eyes", _blockTimestamp, _blockDifficulty),
-        equipmentDistributionMatrix[1]
-      ),
-      symbol: _getOption(
-        _randPercentage(
-          newTokenId,
-          "symbol",
-          _blockTimestamp,
-          _blockDifficulty
-        ),
-        equipmentDistributionMatrix[2]
+        eyesDistribution
       ),
       horn: _getOption(
         _randPercentage(newTokenId, "horn", _blockTimestamp, _blockDifficulty),
-        equipmentDistributionMatrix[3]
+        hornDistribution
       ),
       weapon: _getOption(
         _randPercentage(
@@ -204,7 +186,7 @@ contract DojoNFT is
           _blockTimestamp,
           _blockDifficulty
         ),
-        equipmentDistributionMatrix[4]
+        weaponDistribution
       ),
       helmet: _getOption(
         _randPercentage(
@@ -213,23 +195,17 @@ contract DojoNFT is
           _blockTimestamp,
           _blockDifficulty
         ),
-        armorDistributionMatrix[0]
+        helmetDistribution
       ),
       bust: _getOption(
-        _randPercentage(
-          newTokenId,
-          "faceMaskColor",
-          _blockTimestamp,
-          _blockDifficulty
-        ),
-        armorDistributionMatrix[1]
+        _randPercentage(newTokenId, "bust", _blockTimestamp, _blockDifficulty),
+        bustDistribution
       )
     });
 
     characteristics[newTokenId] = Characteristics({
       faceMask: rarityInfo.faceMask.optionId,
       eyes: rarityInfo.eyes.optionId,
-      symbol: rarityInfo.symbol.optionId,
       horn: rarityInfo.horn.optionId,
       weapon: rarityInfo.weapon.optionId,
       helmet: rarityInfo.helmet.optionId,
@@ -239,7 +215,6 @@ contract DojoNFT is
     rarityIndex[newTokenId] =
       rarityInfo.faceMask.rarity +
       rarityInfo.eyes.rarity +
-      rarityInfo.symbol.rarity +
       rarityInfo.horn.rarity +
       rarityInfo.weapon.rarity +
       rarityInfo.helmet.rarity +
