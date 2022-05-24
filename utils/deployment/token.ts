@@ -3,12 +3,12 @@ import { createDeployContract, waitForReceipt } from ".";
 import {
   DojoToken,
   DojoToken__factory,
-  TokenVesting,
-  TokenVesting__factory,
+  VestingManagement,
+  VestingManagement__factory,
 } from "../../typechain";
 import configEnv from "../../config/config";
 
-const { DJO_TOKEN_ADDRESS, DJO_TOKEN_OWNER, TOKEN_VESTING_ADDRESS } = configEnv;
+const { DJO_TOKEN_ADDRESS, TOKEN_VESTING_ADDRESS } = configEnv;
 
 export const deployToken = async () => {
   const deploy = createDeployContract<DojoToken__factory>("DojoToken");
@@ -17,54 +17,72 @@ export const deployToken = async () => {
 };
 
 export const deployVesting = async () => {
-  const deploy = createDeployContract<TokenVesting__factory>("TokenVesting");
-  await deploy(DJO_TOKEN_ADDRESS, DJO_TOKEN_OWNER).then(
-    (v) => v as TokenVesting
-  );
+  const deploy =
+    createDeployContract<VestingManagement__factory>("VestingManagement");
+  await deploy().then((v) => v as VestingManagement);
 };
 
 export const createVestingSchedule = async (
   beneficiary: string,
   start: number,
-  cliff: number,
   duration: number,
-  slicePeriodSeconds: number,
   amount: number
 ) => {
   const DojoTokenFactory = await ethers.getContractFactory<DojoToken__factory>(
     "DojoToken"
   );
-  const TokenVestingFactory =
-    await ethers.getContractFactory<TokenVesting__factory>("TokenVesting");
+  const VestingManagementFactory =
+    await ethers.getContractFactory<VestingManagement__factory>(
+      "VestingManagement"
+    );
   const dojoToken = await DojoTokenFactory.attach(DJO_TOKEN_ADDRESS);
-  const tokenVesting = await TokenVestingFactory.attach(TOKEN_VESTING_ADDRESS);
-  console.log(`Sending ${amount} tokens to ${tokenVesting.address}`);
-  await dojoToken.transfer(tokenVesting.address, amount).then(waitForReceipt);
-  const withdrawableAmount = await tokenVesting.getWithdrawableAmount();
-  console.log(
-    `withdrawableAmount: ${withdrawableAmount}, creating vesting schedule with ${amount} tokens`
+  const tokenVesting = await VestingManagementFactory.attach(
+    TOKEN_VESTING_ADDRESS
   );
+  const amountWithdrawableFromFixedVestings =
+    await tokenVesting.totalReleasableFromFixed(DJO_TOKEN_ADDRESS, beneficiary);
+  const amountWithdrawableFromTerminableVestings =
+    await tokenVesting.totalReleasableFromTerminable(
+      DJO_TOKEN_ADDRESS,
+      beneficiary
+    );
+  console.log(
+    `amount withdrawable from fixed vestings: ${amountWithdrawableFromFixedVestings}, from terminable vestings: ${amountWithdrawableFromTerminableVestings}`
+  );
+  console.log(`Creating terminable vesting schedule with ${amount} tokens`);
   await tokenVesting
-    .createVestingSchedule(
-      beneficiary,
-      start,
-      cliff,
-      duration,
-      slicePeriodSeconds,
-      amount
-    )
+    .addNewTerminableVesting(beneficiary, start, duration)
     .then(waitForReceipt);
+
+  const vestingsCount = await tokenVesting.getTerminableVestingsCount(
+    beneficiary
+  );
+  const vestingAddress = await tokenVesting.terminableVestingWallets(
+    beneficiary,
+    +vestingsCount - 1
+  );
+  console.log(
+    `Created new terminable vesting at address ${vestingAddress}, terminable vestings count: ${vestingsCount}`
+  );
+  console.log(`Sending ${amount} tokens to last vesting at ${vestingAddress}`);
+  await dojoToken.transfer(vestingAddress, amount).then(waitForReceipt);
 };
 
 export const releaseVesting = async (beneficiary: string) => {
   const DojoTokenFactory = await ethers.getContractFactory<DojoToken__factory>(
     "DojoToken"
   );
-  const TokenVestingFactory =
-    await ethers.getContractFactory<TokenVesting__factory>("TokenVesting");
+  const VestingManagementFactory =
+    await ethers.getContractFactory<VestingManagement__factory>(
+      "VestingManagement"
+    );
   const dojoToken = await DojoTokenFactory.attach(DJO_TOKEN_ADDRESS);
-  const tokenVesting = await TokenVestingFactory.attach(TOKEN_VESTING_ADDRESS);
-  const releasableAmount = await tokenVesting.computeReleasableAmount(
+  const tokenVesting = await VestingManagementFactory.attach(
+    TOKEN_VESTING_ADDRESS
+  );
+
+  const releasableAmount = await tokenVesting.totalReleasableFromTerminable(
+    dojoToken.address,
     beneficiary
   );
   console.log(
@@ -73,7 +91,7 @@ export const releaseVesting = async (beneficiary: string) => {
     )}, amount to claim: ${releasableAmount}`
   );
   await tokenVesting
-    .release(beneficiary, releasableAmount)
+    .releaseTerminable(dojoToken.address, beneficiary)
     .then(waitForReceipt);
   console.log(
     `Vested tokens released, balance after: ${await dojoToken.balanceOf(
