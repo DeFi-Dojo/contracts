@@ -206,32 +206,6 @@ contract VestingManagement is Ownable {
   }
 
   /**
-   * @dev Returns total value that can be released during vesting period from all fixed (non-terminable) vestings of specific token for beneficiary
-   * @param token Address of vested token
-   * @param beneficiary Vesting receiver
-   * @return total value that can be released during vesting period from fixed vesting contracts
-   */
-  function totalToBeReleasedFromFixed(address token, address beneficiary)
-    public
-    view
-    returns (uint256)
-  {
-    uint256 totalTokenBalance = 0;
-    TerminableVestingWallet[] storage vestingWallets = terminableVestingWallets[
-      beneficiary
-    ];
-
-    for (uint256 i = 0; i < vestingWallets.length; i++) {
-      VestingWallet vestingWallet = vestingWallets[i];
-      uint256 tokenBalance = IERC20(token).balanceOf(address(vestingWallet));
-
-      totalTokenBalance += tokenBalance;
-    }
-
-    return totalTokenBalance + totalReleasedFromTerminable(token, beneficiary);
-  }
-
-  /**
    * @dev Returns total value that can be released during vesting period from all terminable vestings of specific token for beneficiary
    * @param token Address of vested token
    * @param beneficiary Vesting receiver
@@ -243,8 +217,24 @@ contract VestingManagement is Ownable {
     returns (uint256)
   {
     return
-      totalTokenBalanceTerminable(token, beneficiary) +
-      totalReleasedFromTerminable(token, beneficiary);
+      totalReleasedFromTerminable(token, beneficiary) +
+      totalTokenBalanceTerminable(token, beneficiary);
+  }
+
+  /**
+   * @dev Returns total value that can be released during vesting period from all fixed (non-terminable) vestings of specific token for beneficiary
+   * @param token Address of vested token
+   * @param beneficiary Vesting receiver
+   * @return total value that can be released during vesting period from fixed vesting contracts
+   */
+  function totalToBeReleasedFromFixed(address token, address beneficiary)
+    public
+    view
+    returns (uint256)
+  {
+    return
+      totalReleasedFromTerminable(token, beneficiary) +
+      totalTokenBalanceFixed(token, beneficiary);
   }
 
   function totalTokenBalanceTerminable(address token, address beneficiary)
@@ -295,7 +285,11 @@ contract VestingManagement is Ownable {
     ];
 
     for (uint256 i = 0; i < vestingWallets.length; i++) {
-      vestingWallets[i].withdrawAllFromTerminated(token, to);
+      TerminableVestingWallet vestingWallet = vestingWallets[i];
+
+      if (vestingWallet.isTerminated()) {
+        vestingWallet.withdrawAllFromTerminated(token, to);
+      }
     }
   }
 }

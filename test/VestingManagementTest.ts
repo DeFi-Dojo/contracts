@@ -388,4 +388,45 @@ describe("VestingManagement", () => {
       expectedTokenTransfer2
     );
   });
+
+  describe("withdrawAllFromTerminated", () => {
+    let TO: string;
+    const addVesting = () =>
+      vestingManagement.addNewTerminableVesting(
+        BENEFICIARY,
+        START_TIME,
+        DURATION
+      );
+    const withdrawFromTerminated = (signer = signers[0]) =>
+      vestingManagement
+        .connect(signer)
+        .withdrawAllFromTerminated(vestedToken.address, BENEFICIARY, TO);
+
+    beforeEach(async () => {
+      TO = signers[6].address;
+
+      await addVesting();
+      await addVesting();
+
+      await vestingManagement.terminateVesting(BENEFICIARY, 0);
+
+      vestedToken.transfer.returns(true);
+    });
+
+    it("Withdraws for each terminated vesting", async () => {
+      const TOKEN_BALANCE = 12000;
+      vestedToken.balanceOf.returns(TOKEN_BALANCE);
+
+      await withdrawFromTerminated();
+
+      expect(vestedToken.transfer).to.be.calledWith(TO, TOKEN_BALANCE);
+    });
+
+    it("Throws when called by non-owner", () => {
+      expectRevert(
+        withdrawFromTerminated(signers[6]),
+        "Ownable: caller is not the owner"
+      );
+    });
+  });
 });
