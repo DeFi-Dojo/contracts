@@ -20,6 +20,16 @@ describe("VestingManagement", () => {
   let vestedToken: FakeContract;
   let signers: SignerWithAddress[];
 
+  const addTerminableVesting = () =>
+    vestingManagement.addNewTerminableVesting(
+      BENEFICIARY,
+      START_TIME,
+      DURATION
+    );
+
+  const addFixedVesting = () =>
+    vestingManagement.addNewFixedVesting(BENEFICIARY, START_TIME, DURATION);
+
   beforeEach(async () => {
     signers = await ethers.getSigners();
     vestedToken = await smock.fake(IERC20.abi);
@@ -196,6 +206,94 @@ describe("VestingManagement", () => {
         BENEFICIARY
       )
     ).to.equal(expectedTokensVested);
+  });
+
+  it("Should return total released from terminable", async () => {
+    const totalReleased = () =>
+      vestingManagement.totalReleasedFromTerminable(
+        vestedToken.address,
+        BENEFICIARY
+      );
+
+    const TOKEN_BALANCE = 100000;
+    const expectedTokensVested = 9583;
+    vestedToken.balanceOf.returns(TOKEN_BALANCE);
+    vestedToken.transfer.returns(true);
+
+    await vestingManagement.addNewTerminableVesting(
+      BENEFICIARY,
+      START_TIME,
+      DURATION
+    );
+    await latestTime().then((t) => increaseTime(t + 120));
+
+    expect(await totalReleased()).to.equal(0);
+
+    await vestingManagement.releaseTerminable(vestedToken.address, BENEFICIARY);
+
+    expect(await totalReleased()).to.equal(expectedTokensVested);
+  });
+
+  it("Should return total released from fixed vestings", async () => {
+    const totalReleased = () =>
+      vestingManagement.totalReleasedFromFixed(
+        vestedToken.address,
+        BENEFICIARY
+      );
+
+    const TOKEN_BALANCE = 100000;
+    const expectedTokensVested = 9583;
+    vestedToken.balanceOf.returns(TOKEN_BALANCE);
+    vestedToken.transfer.returns(true);
+
+    await vestingManagement.addNewFixedVesting(
+      BENEFICIARY,
+      START_TIME,
+      DURATION
+    );
+    await latestTime().then((t) => increaseTime(t + 120));
+
+    expect(await totalReleased()).to.equal(0);
+
+    await vestingManagement.releaseFixed(vestedToken.address, BENEFICIARY);
+
+    expect(await totalReleased()).to.equal(expectedTokensVested);
+  });
+
+  it.only("Should return total token balance from terminable vestings", async () => {
+    const totalBalance = () =>
+      vestingManagement.totalTokenBalanceTerminable(
+        vestedToken.address,
+        BENEFICIARY
+      );
+
+    const TOKEN_BALANCE = 100000;
+    vestedToken.balanceOf.returns(TOKEN_BALANCE);
+    vestedToken.transfer.returns(true);
+
+    await addTerminableVesting();
+    await addTerminableVesting();
+    await addTerminableVesting();
+
+    expect(await totalBalance()).to.equal(TOKEN_BALANCE * 3);
+  });
+
+  it("Should return total token balance from fixed vestings", async () => {
+    const totalBalance = () =>
+      vestingManagement.totalTokenBalanceFixed(
+        vestedToken.address,
+        BENEFICIARY
+      );
+
+    const TOKEN_BALANCE = 100000;
+    vestedToken.balanceOf.returns(TOKEN_BALANCE);
+    vestedToken.transfer.returns(true);
+
+    await addFixedVesting();
+    await addFixedVesting();
+    await addFixedVesting();
+
+    expect(await totalBalance()).to.equal(TOKEN_BALANCE * 3);
   });
 
   it("Should release tokens from two fixed contracts on releaseFixed", async () => {
@@ -391,12 +489,6 @@ describe("VestingManagement", () => {
 
   describe("withdrawAllFromTerminated", () => {
     let TO: string;
-    const addVesting = () =>
-      vestingManagement.addNewTerminableVesting(
-        BENEFICIARY,
-        START_TIME,
-        DURATION
-      );
     const withdrawFromTerminated = (signer = signers[0]) =>
       vestingManagement
         .connect(signer)
@@ -405,8 +497,8 @@ describe("VestingManagement", () => {
     beforeEach(async () => {
       TO = signers[6].address;
 
-      await addVesting();
-      await addVesting();
+      await addTerminableVesting();
+      await addTerminableVesting();
 
       await vestingManagement.terminateVesting(BENEFICIARY, 0);
 
