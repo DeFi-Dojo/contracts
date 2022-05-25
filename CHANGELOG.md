@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.42.0](https://github.com/DeFi-Dojo/contracts/compare/v1.41.0...v1.42.0) (2022-05-25)
+
+
+### Features
+
+* dex-557 integration testing ([#94](https://github.com/DeFi-Dojo/contracts/issues/94)) ([b3a7bbe](https://github.com/DeFi-Dojo/contracts/commit/b3a7bbe079108f092456e1212de9743c7c3953f5))
+
 # [1.41.0](https://github.com/DeFi-Dojo/contracts/compare/v1.40.0...v1.41.0) (2022-05-24)
 
 
