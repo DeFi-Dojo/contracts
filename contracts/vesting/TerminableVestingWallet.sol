@@ -36,7 +36,7 @@ contract TerminableVestingWallet is VestingWallet, Ownable {
     onlyTerminated
   {
     uint256 balance = IERC20(token).balanceOf(address(this));
-    IERC20(token).transfer(to, balance);
+    require(IERC20(token).transfer(to, balance), "withdraw failed");
   }
 
   /**

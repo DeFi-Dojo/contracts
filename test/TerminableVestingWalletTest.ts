@@ -2,6 +2,7 @@ import { ethers } from "hardhat";
 import chai, { expect } from "chai";
 import { FakeContract } from "@defi-wonderland/smock/dist/src/types";
 import { smock } from "@defi-wonderland/smock";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { deployContract } from "../utils";
 import { TerminableVestingWallet } from "../typechain";
 import IERC20 from "../artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json";
@@ -142,6 +143,77 @@ describe("TerminableVestingWallet", () => {
     );
     expect(await terminableVestingWallet.isTerminated()).to.equal(false);
     expect(await terminableVestingWallet.terminationTimestamp()).to.equal(0);
+  });
+
+  describe("withdrawAllFromTerminated", () => {
+    let signers: SignerWithAddress[];
+    let BENEFICIARY: string;
+    let TO: string;
+    let START_TIME: number;
+    let DURATION: number;
+    let TOKEN_BALANCE: number;
+
+    beforeEach(async () => {
+      signers = await ethers.getSigners();
+      BENEFICIARY = signers[9].address;
+      TO = signers[5].address;
+
+      const LAST_MINED_TIMESTAMP = await latestTime();
+      START_TIME = LAST_MINED_TIMESTAMP + 100;
+      DURATION = 240;
+
+      TOKEN_BALANCE = 12000;
+      vestedToken.balanceOf.returns(TOKEN_BALANCE);
+      vestedToken.transfer.returns(false);
+      vestedToken.transfer.whenCalledWith(TO, TOKEN_BALANCE).returns(true);
+
+      terminableVestingWallet = await deployContract<TerminableVestingWallet>(
+        "TerminableVestingWallet",
+        [BENEFICIARY, START_TIME, DURATION],
+        undefined
+      );
+    });
+
+    it("Should withdraw all tokens from terminated", async () => {
+      await terminableVestingWallet.terminateVesting();
+      await terminableVestingWallet.withdrawAllFromTerminated(
+        vestedToken.address,
+        TO
+      );
+    });
+
+    it("Should revert when called by non-owner account", async () => {
+      await terminableVestingWallet.terminateVesting();
+      await expectRevert(
+        terminableVestingWallet
+          .connect(signers[6])
+          .withdrawAllFromTerminated(vestedToken.address, TO),
+        "Ownable: caller is not the owner"
+      );
+    });
+
+    it("Should revert when transfer fails", async () => {
+      await terminableVestingWallet.terminateVesting();
+      vestedToken.transfer.whenCalledWith(TO, TOKEN_BALANCE).returns(false);
+
+      await expectRevert(
+        terminableVestingWallet.withdrawAllFromTerminated(
+          vestedToken.address,
+          TO
+        ),
+        "withdraw failed"
+      );
+    });
+
+    it("Should revert when not terminated", async () => {
+      await expectRevert(
+        terminableVestingWallet.withdrawAllFromTerminated(
+          vestedToken.address,
+          TO
+        ),
+        "not terminated"
+      );
+    });
   });
 
   it("Should vest zero tokens if terminated before start", async () => {
