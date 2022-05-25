@@ -30,6 +30,15 @@ contract TerminableVestingWallet is VestingWallet, Ownable {
     }
   }
 
+  function withdrawAllFromTerminated(address token, address to)
+    external
+    onlyOwner
+    onlyTerminated
+  {
+    uint256 balance = IERC20(token).balanceOf(address(this));
+    IERC20(token).transfer(to, balance);
+  }
+
   /**
    * @dev Indicates if current vesting is terminated
    * @return true if vesting is terminated
@@ -53,5 +62,10 @@ contract TerminableVestingWallet is VestingWallet, Ownable {
     } else {
       return (totalAllocation * (timestamp - start())) / duration();
     }
+  }
+
+  modifier onlyTerminated() {
+    require(isTerminated(), "not terminated");
+    _;
   }
 }
