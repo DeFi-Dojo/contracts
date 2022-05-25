@@ -18,6 +18,6 @@
     "./config",
     "./autotasks"
   ],
-  "files": ["./hardhat.config.ts", "./test.config.ts"],
+  "files": ["./hardhat.config.ts", "./test.config.ts", "types/index.d.ts"],
   "exclude": ["node_modules"]
 }

@@ -3,14 +3,12 @@ import chai, { expect } from "chai";
 import { FakeContract } from "@defi-wonderland/smock/dist/src/types";
 import { smock } from "@defi-wonderland/smock";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
+import { expectRevert } from "@openzeppelin/test-helpers";
+
 import { deployContract } from "../utils";
 import { TerminableVestingWallet } from "../typechain";
 import IERC20 from "../artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json";
-
-const { time, expectRevert } = require("@openzeppelin/test-helpers");
-
-type Time = { latest: () => Promise<string> };
-const latestTime = async () => (time as Time).latest().then(Number);
+import { increaseTime, latestTime } from "./utils";
 
 chai.use(smock.matchers);
 
@@ -77,8 +75,8 @@ describe("TerminableVestingWallet", () => {
 
   it("Should release vested tokens", async () => {
     const TOKEN_BALANCE = 12000;
-    await vestedToken.transfer.returns(true);
-    await vestedToken.balanceOf.returns(TOKEN_BALANCE);
+    vestedToken.transfer.returns(true);
+    vestedToken.balanceOf.returns(TOKEN_BALANCE);
     const signers = await ethers.getSigners();
     const LAST_MINED_TIMESTAMP = await latestTime();
     const BENEFICIARY = signers[9].address;
@@ -93,7 +91,7 @@ describe("TerminableVestingWallet", () => {
 
     const nextBlockTimestamp = (await latestTime()) + 180;
     const expectedTokensVested = 4100;
-    await time.increaseTo(nextBlockTimestamp);
+    await increaseTime(nextBlockTimestamp);
 
     await terminableVestingWallet["release(address)"](vestedToken.address);
 
@@ -257,7 +255,7 @@ describe("TerminableVestingWallet", () => {
 
     const nextBlockTimestamp = (await latestTime()) + 180;
     const expectedTokensVested = 4100;
-    await time.increaseTo(nextBlockTimestamp);
+    await increaseTime(nextBlockTimestamp);
 
     await terminableVestingWallet.terminateVesting();
     expect(await terminableVestingWallet.isTerminated()).to.equal(true);
