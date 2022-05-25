@@ -8,6 +8,9 @@ import IERC20 from "../artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/
 
 const { time, expectRevert } = require("@openzeppelin/test-helpers");
 
+type Time = { latest: () => Promise<string> };
+const latestTime = async () => (time as Time).latest().then(Number);
+
 chai.use(smock.matchers);
 
 describe("TerminableVestingWallet", () => {
@@ -22,9 +25,9 @@ describe("TerminableVestingWallet", () => {
     const TOKEN_BALANCE = 12000;
     vestedToken.balanceOf.returns(TOKEN_BALANCE);
     const signers = await ethers.getSigners();
-    const LAST_MINED_TIMESTAMP: number = await time.latest();
+    const LAST_MINED_TIMESTAMP = await latestTime();
     const BENEFICIARY = signers[9].address;
-    const START_TIME: number = +LAST_MINED_TIMESTAMP + 100;
+    const START_TIME = LAST_MINED_TIMESTAMP + 100;
     const DURATION = 240;
 
     terminableVestingWallet = await deployContract<TerminableVestingWallet>(
@@ -36,7 +39,7 @@ describe("TerminableVestingWallet", () => {
     expect(
       await terminableVestingWallet["vestedAmount(address,uint64)"](
         vestedToken.address,
-        +LAST_MINED_TIMESTAMP
+        LAST_MINED_TIMESTAMP
       )
     ).to.equal(0);
     expect(
@@ -48,25 +51,25 @@ describe("TerminableVestingWallet", () => {
     expect(
       await terminableVestingWallet["vestedAmount(address,uint64)"](
         vestedToken.address,
-        +START_TIME + +DURATION * 0.3
+        START_TIME + DURATION * 0.3
       )
     ).to.equal(3600);
     expect(
       await terminableVestingWallet["vestedAmount(address,uint64)"](
         vestedToken.address,
-        +START_TIME + +DURATION * 0.6
+        START_TIME + DURATION * 0.6
       )
     ).to.equal(7200);
     expect(
       await terminableVestingWallet["vestedAmount(address,uint64)"](
         vestedToken.address,
-        +START_TIME + +DURATION
+        START_TIME + DURATION
       )
     ).to.equal(TOKEN_BALANCE);
     expect(
       await terminableVestingWallet["vestedAmount(address,uint64)"](
         vestedToken.address,
-        +START_TIME + +DURATION * 1.3
+        START_TIME + DURATION * 1.3
       )
     ).to.equal(TOKEN_BALANCE);
   });
@@ -76,9 +79,9 @@ describe("TerminableVestingWallet", () => {
     await vestedToken.transfer.returns(true);
     await vestedToken.balanceOf.returns(TOKEN_BALANCE);
     const signers = await ethers.getSigners();
-    const LAST_MINED_TIMESTAMP: number = await time.latest();
+    const LAST_MINED_TIMESTAMP = await latestTime();
     const BENEFICIARY = signers[9].address;
-    const START_TIME: number = +LAST_MINED_TIMESTAMP + 100;
+    const START_TIME = LAST_MINED_TIMESTAMP + 100;
     const DURATION = 240;
 
     terminableVestingWallet = await deployContract<TerminableVestingWallet>(
@@ -87,7 +90,7 @@ describe("TerminableVestingWallet", () => {
       undefined
     );
 
-    const nextBlockTimestamp = +(await time.latest()) + +180;
+    const nextBlockTimestamp = (await latestTime()) + 180;
     const expectedTokensVested = 4100;
     await time.increaseTo(nextBlockTimestamp);
 
@@ -101,9 +104,9 @@ describe("TerminableVestingWallet", () => {
 
   it("Should indicate termination at start if terminated earlier", async () => {
     const signers = await ethers.getSigners();
-    const LAST_MINED_TIMESTAMP: number = await time.latest();
+    const LAST_MINED_TIMESTAMP = await latestTime();
     const BENEFICIARY = signers[9].address;
-    const START_TIME: number = +LAST_MINED_TIMESTAMP + 100;
+    const START_TIME = LAST_MINED_TIMESTAMP + 100;
     const DURATION = 240;
 
     terminableVestingWallet = await deployContract<TerminableVestingWallet>(
@@ -122,9 +125,9 @@ describe("TerminableVestingWallet", () => {
 
   it("Should not let to terminate vesting for non-owner", async () => {
     const signers = await ethers.getSigners();
-    const LAST_MINED_TIMESTAMP: number = await time.latest();
+    const LAST_MINED_TIMESTAMP = await latestTime();
     const BENEFICIARY = signers[9].address;
-    const START_TIME: number = +LAST_MINED_TIMESTAMP + 100;
+    const START_TIME = LAST_MINED_TIMESTAMP + 100;
     const DURATION = 240;
 
     terminableVestingWallet = await deployContract<TerminableVestingWallet>(
@@ -145,9 +148,9 @@ describe("TerminableVestingWallet", () => {
     const TOKEN_BALANCE = 12500;
     vestedToken.balanceOf.returns(TOKEN_BALANCE);
     const signers = await ethers.getSigners();
-    const LAST_MINED_TIMESTAMP: number = await time.latest();
+    const LAST_MINED_TIMESTAMP = await latestTime();
     const BENEFICIARY = signers[9].address;
-    const START_TIME: number = +LAST_MINED_TIMESTAMP + 100;
+    const START_TIME = LAST_MINED_TIMESTAMP + 100;
     const DURATION = 240;
 
     terminableVestingWallet = await deployContract<TerminableVestingWallet>(
@@ -160,7 +163,7 @@ describe("TerminableVestingWallet", () => {
     expect(
       await terminableVestingWallet["vestedAmount(address,uint64)"](
         vestedToken.address,
-        +START_TIME + +DURATION
+        START_TIME + DURATION
       )
     ).to.equal(0);
   });
@@ -169,9 +172,9 @@ describe("TerminableVestingWallet", () => {
     const TOKEN_BALANCE = 12000;
     vestedToken.balanceOf.returns(TOKEN_BALANCE);
     const signers = await ethers.getSigners();
-    const LAST_MINED_TIMESTAMP: number = await time.latest();
+    const LAST_MINED_TIMESTAMP = await latestTime();
     const BENEFICIARY = signers[9].address;
-    const START_TIME: number = +LAST_MINED_TIMESTAMP + 100;
+    const START_TIME = LAST_MINED_TIMESTAMP + 100;
     const DURATION = 240;
 
     terminableVestingWallet = await deployContract<TerminableVestingWallet>(
@@ -180,7 +183,7 @@ describe("TerminableVestingWallet", () => {
       undefined
     );
 
-    const nextBlockTimestamp = +(await time.latest()) + +180;
+    const nextBlockTimestamp = (await latestTime()) + 180;
     const expectedTokensVested = 4100;
     await time.increaseTo(nextBlockTimestamp);
 
@@ -195,7 +198,7 @@ describe("TerminableVestingWallet", () => {
     expect(
       await terminableVestingWallet["vestedAmount(address,uint64)"](
         vestedToken.address,
-        +START_TIME + +DURATION
+        START_TIME + DURATION
       )
     ).to.equal(expectedTokensVested);
   });
