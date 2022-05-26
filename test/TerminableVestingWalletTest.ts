@@ -200,7 +200,7 @@ describe("TerminableVestingWallet", () => {
           vestedToken.address,
           TO
         ),
-        "withdraw failed"
+        "SafeERC20: ERC20 operation did not succeed"
       );
     });
 
