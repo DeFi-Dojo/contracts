@@ -162,8 +162,7 @@ describe("TerminableVestingWallet", () => {
 
       TOKEN_BALANCE = 12000;
       vestedToken.balanceOf.returns(TOKEN_BALANCE);
-      vestedToken.transfer.returns(false);
-      vestedToken.transfer.whenCalledWith(TO, TOKEN_BALANCE).returns(true);
+      vestedToken.transfer.returns(true);
 
       terminableVestingWallet = await deployContract<TerminableVestingWallet>(
         "TerminableVestingWallet",
@@ -178,6 +177,8 @@ describe("TerminableVestingWallet", () => {
         vestedToken.address,
         TO
       );
+
+      expect(vestedToken).to.be.calledWith(TO, TOKEN_BALANCE);
     });
 
     it("Should revert when called by non-owner account", async () => {
