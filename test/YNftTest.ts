@@ -1,11 +1,10 @@
 /* eslint-disable no-underscore-dangle */
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { deployContract } from "../utils/deployment";
-import { YNFT } from "../typechain";
-
 // @ts-ignore
 import { expectRevert } from "@openzeppelin/test-helpers";
+import { deployContract } from "../utils/deployment";
+import { YNFT } from "../typechain";
 
 describe("YNFTVault", () => {
   let ynft: YNFT;

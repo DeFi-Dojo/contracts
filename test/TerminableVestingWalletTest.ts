@@ -2,11 +2,13 @@ import { ethers } from "hardhat";
 import chai, { expect } from "chai";
 import { FakeContract } from "@defi-wonderland/smock/dist/src/types";
 import { smock } from "@defi-wonderland/smock";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
+import { expectRevert } from "@openzeppelin/test-helpers";
+
 import { deployContract } from "../utils";
 import { TerminableVestingWallet } from "../typechain";
 import IERC20 from "../artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json";
-
-const { time, expectRevert } = require("@openzeppelin/test-helpers");
+import { increaseTime, latestTime } from "./utils";
 
 chai.use(smock.matchers);
 
@@ -22,9 +24,9 @@ describe("TerminableVestingWallet", () => {
     const TOKEN_BALANCE = 12000;
     vestedToken.balanceOf.returns(TOKEN_BALANCE);
     const signers = await ethers.getSigners();
-    const LAST_MINED_TIMESTAMP: number = await time.latest();
+    const LAST_MINED_TIMESTAMP = await latestTime();
     const BENEFICIARY = signers[9].address;
-    const START_TIME: number = +LAST_MINED_TIMESTAMP + 100;
+    const START_TIME = LAST_MINED_TIMESTAMP + 100;
     const DURATION = 240;
 
     terminableVestingWallet = await deployContract<TerminableVestingWallet>(
@@ -36,7 +38,7 @@ describe("TerminableVestingWallet", () => {
     expect(
       await terminableVestingWallet["vestedAmount(address,uint64)"](
         vestedToken.address,
-        +LAST_MINED_TIMESTAMP
+        LAST_MINED_TIMESTAMP
       )
     ).to.equal(0);
     expect(
@@ -48,37 +50,37 @@ describe("TerminableVestingWallet", () => {
     expect(
       await terminableVestingWallet["vestedAmount(address,uint64)"](
         vestedToken.address,
-        +START_TIME + +DURATION * 0.3
+        START_TIME + DURATION * 0.3
       )
     ).to.equal(3600);
     expect(
       await terminableVestingWallet["vestedAmount(address,uint64)"](
         vestedToken.address,
-        +START_TIME + +DURATION * 0.6
+        START_TIME + DURATION * 0.6
       )
     ).to.equal(7200);
     expect(
       await terminableVestingWallet["vestedAmount(address,uint64)"](
         vestedToken.address,
-        +START_TIME + +DURATION
+        START_TIME + DURATION
       )
     ).to.equal(TOKEN_BALANCE);
     expect(
       await terminableVestingWallet["vestedAmount(address,uint64)"](
         vestedToken.address,
-        +START_TIME + +DURATION * 1.3
+        START_TIME + DURATION * 1.3
       )
     ).to.equal(TOKEN_BALANCE);
   });
 
   it("Should release vested tokens", async () => {
     const TOKEN_BALANCE = 12000;
-    await vestedToken.transfer.returns(true);
-    await vestedToken.balanceOf.returns(TOKEN_BALANCE);
+    vestedToken.transfer.returns(true);
+    vestedToken.balanceOf.returns(TOKEN_BALANCE);
     const signers = await ethers.getSigners();
-    const LAST_MINED_TIMESTAMP: number = await time.latest();
+    const LAST_MINED_TIMESTAMP = await latestTime();
     const BENEFICIARY = signers[9].address;
-    const START_TIME: number = +LAST_MINED_TIMESTAMP + 100;
+    const START_TIME = LAST_MINED_TIMESTAMP + 100;
     const DURATION = 240;
 
     terminableVestingWallet = await deployContract<TerminableVestingWallet>(
@@ -87,9 +89,9 @@ describe("TerminableVestingWallet", () => {
       undefined
     );
 
-    const nextBlockTimestamp = +(await time.latest()) + +180;
+    const nextBlockTimestamp = (await latestTime()) + 180;
     const expectedTokensVested = 4100;
-    await time.increaseTo(nextBlockTimestamp);
+    await increaseTime(nextBlockTimestamp);
 
     await terminableVestingWallet["release(address)"](vestedToken.address);
 
@@ -101,9 +103,9 @@ describe("TerminableVestingWallet", () => {
 
   it("Should indicate termination at start if terminated earlier", async () => {
     const signers = await ethers.getSigners();
-    const LAST_MINED_TIMESTAMP: number = await time.latest();
+    const LAST_MINED_TIMESTAMP = await latestTime();
     const BENEFICIARY = signers[9].address;
-    const START_TIME: number = +LAST_MINED_TIMESTAMP + 100;
+    const START_TIME = LAST_MINED_TIMESTAMP + 100;
     const DURATION = 240;
 
     terminableVestingWallet = await deployContract<TerminableVestingWallet>(
@@ -122,9 +124,9 @@ describe("TerminableVestingWallet", () => {
 
   it("Should not let to terminate vesting for non-owner", async () => {
     const signers = await ethers.getSigners();
-    const LAST_MINED_TIMESTAMP: number = await time.latest();
+    const LAST_MINED_TIMESTAMP = await latestTime();
     const BENEFICIARY = signers[9].address;
-    const START_TIME: number = +LAST_MINED_TIMESTAMP + 100;
+    const START_TIME = LAST_MINED_TIMESTAMP + 100;
     const DURATION = 240;
 
     terminableVestingWallet = await deployContract<TerminableVestingWallet>(
@@ -141,13 +143,85 @@ describe("TerminableVestingWallet", () => {
     expect(await terminableVestingWallet.terminationTimestamp()).to.equal(0);
   });
 
+  describe("withdrawAllFromTerminated", () => {
+    let signers: SignerWithAddress[];
+    let BENEFICIARY: string;
+    let TO: string;
+    let START_TIME: number;
+    let DURATION: number;
+    let TOKEN_BALANCE: number;
+
+    beforeEach(async () => {
+      signers = await ethers.getSigners();
+      BENEFICIARY = signers[9].address;
+      TO = signers[5].address;
+
+      const LAST_MINED_TIMESTAMP = await latestTime();
+      START_TIME = LAST_MINED_TIMESTAMP + 100;
+      DURATION = 240;
+
+      TOKEN_BALANCE = 12000;
+      vestedToken.balanceOf.returns(TOKEN_BALANCE);
+      vestedToken.transfer.returns(true);
+
+      terminableVestingWallet = await deployContract<TerminableVestingWallet>(
+        "TerminableVestingWallet",
+        [BENEFICIARY, START_TIME, DURATION],
+        undefined
+      );
+    });
+
+    it("Should withdraw all tokens from terminated", async () => {
+      await terminableVestingWallet.terminateVesting();
+      await terminableVestingWallet.withdrawAllFromTerminated(
+        vestedToken.address,
+        TO
+      );
+
+      expect(vestedToken).to.be.calledWith(TO, TOKEN_BALANCE);
+    });
+
+    it("Should revert when called by non-owner account", async () => {
+      await terminableVestingWallet.terminateVesting();
+      await expectRevert(
+        terminableVestingWallet
+          .connect(signers[6])
+          .withdrawAllFromTerminated(vestedToken.address, TO),
+        "Ownable: caller is not the owner"
+      );
+    });
+
+    it("Should revert when transfer fails", async () => {
+      await terminableVestingWallet.terminateVesting();
+      vestedToken.transfer.whenCalledWith(TO, TOKEN_BALANCE).returns(false);
+
+      await expectRevert(
+        terminableVestingWallet.withdrawAllFromTerminated(
+          vestedToken.address,
+          TO
+        ),
+        "withdraw failed"
+      );
+    });
+
+    it("Should revert when not terminated", async () => {
+      await expectRevert(
+        terminableVestingWallet.withdrawAllFromTerminated(
+          vestedToken.address,
+          TO
+        ),
+        "not terminated"
+      );
+    });
+  });
+
   it("Should vest zero tokens if terminated before start", async () => {
     const TOKEN_BALANCE = 12500;
     vestedToken.balanceOf.returns(TOKEN_BALANCE);
     const signers = await ethers.getSigners();
-    const LAST_MINED_TIMESTAMP: number = await time.latest();
+    const LAST_MINED_TIMESTAMP = await latestTime();
     const BENEFICIARY = signers[9].address;
-    const START_TIME: number = +LAST_MINED_TIMESTAMP + 100;
+    const START_TIME = LAST_MINED_TIMESTAMP + 100;
     const DURATION = 240;
 
     terminableVestingWallet = await deployContract<TerminableVestingWallet>(
@@ -160,7 +234,7 @@ describe("TerminableVestingWallet", () => {
     expect(
       await terminableVestingWallet["vestedAmount(address,uint64)"](
         vestedToken.address,
-        +START_TIME + +DURATION
+        START_TIME + DURATION
       )
     ).to.equal(0);
   });
@@ -169,9 +243,9 @@ describe("TerminableVestingWallet", () => {
     const TOKEN_BALANCE = 12000;
     vestedToken.balanceOf.returns(TOKEN_BALANCE);
     const signers = await ethers.getSigners();
-    const LAST_MINED_TIMESTAMP: number = await time.latest();
+    const LAST_MINED_TIMESTAMP = await latestTime();
     const BENEFICIARY = signers[9].address;
-    const START_TIME: number = +LAST_MINED_TIMESTAMP + 100;
+    const START_TIME = LAST_MINED_TIMESTAMP + 100;
     const DURATION = 240;
 
     terminableVestingWallet = await deployContract<TerminableVestingWallet>(
@@ -180,9 +254,9 @@ describe("TerminableVestingWallet", () => {
       undefined
     );
 
-    const nextBlockTimestamp = +(await time.latest()) + +180;
+    const nextBlockTimestamp = (await latestTime()) + 180;
     const expectedTokensVested = 4100;
-    await time.increaseTo(nextBlockTimestamp);
+    await increaseTime(nextBlockTimestamp);
 
     await terminableVestingWallet.terminateVesting();
     expect(await terminableVestingWallet.isTerminated()).to.equal(true);
@@ -195,7 +269,7 @@ describe("TerminableVestingWallet", () => {
     expect(
       await terminableVestingWallet["vestedAmount(address,uint64)"](
         vestedToken.address,
-        +START_TIME + +DURATION
+        START_TIME + DURATION
       )
     ).to.equal(expectedTokensVested);
   });

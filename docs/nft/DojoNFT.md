@@ -44,29 +44,6 @@ function approve(address to, uint256 tokenId) external nonpayable
 | to | address | undefined |
 | tokenId | uint256 | undefined |
 
-### armorDistributionMatrix
-
-```solidity
-function armorDistributionMatrix(uint256, uint256) external view returns (uint8)
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint256 | undefined |
-| _1 | uint256 | undefined |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint8 | undefined |
-
 ### balanceOf
 
 ```solidity
@@ -106,10 +83,32 @@ function baseTokenURI() external view returns (string)
 |---|---|---|
 | _0 | string | base URI. |
 
+### bustDistribution
+
+```solidity
+function bustDistribution(uint256) external view returns (uint8)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint8 | undefined |
+
 ### characteristics
 
 ```solidity
-function characteristics(uint256) external view returns (uint8 faceMask, uint8 eyes, uint8 symbol, uint8 horn, uint8 weapon, uint8 helmet, uint8 bust)
+function characteristics(uint256) external view returns (uint8 faceMask, uint8 eyes, uint8 horn, uint8 weapon, uint8 helmet, uint8 bust)
 ```
 
 
@@ -128,7 +127,6 @@ function characteristics(uint256) external view returns (uint8 faceMask, uint8 e
 |---|---|---|
 | faceMask | uint8 | undefined |
 | eyes | uint8 | undefined |
-| symbol | uint8 | undefined |
 | horn | uint8 | undefined |
 | weapon | uint8 | undefined |
 | helmet | uint8 | undefined |
@@ -150,29 +148,6 @@ function currentTokenId() external view returns (uint256)
 | Name | Type | Description |
 |---|---|---|
 | _0 | uint256 | undefined |
-
-### equipmentDistributionMatrix
-
-```solidity
-function equipmentDistributionMatrix(uint256, uint256) external view returns (uint8)
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint256 | undefined |
-| _1 | uint256 | undefined |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint8 | undefined |
 
 ### executeMetaTransaction
 
@@ -221,6 +196,50 @@ function exist(uint256 tokenId) external view returns (bool)
 | Name | Type | Description |
 |---|---|---|
 | _0 | bool | true if token exists false otherwise. |
+
+### eyesDistribution
+
+```solidity
+function eyesDistribution(uint256) external view returns (uint8)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint8 | undefined |
+
+### faceMaskDistribution
+
+```solidity
+function faceMaskDistribution(uint256) external view returns (uint8)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint8 | undefined |
 
 ### getApproved
 
@@ -299,6 +318,50 @@ function getNonce(address user) external view returns (uint256 nonce)
 | Name | Type | Description |
 |---|---|---|
 | nonce | uint256 | undefined |
+
+### helmetDistribution
+
+```solidity
+function helmetDistribution(uint256) external view returns (uint8)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint8 | undefined |
+
+### hornDistribution
+
+```solidity
+function hornDistribution(uint256) external view returns (uint8)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint8 | undefined |
 
 ### isApprovedForAll
 
@@ -660,6 +723,28 @@ function transferOwnership(address newOwner) external nonpayable
 | Name | Type | Description |
 |---|---|---|
 | newOwner | address | undefined |
+
+### weaponDistribution
+
+```solidity
+function weaponDistribution(uint256) external view returns (uint8)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint8 | undefined |
 
 
 

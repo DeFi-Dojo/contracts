@@ -20,7 +20,7 @@ contract VestingManagement is Ownable {
     address beneficiaryAddress,
     uint64 startTimestamp,
     uint64 durationSeconds
-  ) external {
+  ) external onlyOwner {
     TerminableVestingWallet newVesting = new TerminableVestingWallet(
       beneficiaryAddress,
       startTimestamp,
@@ -39,7 +39,7 @@ contract VestingManagement is Ownable {
     address beneficiaryAddress,
     uint64 startTimestamp,
     uint64 durationSeconds
-  ) external {
+  ) external onlyOwner {
     VestingWallet newVesting = new VestingWallet(
       beneficiaryAddress,
       startTimestamp,
@@ -129,16 +129,21 @@ contract VestingManagement is Ownable {
     view
     returns (uint256)
   {
-    uint256 totalReleasable = 0;
-    for (uint256 i = 0; i < terminableVestingWallets[beneficiary].length; i++) {
-      totalReleasable +=
-        terminableVestingWallets[beneficiary][i].vestedAmount(
-          token,
-          uint64(block.timestamp)
-        ) -
-        terminableVestingWallets[beneficiary][i].released(token);
+    uint256 totalVested = 0;
+    TerminableVestingWallet[] storage vestingWallets = terminableVestingWallets[
+      beneficiary
+    ];
+
+    for (uint256 i = 0; i < vestingWallets.length; i++) {
+      uint256 vestedAmount = vestingWallets[i].vestedAmount(
+        token,
+        uint64(block.timestamp)
+      );
+
+      totalVested += vestedAmount;
     }
-    return totalReleasable;
+
+    return totalVested - totalReleasedFromTerminable(token, beneficiary);
   }
 
   /**
@@ -162,5 +167,129 @@ contract VestingManagement is Ownable {
         fixedVestingWallets[beneficiary][i].released(token);
     }
     return totalReleasable;
+  }
+
+  /**
+   * @dev Returns released value from all terminable vestings of specific token for beneficiary
+   * @param token Address of released token
+   * @param beneficiary Vesting receiver
+   * @return total released value from terminable contracts
+   */
+  function totalReleasedFromTerminable(address token, address beneficiary)
+    public
+    view
+    returns (uint256)
+  {
+    uint256 totalReleased = 0;
+    for (uint256 i = 0; i < terminableVestingWallets[beneficiary].length; i++) {
+      totalReleased += terminableVestingWallets[beneficiary][i].released(token);
+    }
+    return totalReleased;
+  }
+
+  /**
+   * @dev Returns released value from all fixed (non-terminable) vestings of specific token for beneficiary
+   * @param token Address of released token
+   * @param beneficiary Vesting receiver
+   * @return total released value from fixed contracts
+   */
+  function totalReleasedFromFixed(address token, address beneficiary)
+    public
+    view
+    returns (uint256)
+  {
+    uint256 totalReleased = 0;
+    for (uint256 i = 0; i < fixedVestingWallets[beneficiary].length; i++) {
+      totalReleased += fixedVestingWallets[beneficiary][i].released(token);
+    }
+    return totalReleased;
+  }
+
+  /**
+   * @dev Returns total value that can be released during vesting period from all terminable vestings of specific token for beneficiary
+   * @param token Address of vested token
+   * @param beneficiary Vesting receiver
+   * @return total value that can be released during vesting period from terminable vesting contracts
+   */
+  function totalToBeReleasedFromTerminable(address token, address beneficiary)
+    external
+    view
+    returns (uint256)
+  {
+    return
+      totalReleasedFromTerminable(token, beneficiary) +
+      totalTokenBalanceTerminable(token, beneficiary);
+  }
+
+  /**
+   * @dev Returns total value that can be released during vesting period from all fixed (non-terminable) vestings of specific token for beneficiary
+   * @param token Address of vested token
+   * @param beneficiary Vesting receiver
+   * @return total value that can be released during vesting period from fixed vesting contracts
+   */
+  function totalToBeReleasedFromFixed(address token, address beneficiary)
+    public
+    view
+    returns (uint256)
+  {
+    return
+      totalReleasedFromTerminable(token, beneficiary) +
+      totalTokenBalanceFixed(token, beneficiary);
+  }
+
+  function totalTokenBalanceTerminable(address token, address beneficiary)
+    public
+    view
+    returns (uint256)
+  {
+    uint256 totalTokenBalance = 0;
+    TerminableVestingWallet[] storage vestingWallets = terminableVestingWallets[
+      beneficiary
+    ];
+
+    for (uint256 i = 0; i < vestingWallets.length; i++) {
+      VestingWallet vestingWallet = vestingWallets[i];
+      uint256 tokenBalance = IERC20(token).balanceOf(address(vestingWallet));
+
+      totalTokenBalance += tokenBalance;
+    }
+
+    return totalTokenBalance;
+  }
+
+  function totalTokenBalanceFixed(address token, address beneficiary)
+    public
+    view
+    returns (uint256)
+  {
+    uint256 totalTokenBalance = 0;
+    VestingWallet[] storage vestingWallets = fixedVestingWallets[beneficiary];
+
+    for (uint256 i = 0; i < vestingWallets.length; i++) {
+      VestingWallet vestingWallet = vestingWallets[i];
+      uint256 tokenBalance = IERC20(token).balanceOf(address(vestingWallet));
+
+      totalTokenBalance += tokenBalance;
+    }
+
+    return totalTokenBalance;
+  }
+
+  function withdrawAllFromTerminated(
+    address token,
+    address beneficiary,
+    address to
+  ) external onlyOwner {
+    TerminableVestingWallet[] storage vestingWallets = terminableVestingWallets[
+      beneficiary
+    ];
+
+    for (uint256 i = 0; i < vestingWallets.length; i++) {
+      TerminableVestingWallet vestingWallet = vestingWallets[i];
+
+      if (vestingWallet.isTerminated()) {
+        vestingWallet.withdrawAllFromTerminated(token, to);
+      }
+    }
   }
 }
