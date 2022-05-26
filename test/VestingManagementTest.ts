@@ -260,7 +260,7 @@ describe("VestingManagement", () => {
     expect(await totalReleased()).to.equal(expectedTokensVested);
   });
 
-  it.only("Should return total token balance from terminable vestings", async () => {
+  it("Should return total token balance from terminable vestings", async () => {
     const totalBalance = () =>
       vestingManagement.totalTokenBalanceTerminable(
         vestedToken.address,

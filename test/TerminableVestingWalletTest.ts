@@ -172,13 +172,14 @@ describe("TerminableVestingWallet", () => {
     });
 
     it("Should withdraw all tokens from terminated", async () => {
+      vestedToken.transfer.whenCalledWith(TO, TOKEN_BALANCE).returns(true);
+
       await terminableVestingWallet.terminateVesting();
+      // should not revert
       await terminableVestingWallet.withdrawAllFromTerminated(
         vestedToken.address,
         TO
       );
-
-      expect(vestedToken).to.be.calledWith(TO, TOKEN_BALANCE);
     });
 
     it("Should revert when called by non-owner account", async () => {
@@ -200,7 +201,7 @@ describe("TerminableVestingWallet", () => {
           vestedToken.address,
           TO
         ),
-        "withdraw failed"
+        "SafeERC20: ERC20 operation did not succeed"
       );
     });
 

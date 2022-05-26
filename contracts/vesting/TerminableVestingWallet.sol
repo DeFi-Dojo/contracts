@@ -2,8 +2,10 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/finance/VestingWallet.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract TerminableVestingWallet is VestingWallet, Ownable {
+  using SafeERC20 for IERC20;
   uint256 public terminationTimestamp;
 
   constructor(
@@ -36,7 +38,8 @@ contract TerminableVestingWallet is VestingWallet, Ownable {
     onlyTerminated
   {
     uint256 balance = IERC20(token).balanceOf(address(this));
-    require(IERC20(token).transfer(to, balance), "withdraw failed");
+
+    IERC20(token).safeTransfer(to, balance);
   }
 
   /**

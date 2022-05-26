@@ -233,7 +233,7 @@ contract VestingManagement is Ownable {
     returns (uint256)
   {
     return
-      totalReleasedFromTerminable(token, beneficiary) +
+      totalReleasedFromFixed(token, beneficiary) +
       totalTokenBalanceFixed(token, beneficiary);
   }
 
