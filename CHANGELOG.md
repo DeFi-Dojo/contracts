@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.44.0](https://github.com/DeFi-Dojo/contracts/compare/v1.43.0...v1.44.0) (2022-05-26)
+
+
+### Features
+
+* dex-540 vesting fixes ([#96](https://github.com/DeFi-Dojo/contracts/issues/96)) ([d11d6e8](https://github.com/DeFi-Dojo/contracts/commit/d11d6e86d4800476acae1929c675722295122f98))
+
 # [1.43.0](https://github.com/DeFi-Dojo/contracts/compare/v1.42.0...v1.43.0) (2022-05-26)
 
 
