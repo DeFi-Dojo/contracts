@@ -1,6 +1,6 @@
 import { deployAaveVaultsWithMetadata } from "../../utils";
 
-deployAaveVaultsWithMetadata()
+deployAaveVaultsWithMetadata({})
   .then(() => process.exit(0))
   .catch((error) => {
     console.error(error);

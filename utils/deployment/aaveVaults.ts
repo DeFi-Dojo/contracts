@@ -1,4 +1,3 @@
-import { ethers } from "hardhat";
 import { readFile, writeFile } from "fs/promises";
 import path from "path";
 
@@ -14,9 +13,10 @@ import {
   AaveVaultsToDeploy,
   getAaveTokenAddress,
 } from "../../consts";
-import { resultToPromiseFn, sequence, wait } from "../promises";
+import { resultToPromiseFn, sequence } from "../promises";
 import { uploadYnftMetadata } from "../ynft-metadata";
 import { createDeployContract } from "./deployment";
+import { transferAdminRoleTo } from "./rbac";
 
 const {
   ADDRESSES,
@@ -24,17 +24,22 @@ const {
   BENEFICIARY_ADDRESS,
   MORALIS_IPFS_URL,
   DEFAULT_ADMIN_ROLE_ADDRESS,
+  DEFAULT_ADMIN_ROLE_ADDRESS_DUMMY_VAULTS,
 } = configEnv;
 
 type Config = { isDummyVault?: boolean };
 
 const deployAaveYnftVault =
-  (config?: Config) =>
-  async (vaultName: AaveVaultName, ynftPathUri: string) => {
+  (config: Config) => async (vaultName: AaveVaultName, ynftPathUri: string) => {
     const aaveTokenAddress = getAaveTokenAddress(ADDRESSES, vaultName);
-    const deploy = config?.isDummyVault
+    const deploy = config.isDummyVault
       ? createDeployContract<DummyAaveYNFTVault__factory>("DummyAaveYNFTVault")
       : createDeployContract<AaveYNFTVault__factory>("AaveYNFTVault");
+
+    const adminRoleAddress = config.isDummyVault
+      ? DEFAULT_ADMIN_ROLE_ADDRESS_DUMMY_VAULTS
+      : DEFAULT_ADMIN_ROLE_ADDRESS;
+    const transferAdminRole = transferAdminRoleTo(adminRoleAddress);
 
     const contract = await deploy(
       ADDRESSES.ROUTER_02_SUSHISWAP,
@@ -50,38 +55,33 @@ const deployAaveYnftVault =
     const ynftAddress = await contract.yNFT().catch(() => "");
     console.log(`Deployed vault yNFT address: ${ynftAddress}\n`);
 
-    const projectDir = path.join(__dirname, "../../");
-    const savePath = path.join(projectDir, "consts/deployed/vaults-aave.json");
-    const file = JSON.parse(await readFile(savePath, { encoding: "utf-8" }));
-    file[vaultName] = {
-      vault: contract.address,
-      ynft: ynftAddress,
-      ynftMetaDataUrl: MORALIS_IPFS_URL + ynftPathUri,
-    };
-    await writeFile(savePath, JSON.stringify(file, null, 2));
+    await transferAdminRole(contract);
 
-    await wait(100);
-    await contract.grantRole(
-      await contract.DEFAULT_ADMIN_ROLE(),
-      DEFAULT_ADMIN_ROLE_ADDRESS
-    );
-    const [defaultAdmin] = await ethers.getSigners();
-    await contract.renounceRole(
-      await contract.DEFAULT_ADMIN_ROLE(),
-      defaultAdmin.address
-    );
-    console.log(
-      `DEFAULT_ADMIN_ROLE granted to: ${DEFAULT_ADMIN_ROLE_ADDRESS}\n`
-    );
+    await storeDeployedVaultInfo();
+
+    async function storeDeployedVaultInfo() {
+      const projectDir = path.join(__dirname, "../../");
+      const savePath = path.join(
+        projectDir,
+        "consts/deployed/vaults-aave.json"
+      );
+      const file = JSON.parse(await readFile(savePath, { encoding: "utf-8" }));
+      file[vaultName] = {
+        vault: contract.address,
+        ynft: ynftAddress,
+        ynftMetaDataUrl: MORALIS_IPFS_URL + ynftPathUri,
+      };
+      await writeFile(savePath, JSON.stringify(file, null, 2));
+    }
   };
 
 const deployAaveVaultWithMetadata =
-  (config?: Config) => async (vaultName: AaveVaultName) => {
+  (config: Config) => async (vaultName: AaveVaultName) => {
     const ynftPathUri = await uploadYnftMetadata(vaultName);
     await deployAaveYnftVault(config)(vaultName, ynftPathUri);
   };
 
-export const deployAaveVaultsWithMetadata = (config?: Config) =>
+export const deployAaveVaultsWithMetadata = (config: Config) =>
   sequence(
     AaveVaultsToDeploy.map(
       resultToPromiseFn(deployAaveVaultWithMetadata(config))
