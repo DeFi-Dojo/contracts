@@ -419,8 +419,8 @@ contract QuickswapYNFTVault is YNFTVault {
       _deadline
     );
 
-    uint256 tokenId = _mintYNFTForLiquidity(liquidity);
     _farmLiquidity(liquidity);
+    uint256 tokenId = _mintYNFTForLiquidity(liquidity);
     saveBalancesAtBuyForTokenId(tokenId);
   }
 
