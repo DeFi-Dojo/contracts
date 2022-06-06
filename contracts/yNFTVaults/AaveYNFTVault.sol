@@ -274,8 +274,6 @@ contract AaveYNFTVault is YNFTVault {
 
     uint256 currentAmountOfAToken = aToken.balanceOf(address(this));
 
-    pool.deposit(address(underlyingToken), _tokenAmount, address(this), 0);
-
     if (totalSupply == 0) {
       balanceOf[tokenId] = _tokenAmount;
       totalSupply = _tokenAmount;
@@ -290,6 +288,7 @@ contract AaveYNFTVault is YNFTVault {
     balancesAtBuy[tokenId].totalSupply = totalSupply;
 
     emit YNftCreated(address(underlyingToken), tokenId, _tokenAmount);
+    pool.deposit(address(underlyingToken), _tokenAmount, address(this), 0);
   }
 
   function _withdraw(uint256 _nftTokenId, address _receiver)
