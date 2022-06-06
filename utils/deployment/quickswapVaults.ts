@@ -1,4 +1,3 @@
-import { ethers } from "hardhat";
 import path from "path";
 import { readFile, writeFile } from "fs/promises";
 
@@ -15,9 +14,10 @@ import {
   QuickswapVaultName,
   QuickswapVaultsToDeploy,
 } from "../../consts";
-import { resultToPromiseFn, sequence, wait } from "../promises";
+import { resultToPromiseFn, sequence } from "../promises";
 import { uploadYnftMetadata } from "../ynft-metadata";
 import { createDeployContract } from "./deployment";
+import { transferAdminRoleTo } from "./rbac";
 
 const {
   ADDRESSES,
@@ -27,12 +27,14 @@ const {
   DEFAULT_ADMIN_ROLE_ADDRESS,
 } = configEnv;
 
+const transferAdminRole = transferAdminRoleTo(DEFAULT_ADMIN_ROLE_ADDRESS);
+
 type Config = {
   isDummyVault?: boolean;
 };
 
 const deployQuickswapYnftVault =
-  (config?: Config) =>
+  (config: Config) =>
   async (
     vaultName: QuickswapVaultName,
     stakingDualRewards: string,
@@ -61,36 +63,28 @@ const deployQuickswapYnftVault =
     const ynftAddress = await contract.yNFT();
     console.log(`Deployed vault yNFT address: ${ynftAddress}`);
 
-    const projectDir = path.join(__dirname, "../../");
-    const savePath = path.join(
-      projectDir,
-      "consts/deployed/vaults-quickswap.json"
-    );
-    const file = JSON.parse(await readFile(savePath, { encoding: "utf-8" }));
-    file[vaultName] = {
-      vault: contract.address,
-      ynft: ynftAddress,
-      ynftMetaDataUrl: MORALIS_IPFS_URL + ynftPathUri,
-    };
-    await writeFile(savePath, JSON.stringify(file, null, 2));
+    await transferAdminRole(contract);
 
-    await wait(100);
-    await contract.grantRole(
-      await contract.DEFAULT_ADMIN_ROLE(),
-      DEFAULT_ADMIN_ROLE_ADDRESS
-    );
-    const [defaultAdmin] = await ethers.getSigners();
-    await contract.renounceRole(
-      await contract.DEFAULT_ADMIN_ROLE(),
-      defaultAdmin.address
-    );
-    console.log(
-      `DEFAULT_ADMIN_ROLE granted to: ${DEFAULT_ADMIN_ROLE_ADDRESS}\n`
-    );
+    await storeDeployedVaultInfo();
+
+    async function storeDeployedVaultInfo() {
+      const projectDir = path.join(__dirname, "../../");
+      const savePath = path.join(
+        projectDir,
+        "consts/deployed/vaults-quickswap.json"
+      );
+      const file = JSON.parse(await readFile(savePath, { encoding: "utf-8" }));
+      file[vaultName] = {
+        vault: contract.address,
+        ynft: ynftAddress,
+        ynftMetaDataUrl: MORALIS_IPFS_URL + ynftPathUri,
+      };
+      await writeFile(savePath, JSON.stringify(file, null, 2));
+    }
   };
 
 const deployQuickswapVaultWithMetadata =
-  (config?: Config) => async (vaultName: QuickswapVaultName) => {
+  (config: Config) => async (vaultName: QuickswapVaultName) => {
     const ynftPathUri = await uploadYnftMetadata(vaultName);
     await deployQuickswapYnftVault(config)(
       vaultName,
@@ -99,7 +93,7 @@ const deployQuickswapVaultWithMetadata =
     );
   };
 
-export const deployQuickswapVaultsWithMetadata = (config?: Config) =>
+export const deployQuickswapVaultsWithMetadata = (config: Config) =>
   sequence(
     QuickswapVaultsToDeploy.map(
       resultToPromiseFn(deployQuickswapVaultWithMetadata(config))
