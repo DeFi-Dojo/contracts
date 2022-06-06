@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.48.0](https://github.com/DeFi-Dojo/contracts/compare/v1.47.0...v1.48.0) (2022-06-06)
+
+
+### Features
+
+* audit rework 2 ([#100](https://github.com/DeFi-Dojo/contracts/issues/100)) ([c792f48](https://github.com/DeFi-Dojo/contracts/commit/c792f486f45b74c5cc0cfa73c49785358dc58afc))
+
 # [1.47.0](https://github.com/DeFi-Dojo/contracts/compare/v1.46.0...v1.47.0) (2022-06-06)
 
 
