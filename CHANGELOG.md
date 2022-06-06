@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.47.0](https://github.com/DeFi-Dojo/contracts/compare/v1.46.0...v1.47.0) (2022-06-06)
+
+
+### Features
+
+* transfer vesting ownership ([#99](https://github.com/DeFi-Dojo/contracts/issues/99)) ([49d483a](https://github.com/DeFi-Dojo/contracts/commit/49d483a9089f5b9880615ebb4010778b4d11f429))
+
 # [1.46.0](https://github.com/DeFi-Dojo/contracts/compare/v1.45.0...v1.46.0) (2022-06-06)
 
 
