@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.45.0](https://github.com/DeFi-Dojo/contracts/compare/v1.44.0...v1.45.0) (2022-06-06)
+
+
+### Features
+
+* prepare migrations, update example env ([#97](https://github.com/DeFi-Dojo/contracts/issues/97)) ([5ea8490](https://github.com/DeFi-Dojo/contracts/commit/5ea849082be6d614992fb9dd8e383088141dddcb))
+
 # [1.44.0](https://github.com/DeFi-Dojo/contracts/compare/v1.43.0...v1.44.0) (2022-05-26)
 
 
