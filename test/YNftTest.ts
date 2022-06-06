@@ -66,4 +66,17 @@ describe("YNFTVault", () => {
     await ynft.mint(signers[2].address);
     expect(await ynft.ownerOf(1)).to.equal(signers[2].address);
   });
+
+  it("should return next token id", async () => {
+    const signers = await ethers.getSigners();
+    await ynft.mint(signers[2].address); // 0
+    await ynft.mint(signers[2].address); // 1
+
+    const newTokenId = await ynft.nextTokenId();
+    await ynft.mint(signers[2].address); // 2
+    const nextTokenId = await ynft.nextTokenId();
+
+    expect(+newTokenId).to.equal(2);
+    expect(+nextTokenId).to.equal(3);
+  });
 });

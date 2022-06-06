@@ -155,6 +155,23 @@ function name() external view returns (string)
 |---|---|---|
 | _0 | string | undefined |
 
+### nextTokenId
+
+```solidity
+function nextTokenId() external view returns (uint256)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
+
 ### owner
 
 ```solidity

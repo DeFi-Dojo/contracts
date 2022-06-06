@@ -30,6 +30,10 @@ contract YNFT is ERC721, Ownable {
     return newItemId;
   }
 
+  function nextTokenId() external view returns (uint256) {
+    return _tokenIds.current();
+  }
+
   function burn(uint256 tokenId) public onlyOwner returns (bool) {
     _burn(tokenId);
     return true;
