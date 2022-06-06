@@ -67,16 +67,16 @@ describe("YNFTVault", () => {
     expect(await ynft.ownerOf(1)).to.equal(signers[2].address);
   });
 
-  it("should return new token id before minting", async () => {
+  it("should return next token id", async () => {
     const signers = await ethers.getSigners();
+    await ynft.mint(signers[2].address); // 0
+    await ynft.mint(signers[2].address); // 1
 
     const newTokenId = await ynft.nextTokenId();
-    const { value: mintedTokenId } = await ynft.mint(signers[2].address);
+    await ynft.mint(signers[2].address); // 2
     const nextTokenId = await ynft.nextTokenId();
 
-    expect(+newTokenId).to.equal(0);
-    expect(+newTokenId).to.equal(+mintedTokenId);
-    expect(+nextTokenId).to.equal(1);
-    expect(+nextTokenId).to.equal(+mintedTokenId + 1);
+    expect(+newTokenId).to.equal(2);
+    expect(+nextTokenId).to.equal(3);
   });
 });

@@ -506,7 +506,8 @@ contract QuickswapYNFTVault is YNFTVault {
     virtual
     returns (uint256)
   {
-    uint256 tokenId = yNFT.mint(msg.sender);
+    uint256 tokenId = yNFT.nextTokenId();
+
     if (totalSupply == 0) {
       balanceOf[tokenId] = _liquidity;
       totalSupply = _liquidity;
@@ -516,7 +517,11 @@ contract QuickswapYNFTVault is YNFTVault {
       balanceOf[tokenId] = balance;
       totalSupply = totalSupply + balance;
     }
+
+    yNFT.mint(msg.sender);
+
     emit YNftCreated(address(pair), tokenId, _liquidity);
+
     return tokenId;
   }
 
