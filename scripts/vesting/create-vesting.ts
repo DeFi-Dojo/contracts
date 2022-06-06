@@ -1,4 +1,4 @@
-import { createVestingSchedule } from "../../utils/deployment/token";
+import { createVestingSchedule } from "../../utils/deployment/token-vesting";
 import configEnv from "../../config/config";
 
 const DURATION = 600;

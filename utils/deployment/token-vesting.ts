@@ -8,7 +8,8 @@ import {
 } from "../../typechain";
 import configEnv from "../../config/config";
 
-const { DJO_TOKEN_ADDRESS, TOKEN_VESTING_ADDRESS } = configEnv;
+const { DJO_TOKEN_ADDRESS, TOKEN_VESTING_ADDRESS, DEFAULT_ADMIN_ROLE_ADDRESS } =
+  configEnv;
 
 export const deployToken = async () => {
   const deploy = createDeployContract<DojoToken__factory>("DojoToken");
@@ -19,7 +20,11 @@ export const deployToken = async () => {
 export const deployVesting = async () => {
   const deploy =
     createDeployContract<VestingManagement__factory>("VestingManagement");
-  await deploy().then((v) => v as VestingManagement);
+  const vestingManagement = await deploy().then((v) => v as VestingManagement);
+
+  await vestingManagement.transferOwnership(DEFAULT_ADMIN_ROLE_ADDRESS);
+
+  return vestingManagement;
 };
 
 export const createVestingSchedule = async (
