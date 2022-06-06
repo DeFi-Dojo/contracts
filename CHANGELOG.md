@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.46.0](https://github.com/DeFi-Dojo/contracts/compare/v1.45.0...v1.46.0) (2022-06-06)
+
+
+### Features
+
+* change function order after audit ([#98](https://github.com/DeFi-Dojo/contracts/issues/98)) ([f2986c8](https://github.com/DeFi-Dojo/contracts/commit/f2986c8c92fe0661bd005e4d57592b710f998056))
+
 # [1.45.0](https://github.com/DeFi-Dojo/contracts/compare/v1.44.0...v1.45.0) (2022-06-06)
 
 
