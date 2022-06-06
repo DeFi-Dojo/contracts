@@ -1,4 +1,4 @@
-import { deployToken } from "../../utils/deployment/token";
+import { deployToken } from "../../utils/deployment/token-vesting";
 
 const main = async () => {
   await deployToken();

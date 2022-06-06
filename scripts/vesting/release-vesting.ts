@@ -1,4 +1,4 @@
-import { releaseVesting } from "../../utils/deployment/token";
+import { releaseVesting } from "../../utils/deployment/token-vesting";
 import configEnv from "../../config/config";
 
 const { BENEFICIARY_ADDRESS } = configEnv;

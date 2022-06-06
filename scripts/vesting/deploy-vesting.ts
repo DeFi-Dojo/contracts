@@ -1,4 +1,4 @@
-import { deployVesting } from "../../utils/deployment/token";
+import { deployVesting } from "../../utils/deployment/token-vesting";
 
 const main = deployVesting;
 
