@@ -1,4 +1,5 @@
 import { ethers } from "hardhat";
+import { BigNumber } from "ethers";
 import { createDeployContract, waitForReceipt } from ".";
 import {
   DojoToken,
@@ -31,7 +32,7 @@ export const createVestingSchedule = async (
   beneficiary: string,
   start: number,
   duration: number,
-  amount: number
+  amount: BigNumber | number
 ) => {
   const DojoTokenFactory = await ethers.getContractFactory<DojoToken__factory>(
     "DojoToken"
