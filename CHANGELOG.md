@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.49.0](https://github.com/DeFi-Dojo/contracts/compare/v1.48.0...v1.49.0) (2022-06-13)
+
+
+### Features
+
+* fix vesting scripts ([#101](https://github.com/DeFi-Dojo/contracts/issues/101)) ([e537395](https://github.com/DeFi-Dojo/contracts/commit/e5373958aad4ad1e5e87d66e95ed8a64b8b7f27e))
+
 # [1.48.0](https://github.com/DeFi-Dojo/contracts/compare/v1.47.0...v1.48.0) (2022-06-06)
 
 
