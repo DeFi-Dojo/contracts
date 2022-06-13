@@ -25,6 +25,113 @@ const {
   ETHERSCAN_API_KEY,
 } = configEnv;
 
+// Vesting
+task("deploy-vesting-management")
+  .addOptionalParam("owner", "new vesting owner")
+  .setAction(async (taskArgs, { ethers }) => {
+    const owner: string | undefined = taskArgs?.owner;
+    const signers = await ethers.getSigners();
+    const contractName = "VestingManagement";
+    const contractFactory = await ethers.getContractFactory(contractName);
+
+    console.log(`Deploying ${contractName}`);
+    const contract = await contractFactory.deploy();
+    await contract.deployed();
+    console.log(`${contractName} deployed to: `, contract.address);
+
+    if (owner && owner.toLowerCase() !== signers[0].address) {
+      await contract.transferOwnership(owner);
+    }
+  });
+
+task("deploy-djo-token").setAction(async (taskArgs, { ethers }) => {
+  const signers = await ethers.getSigners();
+  const contractName = "DojoToken";
+  const contractFactory = await ethers.getContractFactory(contractName);
+
+  console.log(`Deploying ${contractName}`);
+  const contract = await contractFactory.deploy(signers[0].address);
+  await contract.deployed();
+  console.log(`${contractName} deployed to: `, contract.address);
+});
+
+task("create-vesting")
+  .addParam<string>("vestingManagement", "Vesting management contract address")
+  .addParam<string>("beneficiary", "Vesting beneficiary address")
+  .addParam<string>("start", "Vesting start ISO date")
+  .addParam<string>("end", "Vesting end ISO date")
+  .addOptionalParam<string>("isTerminable", "Is vesting terminable (not fixed)")
+  .setAction(async (taskArgs, { ethers }) => {
+    console.log(taskArgs);
+    const start = Date.parse(taskArgs.start) / 1000;
+    const end = Date.parse(taskArgs.end) / 1000;
+    const duration = end - start;
+    const isTerminable = taskArgs.isTerminable === "true";
+    const { beneficiary, vestingManagement } = taskArgs;
+
+    const VestingManagementFactory = await ethers.getContractFactory(
+      "VestingManagement"
+    );
+    const tokenVesting = VestingManagementFactory.attach(vestingManagement);
+
+    let vestingAddress: string;
+
+    if (isTerminable) {
+      console.log("Creating terminable vesting schedule");
+      const tx = await tokenVesting.addNewTerminableVesting(
+        beneficiary,
+        start,
+        duration
+      );
+      await tx.wait();
+
+      const vestingsCount = await tokenVesting.getTerminableVestingsCount(
+        beneficiary
+      );
+      vestingAddress = await tokenVesting.terminableVestingWallets(
+        beneficiary,
+        +vestingsCount - 1
+      );
+      console.log(
+        `Created new terminable vesting at address ${vestingAddress}, terminable vestings count: ${vestingsCount}`
+      );
+    } else {
+      console.log("Creating fixed vesting schedule");
+      const tx = await tokenVesting.addNewFixedVesting(
+        beneficiary,
+        start,
+        duration
+      );
+      await tx.wait();
+
+      const vestingsCount = await tokenVesting.getFixedVestingsCount(
+        beneficiary
+      );
+      vestingAddress = await tokenVesting.fixedVestingWallets(
+        beneficiary,
+        +vestingsCount - 1
+      );
+      console.log(
+        `Created new fixed vesting at address ${vestingAddress}, terminable vestings count: ${vestingsCount}`
+      );
+    }
+  });
+
+task("transfer", "Transfers ERC-20 tokens")
+  .addParam("token", "Token address")
+  .addParam("amount", "Token amount")
+  .addParam("to", "Receiver address")
+  .setAction(async (taskArgs, { ethers }) => {
+    const bn = ethers.BigNumber.from;
+    const { token, amount, to } = taskArgs;
+
+    const DojoTokenFactory = await ethers.getContractFactory("DojoToken");
+    const dojoToken = DojoTokenFactory.attach(token);
+
+    console.log(`Sending ${amount} tokens to last vesting at ${to}`);
+    await dojoToken.transfer(to, bn(amount).mul(bn(10).pow(18)));
+  });
+
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   const accounts = await hre.ethers.getSigners();
 

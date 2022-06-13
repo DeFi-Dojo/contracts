@@ -81,6 +81,30 @@ We use [npm scripts](https://docs.npmjs.com/cli/v8/using-npm/scripts), [hardhat 
    --ynft-path-uri <ipfs-uri>  --quickswap-staking-dual-rewards-address <dual-rewards-address-for-pair>
   ```
 
+- Deploy vesting management
+
+  ```bash
+  npx hardhat --network matic deploy-vesting-management
+  ```
+
+- Create new terminable vesting
+
+  ```bash
+  npx hardhat --network matic create-vesting \
+  --vesting-management 0xd37D13Ac196a0D683c9123Ea186B1463C9f929ef \
+  --beneficiary 0x0C7f5431e4f233510A3660670B03A1aDD9BeaD45 \
+  --start 2022-06-14T09:00 \
+  --end 2022-06-14T19:00 \
+  --is-terminable false \
+  ```
+
+- Transfer tokens to vesting
+  ```bash
+  npx hardhat --network matic transfer \
+  --token 0x47b698Efe95FfEaECE9b5b293d777965E48eE652 \
+  --amount 10000 --to 0xD3fE13C31d295a41b62e6521704D14015dde8DBe \
+  ```
+
 ### Code quality
 
 - Contract unit tests: `yarn:test`

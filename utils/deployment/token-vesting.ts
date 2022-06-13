@@ -4,28 +4,16 @@ import { createDeployContract, waitForReceipt } from ".";
 import {
   DojoToken,
   DojoToken__factory,
-  VestingManagement,
   VestingManagement__factory,
 } from "../../typechain";
 import configEnv from "../../config/config";
 
-const { DJO_TOKEN_ADDRESS, TOKEN_VESTING_ADDRESS, DEFAULT_ADMIN_ROLE_ADDRESS } =
-  configEnv;
+const { DJO_TOKEN_ADDRESS, TOKEN_VESTING_ADDRESS } = configEnv;
 
 export const deployToken = async () => {
   const deploy = createDeployContract<DojoToken__factory>("DojoToken");
   const signers = await ethers.getSigners();
   await deploy(signers[0].address).then((v) => v as DojoToken);
-};
-
-export const deployVesting = async () => {
-  const deploy =
-    createDeployContract<VestingManagement__factory>("VestingManagement");
-  const vestingManagement = await deploy().then((v) => v as VestingManagement);
-
-  await vestingManagement.transferOwnership(DEFAULT_ADMIN_ROLE_ADDRESS);
-
-  return vestingManagement;
 };
 
 export const createVestingSchedule = async (
