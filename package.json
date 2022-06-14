@@ -1,6 +1,6 @@
 {
   "name": "uniswap-v2-fork-all-in-one",
-  "version": "1.49.0",
+  "version": "1.50.0",
   "description": "",
   "main": "index.js",
   "private": true,
