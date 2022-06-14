@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.50.1](https://github.com/DeFi-Dojo/contracts/compare/v1.50.0...v1.50.1) (2022-06-14)
+
+
+### Bug Fixes
+
+* readme ([#103](https://github.com/DeFi-Dojo/contracts/issues/103)) ([42af5e8](https://github.com/DeFi-Dojo/contracts/commit/42af5e802653f000495ee494283d0c3831625d64))
+
 # [1.50.0](https://github.com/DeFi-Dojo/contracts/compare/v1.49.0...v1.50.0) (2022-06-14)
 
 
