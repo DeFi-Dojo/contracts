@@ -2350,6 +2350,13 @@ axios@^0.19.2:
   dependencies:
     follow-redirects "1.5.10"
 
+axios@^0.21.2:
+  version "0.21.4"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.21.4.tgz#c67b90dc0568e5c1cf2b0b858c43ba28e2eda575"
+  integrity sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==
+  dependencies:
+    follow-redirects "^1.14.0"
+
 axios@^0.26.1:
   version "0.26.1"
   resolved "https://registry.yarnpkg.com/axios/-/axios-0.26.1.tgz#1ede41c51fcf51bbbd6fd43669caaa4f0495aaa9"
@@ -4191,6 +4198,16 @@ defender-autotask-utils@^1.12.1:
   resolved "https://registry.npmjs.org/defender-autotask-utils/-/defender-autotask-utils-1.12.1.tgz"
   integrity sha512-e+QABIxuror+xHw1Xfv7PhRzri1qLWx1GS2M8nmA/tu4sQI+LI3KJxRpbHMIdWVBQgbsI2swyvh83m0tKAoUnA==
 
+defender-base-client@1.24.0:
+  version "1.24.0"
+  resolved "https://registry.yarnpkg.com/defender-base-client/-/defender-base-client-1.24.0.tgz#7696e43c9f29be0446b4a33129e0db692d75c916"
+  integrity sha512-5z1pbJLSiDxPik/LcbaYtKvea9c/u0wfzxWKIj/SkfqiY8PumeRvju9yHEvkuksVWUmAIBg0JoJTtn6haUjkMA==
+  dependencies:
+    amazon-cognito-identity-js "^4.3.3"
+    axios "^0.21.2"
+    lodash "^4.17.19"
+    node-fetch "^2.6.0"
+
 defender-base-client@^1.12.1:
   version "1.12.1"
   resolved "https://registry.npmjs.org/defender-base-client/-/defender-base-client-1.12.1.tgz"
@@ -4201,14 +4218,14 @@ defender-base-client@^1.12.1:
     lodash "^4.17.19"
     node-fetch "^2.6.0"
 
-defender-relay-client@^1.12.1:
-  version "1.12.1"
-  resolved "https://registry.npmjs.org/defender-relay-client/-/defender-relay-client-1.12.1.tgz"
-  integrity sha512-zOml68K5uZNhikFcXrL2tNWHbgC0++yw9487XKt4iZXpMxKHZNHEyG1D7lFpC9+Ic6bXHLr10fES+AeYjZCHuQ==
+defender-relay-client@^1.24.0:
+  version "1.24.0"
+  resolved "https://registry.yarnpkg.com/defender-relay-client/-/defender-relay-client-1.24.0.tgz#808c73fb2229783f045b005b7c919868a822fe9f"
+  integrity sha512-41+HHtJl5vu68mAn1iLPTYsvfl+S4VQuUsQ8HxdglpT6cRLQjcnJ5bxl11ZUVIiz7BztpbWAMBuUg3sS7r17SA==
   dependencies:
     amazon-cognito-identity-js "^4.3.3"
-    axios "^0.19.2"
-    defender-base-client "^1.12.1"
+    axios "^0.21.2"
+    defender-base-client "1.24.0"
     lodash "^4.17.19"
     node-fetch "^2.6.0"
 
@@ -5976,6 +5993,11 @@ follow-redirects@^1.12.1:
   version "1.14.6"
   resolved "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.14.6.tgz"
   integrity sha512-fhUl5EwSJbbl8AR+uYL2KQDxLkdSjZGR36xy46AO7cOMTrCMON6Sa28FmAnC2tRTDbd/Uuzz3aJBv7EBN7JH8A==
+
+follow-redirects@^1.14.0:
+  version "1.15.1"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.1.tgz#0ca6a452306c9b276e4d3127483e29575e207ad5"
+  integrity sha512-yLAMQs+k0b2m7cVxpS1VKJVvoz7SS9Td1zss3XRwXj+ZDH00RJgnuLx7E44wx02kQLrdM3aOOy+FpzS7+8OizA==
 
 follow-redirects@^1.14.4, follow-redirects@^1.14.8:
   version "1.14.9"
