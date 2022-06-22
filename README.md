@@ -95,7 +95,19 @@ We use [npm scripts](https://docs.npmjs.com/cli/v8/using-npm/scripts), [hardhat 
   --beneficiary 0x0C7f5431e4f233510A3660670B03A1aDD9BeaD45 \
   --start 2022-06-14T09:00 \
   --end 2022-06-14T19:00 \
-  --is-terminable true \
+  --is-terminable true
+  ```
+
+- Create new terminable vesting multisig proposal
+
+  ```bash
+  npx hardhat --network matic create-vesting-proposal \
+  --vesting-management 0x38c90c5f8B64FD867510AbAd844b95C62c7F0e3C \
+  --gnosis-safe 0x7dBA423bbB96688c72A45Cc0927FDC41853e2531 \
+  --beneficiary 0x1F07c82e914305Bfca5A5B7eC217F2b4BFbb3B35 \
+  --start 2022-06-21T20:00 \
+  --end 2022-06-23T20:00 \
+  --is-terminable true
   ```
 
 - Transfer tokens to vesting
@@ -103,7 +115,7 @@ We use [npm scripts](https://docs.npmjs.com/cli/v8/using-npm/scripts), [hardhat 
   npx hardhat --network matic transfer \
   --token 0x47b698Efe95FfEaECE9b5b293d777965E48eE652 \
   --amount 10000
-  --to 0xD3fE13C31d295a41b62e6521704D14015dde8DBe \
+  --to 0xD3fE13C31d295a41b62e6521704D14015dde8DBe
   ```
 
 ### Code quality
