@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.51.0](https://github.com/DeFi-Dojo/contracts/compare/v1.50.1...v1.51.0) (2022-06-22)
+
+
+### Features
+
+* create vesting proposal multisig ([#104](https://github.com/DeFi-Dojo/contracts/issues/104)) ([282ca42](https://github.com/DeFi-Dojo/contracts/commit/282ca424fcf25945cd6351d157b52f28c752567f))
+
 ## [1.50.1](https://github.com/DeFi-Dojo/contracts/compare/v1.50.0...v1.50.1) (2022-06-14)
 
 
