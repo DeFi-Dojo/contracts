@@ -9,6 +9,8 @@ import "solidity-coverage";
 
 import { task, HardhatUserConfig } from "hardhat/config";
 import configEnv from "./config";
+import { createVesting } from "./utils/deployment/vesting";
+import { createAddNewVestingProposal } from "./utils/defender/create-vesting-proposal";
 
 const {
   RINKEBY_API_URL,
@@ -62,59 +64,36 @@ task("create-vesting")
   .addParam<string>("end", "Vesting end ISO date")
   .addOptionalParam<string>("isTerminable", "Is vesting terminable (not fixed)")
   .setAction(async (taskArgs, { ethers }) => {
-    console.log(taskArgs);
     const start = Date.parse(taskArgs.start) / 1000;
     const end = Date.parse(taskArgs.end) / 1000;
-    const duration = end - start;
     const isTerminable = taskArgs.isTerminable === "true";
     const { beneficiary, vestingManagement } = taskArgs;
 
-    const VestingManagementFactory = await ethers.getContractFactory(
-      "VestingManagement"
+    await createVesting(
+      { start, end, isTerminable, beneficiary, vestingManagement },
+      { ethers }
     );
-    const tokenVesting = VestingManagementFactory.attach(vestingManagement);
+  });
 
-    let vestingAddress: string;
+task("create-vesting-proposal")
+  .addParam<string>("vestingManagement", "Vesting management contract address")
+  .addParam<string>("gnosisSafe", "Gnosis safe contract address")
+  .addParam<string>("beneficiary", "Vesting beneficiary address")
+  .addParam<string>("start", "Vesting start ISO date")
+  .addParam<string>("end", "Vesting end ISO date")
+  .addOptionalParam<string>("isTerminable", "Is vesting terminable (not fixed)")
+  .setAction(async (taskArgs) => {
+    const isTerminable = taskArgs.isTerminable === "true";
+    const { beneficiary, vestingManagement, start, end, gnosisSafe } = taskArgs;
 
-    if (isTerminable) {
-      console.log("Creating terminable vesting schedule");
-      const tx = await tokenVesting.addNewTerminableVesting(
-        beneficiary,
-        start,
-        duration
-      );
-      await tx.wait();
-
-      const vestingsCount = await tokenVesting.getTerminableVestingsCount(
-        beneficiary
-      );
-      vestingAddress = await tokenVesting.terminableVestingWallets(
-        beneficiary,
-        +vestingsCount - 1
-      );
-      console.log(
-        `Created new terminable vesting at address ${vestingAddress}, terminable vestings count: ${vestingsCount}`
-      );
-    } else {
-      console.log("Creating fixed vesting schedule");
-      const tx = await tokenVesting.addNewFixedVesting(
-        beneficiary,
-        start,
-        duration
-      );
-      await tx.wait();
-
-      const vestingsCount = await tokenVesting.getFixedVestingsCount(
-        beneficiary
-      );
-      vestingAddress = await tokenVesting.fixedVestingWallets(
-        beneficiary,
-        +vestingsCount - 1
-      );
-      console.log(
-        `Created new fixed vesting at address ${vestingAddress}, terminable vestings count: ${vestingsCount}`
-      );
-    }
+    await createAddNewVestingProposal({
+      start,
+      end,
+      isTerminable,
+      beneficiary,
+      vestingManagement,
+      gnosisSafe,
+    });
   });
 
 task("transfer", "Transfers ERC-20 tokens")

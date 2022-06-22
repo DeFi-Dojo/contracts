@@ -4180,6 +4180,16 @@ deep-is@^0.1.3, deep-is@~0.1.3:
   resolved "https://registry.npmjs.org/deep-is/-/deep-is-0.1.4.tgz"
   integrity sha512-oIPzksmTg4/MriiaYGO+okXDT7ztn/w3Eptv/+gSIdMdKsJo0u4CfYNFJPy+4SKMuCqGw2wxnA+URMg3t8a/bQ==
 
+defender-admin-client@^1.24.0:
+  version "1.24.0"
+  resolved "https://registry.yarnpkg.com/defender-admin-client/-/defender-admin-client-1.24.0.tgz#07efed3384754d0a61a6e1fd2c8615b9ad80162c"
+  integrity sha512-GPFj6h3usminVprHsDp/APVMcgpvct/ibDT6QsfSXtzv25FbTqb5CgseqlgT8sA4Pq/OibTmhLjp3GltowJ1lg==
+  dependencies:
+    axios "^0.21.2"
+    defender-base-client "1.24.0"
+    lodash "^4.17.19"
+    node-fetch "^2.6.0"
+
 defender-autotask-client@^1.12.1:
   version "1.12.1"
   resolved "https://registry.npmjs.org/defender-autotask-client/-/defender-autotask-client-1.12.1.tgz"
@@ -4215,17 +4225,6 @@ defender-base-client@^1.12.1:
   dependencies:
     amazon-cognito-identity-js "^4.3.3"
     axios "^0.19.2"
-    lodash "^4.17.19"
-    node-fetch "^2.6.0"
-
-defender-relay-client@^1.24.0:
-  version "1.24.0"
-  resolved "https://registry.yarnpkg.com/defender-relay-client/-/defender-relay-client-1.24.0.tgz#808c73fb2229783f045b005b7c919868a822fe9f"
-  integrity sha512-41+HHtJl5vu68mAn1iLPTYsvfl+S4VQuUsQ8HxdglpT6cRLQjcnJ5bxl11ZUVIiz7BztpbWAMBuUg3sS7r17SA==
-  dependencies:
-    amazon-cognito-identity-js "^4.3.3"
-    axios "^0.21.2"
-    defender-base-client "1.24.0"
     lodash "^4.17.19"
     node-fetch "^2.6.0"
 
