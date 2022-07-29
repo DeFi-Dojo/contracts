@@ -213,6 +213,8 @@ const config: HardhatUserConfig = {
     matic: {
       url: POLYGON_MAINNET_API_URL,
       accounts,
+      gasPrice: 44000000000, // 44 gwei
+      gasMultiplier: 1.2,
     },
     mumbai: {
       url: POLYGON_MUMBAI_API_URL,

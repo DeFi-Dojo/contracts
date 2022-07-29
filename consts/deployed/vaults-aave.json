@@ -1,17 +1,17 @@
 {
   "Ao": {
-    "vault": "0xb0E5a32D028B8c821caE8ae85D6A9058B4Fc7E1C",
-    "ynft": "0xe759596b9D8Cc51642e164dcB6dA764e935A722E",
+    "vault": "0x851CE86Ce6A630538d24791987562e557a490246",
+    "ynft": "0x33b676Ff84863ED46d893cA0fC53dEd51223f590",
     "ynftMetaDataUrl": "https://ipfs.moralis.io:2053/ipfs/QmTdQUtdNCjZoyZLoQdTcCdbY4Q3rbipns3W6ZPaTBcVfh"
   },
   "Midori": {
-    "vault": "0x8D0445f78A9fb5572DFE45F943e21fd6E23CAdc2",
-    "ynft": "0x79dA6bBEd43A7b1f3f96d79fC6269003b1A3561C",
+    "vault": "0xCa07bd7e8524E881F9c4bA2403707deeB1A3456e",
+    "ynft": "0x7487e8cC3824570027728071914502E16446746C",
     "ynftMetaDataUrl": "https://ipfs.moralis.io:2053/ipfs/QmSSPePtbY6MNG6BxP3TyvBgp6jAVVmHrGSyWytqSpwMYs"
   },
   "Kiiro": {
-    "vault": "0x3C4f2171b06d00d8307429B8ACF107b63799790b",
-    "ynft": "0xe4B2Bc9480C0Cd40952804b1D21E1Bb53E58B150",
+    "vault": "0x6FB69DDDDD800D302c04bdd819c472A805106B1C",
+    "ynft": "",
     "ynftMetaDataUrl": "https://ipfs.moralis.io:2053/ipfs/QmahqW1uKv34QzZ7RKPex943MpQj8DtzXHtgyRvxiNs2VC"
   }
 }
