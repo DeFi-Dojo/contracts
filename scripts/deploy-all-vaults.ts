@@ -4,8 +4,8 @@ import {
 } from "../utils";
 
 const main = async () => {
-  await deployAaveVaultsWithMetadata({});
-  await deployQuickswapVaultsWithMetadata({});
+  await deployAaveVaultsWithMetadata({ isDummyVault: false });
+  await deployQuickswapVaultsWithMetadata({ isDummyVault: false });
 };
 
 main()
