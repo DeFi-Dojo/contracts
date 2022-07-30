@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.52.0](https://github.com/DeFi-Dojo/contracts/compare/v1.51.0...v1.52.0) (2022-07-30)
+
+
+### Features
+
+* deploy prod vaults ([#105](https://github.com/DeFi-Dojo/contracts/issues/105)) ([e8f394c](https://github.com/DeFi-Dojo/contracts/commit/e8f394c0df8abbbaaf85e2f586f6f3ad00d97976))
+
 # [1.51.0](https://github.com/DeFi-Dojo/contracts/compare/v1.50.1...v1.51.0) (2022-06-22)
 
 
