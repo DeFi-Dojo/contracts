@@ -81,6 +81,12 @@ We use [npm scripts](https://docs.npmjs.com/cli/v8/using-npm/scripts), [hardhat 
    --ynft-path-uri <ipfs-uri>  --quickswap-staking-dual-rewards-address <dual-rewards-address-for-pair>
   ```
 
+- Deploy DJO token (prod)
+
+  ```bash
+  npx hardhat --network matic deploy-djo-token --mintTarget 0x7dBA423bbB96688c72A45Cc0927FDC41853e2531
+  ```
+
 - Deploy vesting management
 
   ```bash

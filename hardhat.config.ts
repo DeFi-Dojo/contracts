@@ -46,16 +46,19 @@ task("deploy-vesting-management")
     }
   });
 
-task("deploy-djo-token").setAction(async (taskArgs, { ethers }) => {
-  const signers = await ethers.getSigners();
-  const contractName = "DojoToken";
-  const contractFactory = await ethers.getContractFactory(contractName);
+task("deploy-djo-token")
+  .addOptionalParam<string>("mintTarget", "Mint target address")
+  .setAction(async (taskArgs, { ethers }) => {
+    const signers = await ethers.getSigners();
+    const contractName = "DojoToken";
+    const contractFactory = await ethers.getContractFactory(contractName);
+    const mintTargetAddress = taskArgs.mintTarget || signers[0].address;
 
-  console.log(`Deploying ${contractName}`);
-  const contract = await contractFactory.deploy(signers[0].address);
-  await contract.deployed();
-  console.log(`${contractName} deployed to: `, contract.address);
-});
+    console.log(`Deploying ${contractName}`);
+    const contract = await contractFactory.deploy(mintTargetAddress);
+    await contract.deployed();
+    console.log(`${contractName} deployed to: `, contract.address);
+  });
 
 task("create-vesting")
   .addParam<string>("vestingManagement", "Vesting management contract address")
