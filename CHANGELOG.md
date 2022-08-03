@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.53.0](https://github.com/DeFi-Dojo/contracts/compare/v1.52.0...v1.53.0) (2022-08-03)
+
+
+### Features
+
+* mint djo token to specific target wallet ([#106](https://github.com/DeFi-Dojo/contracts/issues/106)) ([1fbe9df](https://github.com/DeFi-Dojo/contracts/commit/1fbe9df3ce0fb3e81db18b55a911e7d7645803c2))
+
 # [1.52.0](https://github.com/DeFi-Dojo/contracts/compare/v1.51.0...v1.52.0) (2022-07-30)
 
 
